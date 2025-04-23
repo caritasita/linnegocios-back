@@ -16,7 +16,9 @@ export class CrudService {
   }
 
   create(object: any, url: string): Observable<any> {
-    return this.http.post(url, object);
+    return this.http.post<any>(url, object).pipe(map(objeto => {
+      return objeto;
+    }));
   }
 
   update(object: any, url: string): Observable<any> {

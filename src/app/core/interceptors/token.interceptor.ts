@@ -32,14 +32,14 @@ export class TokenInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
 
-    console.log('ENTRANDO AL INTERCEPTOR');
-
+    console.log('ENTRANDO A INTERCEPTOR');
     const excludeUrl = request.url.includes('login');
+
     const token = this.authService.getAccesToken();
+    console.log('Token:', token);
 
     if (token) {
       if (!request.url.includes('linntae.mx')) {
-        console.log('ENTRANDO AGREGAR TOKEN');
         request = this.addToken(request, this.authService.getAccesToken());
       }
       // if (this.authService.isTendero() || this.authService.isCajero() || this.authService.isCajeroAdmin()) {
@@ -48,11 +48,11 @@ export class TokenInterceptor implements HttpInterceptor {
       // }
     }
 
-    // if (!request.headers.has('Content-Type')) {
+    if (!request.headers.has('Content-Type')) {
       request = request.clone({
         headers: request.headers.set('Content-Type', 'application/json'),
       });
-    // }
+    }
 
     request = request.clone({
       headers: request.headers.set('Accept', 'application/json'),
@@ -60,9 +60,6 @@ export class TokenInterceptor implements HttpInterceptor {
     if (!request.url.includes('linntae.mx')) {
       request = request.clone({url: environment.apiUrl + request.url});
     }
-
-    console.log('Token:', token);
-    console.log('Request Headers:', request.headers);
 
     return next.handle(request).pipe(
       map((event: HttpEvent<any>) => {
