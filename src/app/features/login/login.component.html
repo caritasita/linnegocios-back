@@ -1,0 +1,12 @@
+
+<div class="login-container">
+  <div class="info-login bg-primario"></div>
+<app-form-generico
+  [fields]="fields"
+  [titleDialog]="'Inicio de sesión'"
+  (submitForm)="iniciarSesion($event)"
+  [titleButtonGuardar]="'Entrar'"
+  [mostrarBotonCancelar]="false"
+>
+  ></app-form-generico>
+</div>

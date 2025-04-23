@@ -1,0 +1,22 @@
+
+<h4 mat-dialog-title>{{ titleDialog }}</h4>
+
+<mat-dialog-content class="pt-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div *ngFor="let field of fields">
+      <mat-form-field appearance="outline" class="width-content">
+        <mat-label>{{ field.name }}</mat-label>
+        <input matInput [type]="field.type" [formControlName]="field.name">
+        @if (form.get(field.name)?.value) {
+          <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button class="boton-bg-primario" mat-stroked-button (click)="onClose()">Cancelar</button>
+  <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="form.invalid" (click)="onSubmit()">Guardar</button>
+</mat-dialog-actions>

@@ -1,0 +1,131 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+html, body { height: 100%; padding: 0; }
+body { margin: 0; font-family: 'Poppins', sans-serif; }
+@import "variables";
+:root{
+  --mat-app-body-large-size: 12px;
+  --mdc-list-list-item-label-text-size: 12px;
+  --mdc-list-list-item-label-text-tracking: 0.01rem;
+  --mat-expansion-header-text-color: #676767;
+  --mdc-list-list-item-label-text-color: #3e3e3e;
+  mat-form-field {
+    --mat-form-field-container-height: 35px;
+    --mat-form-field-container-vertical-padding: 8px;
+    --mdc-outlined-text-field-label-text-size: 12px
+  }
+}
+
+.mat-mdc-dialog-content {
+  padding-top: $margin-2 !important;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-text-field__input {
+  font-size: 14px;
+}
+
+/* Cambiar el borde inferior de las celdas de encabezado */
+.mat-mdc-header-cell {
+  color: dimgray;
+  //font-weight: 600 !important;
+  font-size: 12px;
+  border-bottom: 2px solid #ddd !important; /* Cambia el color y el grosor según tus preferencias */
+}
+
+/* Cambiar el borde inferior de las celdas de datos */
+.mat-mdc-cell  {
+  color: rgba(0, 0, 0, 0.75);
+  border-bottom: 1px solid #ddd !important; /* Cambia el color y el grosor según tus preferencias */
+}
+
+/* Opcional: Cambiar el fondo de la fila al pasar el mouse */
+tr:hover {
+  background-color: $color-primario-2 !important; /* Cambia el color al pasar el mouse */
+}
+
+
+.boton-bg-primario {
+  background-color: $color-primario !important; /* Cambia a tu color deseado */
+  color: $color-blanco !important; /* Cambia el color del texto */
+  &[mat-stroked-button] {
+    background-color: transparent !important;
+    border: solid $color-primario 1px !important;
+    color: $color-primario !important;
+  }
+  &:disabled {
+    background-color: $color-primario-50 !important; /* Color para el botón deshabilitado */
+    color: $color-blanco; /* Color del texto para el botón deshabilitado */
+  }
+}
+
+
+
+.mr-1{
+  margin-right: $margin-1;
+}
+
+.mt-1{
+  margin-top: $margin-1 !important;
+}
+.mt-2{
+  margin-top: $margin-2 !important;
+}
+.mt-3{
+  margin-top: $margin-3 !important;
+}
+.mt-4{
+  margin-top: $margin-4 !important;
+}
+
+.p-0{
+  padding: 0 !important;
+}
+.p-1{
+  padding: $margin-1 !important;
+}
+.p-2{
+  padding: $margin-2 !important;
+}
+.p-3{
+  padding: $margin-3 !important;
+}
+.p-4{
+  padding: $margin-4 !important;
+}
+
+.pt-1{
+  padding-top: $margin-1;
+}
+.pt-2{
+  padding-top: $margin-2;
+}
+.pt-3{
+  padding-top: $margin-3;
+}
+.pt-4{
+  padding-top: $margin-4;
+}
+
+.bg-primario {
+  background-color: $color-primario !important;
+}
+.bg-blanco {
+  background-color: $color-blanco !important;
+}
+
+.width-content{
+  width: 100%;
+}
+
+.content-boxing {
+  box-sizing: border-box !important;
+  overflow: hidden;
+}
+
+.border-bottom{
+  border-bottom: 1px solid $color-gray
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

@@ -1,0 +1,27 @@
+<mat-card class="{{colorFondo}}">
+  <mat-card-header>
+    <mat-card-title>{{ titleDialog }}</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content class="pt-4 p-3">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div *ngFor="let field of fields">
+        <mat-form-field class="width-content" appearance="outline">
+          <mat-label>{{ field.name }}</mat-label>
+          <input matInput [type]="field.type" [formControlName]="field.name">
+          @if (form.get(field.name)?.value) {
+            <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <button *ngIf="mostrarBotonCancelar" class="boton-bg-primario mr-1" mat-stroked-button>Cancelar</button>
+    <button mat-flat-button class="boton-bg-primario" type="submit" (click)="onSubmit()" [disabled]="form.invalid">
+      {{ titleButtonGuardar }}
+    </button>
+  </mat-card-actions>
+</mat-card>

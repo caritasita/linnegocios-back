@@ -1,0 +1,13 @@
+@import "variables";
+.login-container {
+  display: grid !important;
+  grid-template-columns: 1fr 400px;
+  grid-template-rows: 1fr;
+  width: 100vw !important;
+  height: 100vh !important;
+
+  .info-login{
+  }
+}
+
+

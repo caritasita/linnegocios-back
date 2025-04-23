@@ -1,0 +1,86 @@
+@import "variables";
+
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 250px;
+  background-color: $color-blanco;
+  color: $color-blanco !important;
+  border-radius: 0;
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+}
+
+.mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: $color-primario;
+  color: $color-blanco !important;
+  mat-icon{
+    color: $color-blanco !important;
+  }
+}
+
+.content {
+  padding: 16px;
+}
+
+.mat-expansion-panel{
+  background-color: transparent!important;
+  box-shadow: none !important;
+  color: #ffff !important;
+  border-radius: 0 !important;
+
+  .mat-expansion-panel-header{
+    &.mat-expanded{
+      height: 45px;
+    }
+    height: 45px;
+
+    .mat-expansion-panel-header-title{
+      font-weight: 500 !important;
+      font-size: 12px !important;
+    }
+  }
+}
+
+.mat-expansion-panel-spacing {
+  margin: 0 0;
+}
+
+.mdc-list {
+  padding: 0 0;
+}
+
+.mat-expansion-panel-content {
+  width: 100%;
+  .mat-expansion-panel-body {
+    padding: 0 2px 16px !important;
+    border-radius: 0 !important;
+  }
+}
+
+.mat-mdc-list-item-unscoped-content .mdc-list-item__primary-text {
+  font-size: 10px !important;
+}
+
+.mdc-list-item.mdc-list-item--with-one-line {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+}
+
+.mat-icon-round{
+  background-color: #e8e8e8 !important;
+  border-radius: 50%;
+  padding: 0.25rem;
+  color: #706b6b !important;
+}
+
+
+
+
+

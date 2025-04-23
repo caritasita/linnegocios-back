@@ -1,0 +1,9 @@
+<app-tabla-generica
+  #tablaGenerica
+  [columns]="columns"
+  [data]="regimenFiscalList"
+  [totalRecords]="totalRecords"
+  [actions]="actions"
+  (pageChange)="handlePageChange($event)"
+></app-tabla-generica>
+
