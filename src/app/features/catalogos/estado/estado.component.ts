@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {EstadoService} from '../../../core/services/estado.service';
 import {ColumnasTabla} from '../pais/pais.component';
 import {Estado} from '../../../shared/models/Estado';
@@ -11,6 +11,8 @@ import {MatCardModule} from '@angular/material/card';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {PaisService} from '../../../core/services/pais.service';
+import {Pais} from '../../../shared/models/Pais';
 
 @Component({
   selector: 'app-estado',
@@ -26,7 +28,8 @@ import {MatIconModule} from '@angular/material/icon';
   templateUrl: './estado.component.html',
   styleUrl: './estado.component.css'
 })
-export class EstadoComponent implements OnInit{
+export class EstadoComponent implements OnInit {
+  paisList: Pais[] = [];
   estadoList: Partial<Estado>[] = [];
 
   columns: ColumnasTabla[] = [
@@ -39,7 +42,7 @@ export class EstadoComponent implements OnInit{
 
   actions = [
     {name: 'Editar', icon: "edit", callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.deletePais(item)},
+    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.delete(item)},
     {name: 'Ver detalle', icon: "visibility", callback: (item: any) => this.verDetalle(item)}
   ];
 
@@ -55,21 +58,20 @@ export class EstadoComponent implements OnInit{
 
   constructor(
     private estadoService: EstadoService,
+    private paisService: PaisService,
     private dialog: MatDialog
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
-    this.loadEstados();
+    this.lista();
+    this.getPaises();
   }
 
-  loadEstados(resetOffset = false) {
+  lista(resetOffset = false) {
+
     if (resetOffset) {
       this.queryParams.offset = 0;
     }
-
-    console.log('----- this.queryParams');
-    console.table(this.queryParams);
 
     this.estadoService
       .get({
@@ -80,35 +82,47 @@ export class EstadoComponent implements OnInit{
 
         this.estadoList = estados.data;
         this.totalRecords = estados.count;
-        console.log('COUNT');
-        console.table(this.totalRecords);
-        this.estadoList = this.datosTabla;
       });
   }
 
-  // Transformar los datos para la tabla
-  get datosTabla(): any {
-    return this.estadoList.map(estado => ({
-      id: estado?.id,
-      fechaRegistro: estado?.fechaRegistro,
-      clave: estado?.clave,
-      nombre: estado?.nombre,
-      descripcion: estado?.descripcion,
-      pais: `<div>${estado?.pais?.nombre}</div>`,
-    }));
+  getPaises(): void {
+    this.paisService.list({all: true}).subscribe((paises: any) => {
+      this.paisList = paises.data;
+    });
   }
 
   openFormDialog(data: any = {}) {
 
-    const fields = [
-      {name: 'clave', type: 'text', validation: Validators.required},
-      {name: 'nombre', type: 'text', validation: Validators.required},
-      {name: 'pais', type: 'select', validation: Validators.required}
+    const transformedPaisList = this.paisList.map(pais => ({
+      label: pais.nombre,
+      value: pais.id
+    }));
+
+    const fields : Field[] = [
+      {
+        name: 'pais',
+        label: 'País',
+        type: 'select',
+        options: transformedPaisList,
+        validation: Validators.required
+      },
+      {
+        name: 'clave',
+        label: 'Clave',
+        type: 'text',
+        validation: Validators.required
+      },
+      {
+        name: 'nombre',
+        label: 'Nombre',
+        type: 'text',
+        validation: Validators.required
+      },
     ]
 
-    let titleDialog= 'Registrar estado'
-    if(data.id) {
-      titleDialog= 'Editar estado'
+    let titleDialog = 'Registrar estado'
+    if (data.id) {
+      titleDialog = 'Editar estado'
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
@@ -118,25 +132,24 @@ export class EstadoComponent implements OnInit{
         data
       },
       disableClose: true,
-      width: '400px',
+      width: '50vw',
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
       if (data.id) {
-        console.log('Entrando a editar estado');
-        console.table(result);
-
         result = ({...result, id: data.id})
-        this.estadoService.update(result).subscribe(() => this.loadEstados());
+        this.estadoService.update(result).subscribe(() => this.lista());
       } else {
-        this.estadoService.create(result).subscribe(() => this.loadEstados());
+        this.estadoService.create(result).subscribe(() => this.lista());
       }
       dialogRef.close();
     });
   }
 
-  deletePais(pais: any) {
-    this.estadoList = this.estadoList.filter(p => p.clave !== pais.clave)
+  delete(objeto: any) {
+    this.estadoService.delete(objeto.id).subscribe(() => {
+      this.lista();
+    });
   }
 
   verDetalle(item: any) {
@@ -146,6 +159,6 @@ export class EstadoComponent implements OnInit{
   public handlePageChange(event: any) {
     this.queryParams.max = event.max;
     this.queryParams.offset = event.offset;
-    this.loadEstados();
+    this.lista();
   }
 }

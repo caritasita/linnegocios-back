@@ -13,7 +13,7 @@ export class PaisService {
 
   constructor(private genericService: CrudService) {}
 
-  get(parametros: any): Observable<any[]> {
+  list(parametros: any): Observable<any[]> {
     return this.genericService.list(parametros, UrlServer.pais);
   }
 

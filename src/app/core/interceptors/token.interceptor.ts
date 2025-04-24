@@ -32,11 +32,8 @@ export class TokenInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
 
-    console.log('ENTRANDO A INTERCEPTOR');
     const excludeUrl = request.url.includes('login');
-
     const token = this.authService.getAccesToken();
-    console.log('Token:', token);
 
     if (token) {
       if (!request.url.includes('linntae.mx')) {

@@ -1,10 +1,9 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {PaisService} from '../../../core/services/pais.service';
-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
+import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {MatButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
@@ -45,7 +44,7 @@ export class PaisComponent implements OnInit {
 
   actions = [
     {name: 'Editar', icon: "edit", callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.deletePais(item)},
+    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.delete(item)},
     {name: 'Ver detalle', icon: "visibility", callback: (item: any) => this.verDetalle(item)}
   ];
 
@@ -66,15 +65,15 @@ export class PaisComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadPaises();
+    this.lista();
   }
 
-  loadPaises(resetOffset = false) {
+  lista(resetOffset = false) {
     if (resetOffset) {
       this.queryParams.offset = 0;
     }
     this.paisService
-      .get({
+      .list({
         ...this.queryParams,
         registrosActivos: !this.queryParams.registrosEliminados,
       })
@@ -100,14 +99,14 @@ export class PaisComponent implements OnInit {
   public handlePageChange(event: any) {
     this.queryParams.max = event.max;
     this.queryParams.offset = event.offset;
-    this.loadPaises();
+    this.lista();
   }
 
   openFormDialog(data: any = {}) {
 
-    const fields = [
-      {name: 'clave', type: 'text', validation: Validators.required},
-      {name: 'nombre', type: 'text', validation: Validators.required}
+    const fields : Field[] = [
+      {name: 'clave' ,label: 'Clave', type: 'text', validation: Validators.required},
+      {name: 'nombre', label: 'Nombre', type: 'text', validation: Validators.required}
     ]
 
     let titleDialog= 'Registrar país'
@@ -126,18 +125,23 @@ export class PaisComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
+      console.log('result pais');
+      console.table(result);
+
       if (data.id) {
         result = ({...result, id: data.id})
-        this.paisService.update(result).subscribe(() => this.loadPaises());
+        this.paisService.update(result).subscribe(() => this.lista());
       } else {
-        this.paisService.create(data).subscribe(() => this.loadPaises());
+        this.paisService.create(result).subscribe(() => this.lista());
       }
       dialogRef.close();
     });
   }
 
-  deletePais(pais: any) {
-    this.paisList = this.paisList.filter(p => p.clave !== pais.clave)
+  delete(objeto: any) {
+    this.paisService.delete(objeto.id).subscribe(() => {
+      this.lista();
+    });
   }
 
   verDetalle(item: any) {

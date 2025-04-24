@@ -60,11 +60,11 @@ export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges 
     const columnsAux = this.columns.map(c => c.clave);
     this.displayedColumns = [...columnsAux, 'actions'];
     this.dataSource = new MatTableDataSource(this.data);
+    console.log('this.dataSource');
+    console.table(this.dataSource);
   }
 
   ngAfterViewInit() {
-    // this.dataSource.paginator = this.paginator;
-    // this.dataSource.sort = this.sort;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -99,6 +99,10 @@ export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges 
   isHtml(content: string): boolean {
     const htmlRegex = /<\/?[a-z][\s\S]*>/i;
     return htmlRegex.test(content);
+  }
+
+  isObject(value: any): boolean {
+    return value !== null && typeof value === 'object';
   }
 
   protected readonly Number = Number;

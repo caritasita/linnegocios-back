@@ -7,6 +7,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 
 @Component({
   selector: 'app-form-generico',
@@ -19,7 +20,8 @@ import {MatSelectModule} from '@angular/material/select';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    NgxMatSelectSearchModule
   ],
   templateUrl: './form-dialog-generico.component.html',
   styleUrl: './form-dialog-generico.component.css',
@@ -31,6 +33,8 @@ export class FormDialogGenericoComponent implements OnInit {
   @Output() submitForm = new EventEmitter<any>();
 
   form!: FormGroup;
+  searchControls: { [key: string]: FormControl } = {};
+  filteredOptions: { [key: string]: any[] } = {};
 
   constructor(
     private fb: FormBuilder,
@@ -40,6 +44,7 @@ export class FormDialogGenericoComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this.fields = this.dialogData.fields;
     this.titleDialog = this.dialogData.titleDialog;
     this.data = this.dialogData.data || {};
@@ -50,9 +55,38 @@ export class FormDialogGenericoComponent implements OnInit {
         this.data[field.name] || '',
         field.validation
       );
+
+      if (field.type === 'select') {
+        this.searchControls[field.name] = new FormControl();
+        this.filteredOptions[field.name] = field.options; // Inicializa las opciones filtradas
+
+        // Filtrar opciones en base al input de búsqueda
+        this.searchControls[field.name].valueChanges.subscribe(value => {
+          this.filteredOptions[field.name] = field.options.filter((option: any) =>{
+            return option.label.toString().toLowerCase().includes(value.toString().toLowerCase());
+          }
+          );
+        });
+
+        // Establecer el valor del FormControl al ID correspondiente
+        const selectedOption = this.data[field.name];
+        if (selectedOption) {
+          formGroup[field.name].setValue(selectedOption.id); // Selecciona el ID a editar
+        }
+      }
     });
 
     this.form = this.fb.group(formGroup);
+
+    //Al editar un registro, el único campo que se deshabilita es la clave.
+    if(this.data?.id) {
+      this.form.get('clave')?.disable();
+    }
+  }
+
+  getLabelForValue(field: Field, value: any): string {
+    const option = field.options?.find(opt => opt.value === value);
+    return option ? option.label : '';
   }
 
   onSubmit() {
@@ -72,6 +106,11 @@ export interface Field {
   label: string;
   name: string;
   type: string;
-  options?: { label: string; value: any }[];
+  options?: OptionField[];
   validation?: any;
+}
+
+export interface OptionField {
+  label: string;
+  value: any;
 }

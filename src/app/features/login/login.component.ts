@@ -57,19 +57,8 @@ export class LoginComponent implements OnInit {
   }
 
   iniciarSesion(event: any): void {
-    const {username, password} = event
-    // if (username === "carlos" && password === "1234") {
-    //   localStorage.setItem('token', 'validacion_corrrecta');
-    //   this.router.navigate(['/catalogos']); // Redirigir al dashboard
-    //   // Recargar la página si es necesario
-    //   window.location.reload(); // Esto recargará la página
-    // } else {
-    //   alert('Credenciales incorrectas');
-    // }
 
-    // if (this.form.invalid) {
-    //   return;
-    // }
+    const {username, password} = event
     this.authService
       .login(username, password, false)
       .subscribe((response:any) => {

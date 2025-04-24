@@ -7,8 +7,8 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div *ngFor="let field of fields">
 
-        <mat-form-field *ngIf="field.type === 'input'" class="width-content" appearance="outline">
-          <mat-label>{{ field.name }} - {{field.type}}</mat-label>
+        <mat-form-field *ngIf="field.type === 'text'" class="width-content" appearance="outline">
+          <mat-label>{{ field.name }}</mat-label>
           <input matInput [type]="field.type" [formControlName]="field.name">
           @if (form.get(field.name)?.value) {
             <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue('')">
@@ -17,8 +17,8 @@
           }
         </mat-form-field>
 
-        <mat-form-field *ngIf="field.type === 'select'" appearance="outline">
-          <mat-label>Pais</mat-label>
+        <mat-form-field *ngIf="field.type === 'select'" class="width-content" appearance="fill">
+          <mat-label>{{ field.name }}</mat-label>
           <mat-select [formControlName]="field.name">
             @for (option of [{label:"México", value: 'MX'}]; track option) {
               <mat-option [value]="option.value">{{option.label}}</mat-option>
