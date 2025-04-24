@@ -102,7 +102,8 @@ export class EstadoComponent implements OnInit{
 
     const fields = [
       {name: 'clave', type: 'text', validation: Validators.required},
-      {name: 'nombre', type: 'text', validation: Validators.required}
+      {name: 'nombre', type: 'text', validation: Validators.required},
+      {name: 'pais', type: 'select', validation: Validators.required}
     ]
 
     let titleDialog= 'Registrar estado'

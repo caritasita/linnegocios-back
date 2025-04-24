@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Inject, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Inject, input, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
@@ -7,6 +7,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {Field} from '../form-dialog-generico/form-dialog-generico.component';
 import {MatCardModule} from '@angular/material/card';
+import {MatSelectModule} from '@angular/material/select';
 
 @Component({
   selector: 'app-form-generico',
@@ -18,7 +19,8 @@ import {MatCardModule} from '@angular/material/card';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatCardModule
+    MatCardModule,
+    MatSelectModule
   ],
   templateUrl: './form-generico.component.html',
   styleUrl: './form-generico.component.css',
@@ -56,4 +58,6 @@ export class FormGenericoComponent implements OnInit {
       this.submitForm.emit(this.form.value);
     }
   }
+
+  protected readonly input = input;
 }
