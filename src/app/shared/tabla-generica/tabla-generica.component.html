@@ -12,7 +12,14 @@
           <span [innerHTML]="sanitizeHtml(element[column.clave])"></span>
         </ng-container>
         <ng-template #textTemplate>
-          {{ isObject(element[column.clave])? element[column.clave].nombre : element[column.clave]    }}
+          @if (column.tipo === 'fecha') {
+            {{ element[column.clave] | date:'dd/MM/yyyy HH:mm:ss a' }}
+          } @else if (column.tipo == 'boleano') {
+            {{ element[column.clave] ? 'Activo' : 'Inactivo' }}
+          } @else {
+            {{ isObject(element[column.clave]) ? element[column.clave].nombre : element[column.clave] }}
+          }
+
         </ng-template>
       </td>
     </ng-container>

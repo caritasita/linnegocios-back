@@ -1,9 +1,32 @@
-<app-tabla-generica
-  #tablaGenerica
-  [columns]="columns"
-  [data]="regimenFiscalList"
-  [totalRecords]="totalRecords"
-  [actions]="actions"
-  (pageChange)="handlePageChange($event)"
-></app-tabla-generica>
+<mat-card class="mat-elevation-z8 bg-blanco content-boxing">
+  <mat-card-header class="p-0 bg-blanco border-bottom">
+    <mat-toolbar>
+      <mat-toolbar>
+        <div class="spacer"></div>
+        <button mat-button mat-stroked-button>
+          <mat-icon>filter_alt</mat-icon>
+          Filtros
+        </button>
+      </mat-toolbar>
+      <div class="spacer"></div>
+      <button mat-button mat-stroked-button (click)="openFormDialog()">
+        <mat-icon>add</mat-icon>
+        Agregar
+      </button>
+    </mat-toolbar>
+  </mat-card-header>
 
+  <mat-card-content class="p-0">
+    <ng-container *ngIf="totalRecords>0">
+      <app-tabla-generica
+        #tablaGenerica
+        [columns]="columns"
+        [data]="regimenFiscalList"
+        [totalRecords]="totalRecords"
+        [actions]="actions"
+        (pageChange)="handlePageChange($event)"
+      ></app-tabla-generica>
+    </ng-container>
+  </mat-card-content>
+
+</mat-card>

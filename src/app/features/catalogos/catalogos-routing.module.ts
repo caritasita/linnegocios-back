@@ -8,7 +8,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./estado/estado.component').then(m => m.EstadoComponent)
+    loadComponent: () => import('./regimen-fiscal/regimen-fiscal.component').then(m => m.RegimenFiscalComponent)
   }, // Ruta por defecto
   {
     path: 'pais',

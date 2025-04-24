@@ -3,15 +3,27 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {EstadoService} from '../../../core/services/estado.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {RegimenFiscalService} from '../../../core/services/regimenFiscal.service';
 import {ColumnasTabla} from '../pais/pais.component';
+import {MatButton} from '@angular/material/button';
+import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
+import {MatIcon} from '@angular/material/icon';
+import {MatToolbar} from '@angular/material/toolbar';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-regimen-fiscal',
   standalone: true,
   imports: [
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    MatButton,
+    MatCard,
+    MatCardContent,
+    MatCardHeader,
+    MatIcon,
+    MatToolbar,
+    NgIf
   ],
   templateUrl: './regimen-fiscal.component.html',
   styleUrl: './regimen-fiscal.component.css'
@@ -22,12 +34,13 @@ export class RegimenFiscalComponent implements OnInit{
     {clave: 'fechaRegistro', valor: 'Fecha de registro', tipo: "fecha"},
     {clave: 'clave', valor: 'Clave', tipo: "texto"},
     {clave: 'nombre', valor: 'Nombre', tipo: "texto"},
-    {clave: 'descripcion', valor: 'Descripción', tipo: "texto"}
+    {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
+    {clave: 'activo', valor: 'Activo', tipo: "boleano"}
   ];
 
   actions = [
     {name: 'Editar', icon: "edit", callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.deletePais(item)},
+    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.delete(item)},
     {name: 'Ver detalle', icon: "visibility", callback: (item: any) => this.verDetalle(item)}
   ];
 
@@ -39,6 +52,7 @@ export class RegimenFiscalComponent implements OnInit{
   };
 
   totalRecords: number = 0;
+
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
 
   constructor(
@@ -48,15 +62,15 @@ export class RegimenFiscalComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.list();
+    this.lista();
   }
 
-  list(resetOffset = false) {
+  lista(resetOffset = false) {
     if (resetOffset) {
       this.queryParams.offset = 0;
     }
     this.regimenFiscalService
-      .get({
+      .list({
         ...this.queryParams,
         registrosActivos: !this.queryParams.registrosEliminados,
       })
@@ -69,19 +83,39 @@ export class RegimenFiscalComponent implements OnInit{
   public handlePageChange(event: any) {
     this.queryParams.max = event.max;
     this.queryParams.offset = event.offset;
-    this.list();
+    this.lista();
   }
 
   openFormDialog(data: any = {}) {
 
-    const fields = [
-      {name: 'clave', type: 'text', validation: Validators.required},
-      {name: 'nombre', type: 'text', validation: Validators.required}
+    const fields: Field[] = [
+      {
+        name: 'clave',
+        label: 'Clave',
+        type: 'text',
+        validation: Validators.required
+      },
+      {
+        name: 'nombre',
+        label: 'Nombre',
+        type: 'text',
+        validation: Validators.required
+      },
+      {
+        name: 'descripcion',
+        label: 'Descripción',
+        type: 'text',
+        validation: Validators.required
+      }
     ]
 
+    let titleDialog = 'Registrar régimen fiscal'
+    if (data.id) {
+      titleDialog = 'Editar régimen fiscal'
+    }
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
-        titleDialog: "Registrar país",
+        titleDialog: titleDialog,
         fields,
         data
       },
@@ -91,17 +125,19 @@ export class RegimenFiscalComponent implements OnInit{
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
       if (data.id) {
-        // this.paisService.updatePais(data.id, result).subscribe(() => this.loadCountries());
+        result = ({...result, id: data.id})
+        this.regimenFiscalService.update(result).subscribe(() => this.lista());
       } else {
-        // this.paisService.createPais(result).subscribe(() => this.loadCountries());
+        this.regimenFiscalService.create(result).subscribe(() => this.lista());
       }
       dialogRef.close();
     });
   }
 
-  deletePais(pais: any) {
-    this.regimenFiscalList = this.regimenFiscalList.filter(p => p.clave !== pais.clave)
-  }
+  delete(objeto: any) {
+    this.regimenFiscalService.delete(objeto.id).subscribe(() => {
+      this.lista();
+    });  }
 
   verDetalle(item: any) {
     alert(`ver Detalle ${item.nombre}`)
