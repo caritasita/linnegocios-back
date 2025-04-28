@@ -160,14 +160,18 @@ export class PaisComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
-      console.log('result pais');
-      console.table(result);
 
       if (data.id) {
         result = ({...result, id: data.id})
-        this.paisService.update(result).subscribe(() => this.lista());
+        this.paisService.update(result).subscribe((respueta) => {
+          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          this.lista();
+        });
       } else {
-        this.paisService.create(result).subscribe(() => this.lista());
+        this.paisService.create(result).subscribe((respueta) => {
+          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          this.lista();
+        });
       }
       dialogRef.close();
     });

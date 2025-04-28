@@ -194,9 +194,15 @@ export class EstadoComponent implements OnInit {
     dialogRef.componentInstance.submitForm.subscribe(result => {
       if (data.id) {
         result = ({...result, id: data.id})
-        this.estadoService.update(result).subscribe(() => this.lista());
+        this.estadoService.update(result).subscribe((respueta) => {
+          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          this.lista();
+        });
       } else {
-        this.estadoService.create(result).subscribe(() => this.lista());
+        this.estadoService.create(result).subscribe((respueta) => {
+          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          this.lista();
+        });
       }
       dialogRef.close();
     });
