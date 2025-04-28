@@ -35,7 +35,7 @@
   width: 100%;
   font-size: 1rem !important;
   a{
-    padding-left: 1.5rem !important;
+    padding-left: 1rem !important;
     height: 50px !important;
     border-radius: 0;
   }
@@ -48,6 +48,7 @@
   border-radius: 0 !important;
 
   .mat-expansion-panel-header{
+    padding-left: 1rem;
     &.mat-expanded{
       height: 50px;
     }
@@ -71,7 +72,7 @@
 .mat-expansion-panel-content {
   width: 100%;
   .mat-expansion-panel-body {
-    padding: 0 2px 16px !important;
+    padding: 0 24px 40px;
     border-radius: 0 !important;
   }
 }
