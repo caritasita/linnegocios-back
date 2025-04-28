@@ -27,21 +27,33 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Acciones</th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button *ngFor="let action of actions" (click)="action.callback(element)">
-          <mat-icon class="mat-icon-round">{{ action.icon }}</mat-icon>
-        </button>
+        <ng-container *ngFor="let action of actions">
+          <button mat-icon-button *ngIf="element.activo && action.icon !== 'restore_from_trash'"
+                  (click)="action.callback(element)">
+            <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="!element.activo && action.icon === 'restore_from_trash'"
+                  (click)="action.callback(element)">
+            <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
+          </button>
+        </ng-container>
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-  <mat-paginator
-    [length]="totalRecords"
-    [pageSize]="pageSize"
-    [pageIndex]="pageIndex"
-    [pageSizeOptions]="[10, 20, 30]"
-    (page)="handlePageChange($event)"
-    showFirstLastButtons
-  ></mat-paginator>
+
+  @if (totalRecords) {
+    <mat-paginator
+      appStylePaginator
+      showFirstLastButtons
+      [totalRecords]="totalRecords"
+      [length]="totalRecords"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="[10, 20, 30]"
+      (page)="handlePageChange($event)"
+    ></mat-paginator>
+  }
 </div>

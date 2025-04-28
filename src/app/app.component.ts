@@ -1,6 +1,5 @@
-import {Component, HostListener, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {Router, RouterLink, RouterOutlet} from '@angular/router';
-import {PaisComponent} from './features/catalogos/pais/pais.component';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatIconModule} from '@angular/material/icon';
@@ -8,19 +7,16 @@ import {MatListModule} from '@angular/material/list';
 import {MatButtonModule} from '@angular/material/button';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {LoginComponent} from './features/login/login.component';
 import {CommonModule} from '@angular/common';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {TokenInterceptor} from './core/interceptors/token.interceptor';
-import {routes} from './app.routes';
+import {MatCardModule} from '@angular/material/card';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
-    LoginComponent,
-    PaisComponent,
     MatToolbarModule,
     MatSidenavModule,
     MatIconModule,
@@ -29,7 +25,8 @@ import {routes} from './app.routes';
     MatMenuModule,
     MatExpansionModule,
     RouterLink,
-    CommonModule
+    CommonModule,
+    MatCardModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

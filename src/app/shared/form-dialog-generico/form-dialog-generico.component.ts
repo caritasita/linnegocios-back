@@ -100,6 +100,16 @@ export class FormDialogGenericoComponent implements OnInit {
   onClose(): void {
     this.dialogRef?.close();
   }
+
+  onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Deshabilitar el evento Enter
+    }
+  }
+
+  clearField(fieldName: string): void {
+    this.form.get(fieldName)?.setValue('');
+  }
 }
 
 export interface Field {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   HttpErrorResponse,
   HttpEvent,
@@ -12,6 +12,7 @@ import {BehaviorSubject, catchError, filter, map, Observable, switchMap, take, t
 import {AuthService} from '../services/auth.service';
 import {environment} from '../../../environments/environment.development';
 import {Router} from '@angular/router';
+import {GenericoService} from '../services/generico.service';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -22,10 +23,13 @@ export class TokenInterceptor implements HttpInterceptor {
   private isRefreshing = false;
 
   protected currentPetitions: any = {};
+
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) {}
+    private genericoService: GenericoService
+  ) {
+  }
 
   intercept(
     request: HttpRequest<any>,
@@ -98,46 +102,49 @@ export class TokenInterceptor implements HttpInterceptor {
           if (errorRespuesta.error) {
             switch (errorRespuesta.error.message) {
               case 'CredentialsExpiredException':
-                // this.snackBar.openSnackBar(
-                //   'Tu conseña ha caducado porfavor cambiarla',
-                //   'cerrar',
-                //   'red-snackbar'
-                // );
+                this.genericoService.openSnackBar(
+                  'Tu conseña ha caducado porfavor cambiarla.',
+                  'cerrar',
+                  'snack-bar-error',
+                  () => {}
+                );
                 // this.router.navigate(['/changePassword'], {
                 //   queryParams: request.body,
                 // });
                 break;
               case 'AccountExpiredException':
-                // this.snackBar.openSnackBar(
-                //   'Tu cuenta ha caducada',
-                //   'cerrar',
-                //   'red-snackbar'
-                // );
+                this.genericoService.openSnackBar(
+                  'Tu cuenta ha caducada.',
+                  'cerrar',
+                  'snack-bar-error',
+                  () => {}
+                );
                 break;
               case 'DisabledException':
-                // this.snackBar.openSnackBar(
-                //   'Tu cuenta está deshabilitada',
-                //   'cerrar',
-                //   'red-snackbar'
-                // );
+                this.genericoService.openSnackBar(
+                  'Tu cuenta está deshabilitada.',
+                  'cerrar',
+                  'snack-bar-error',
+                  () => {}
+                );
                 // this.cerrarSesion();
                 break;
               case 'LockedException':
-                // this.snackBar.openSnackBar(
-                //   'Tu cuenta esta bloqueada',
-                //   'cerrar',
-                //   'red-snackbar'
-                // );
+                this.genericoService.openSnackBar(
+                  'Tu cuenta esta bloqueada.',
+                  'cerrar',
+                  'snack-bar-error',
+                  () => {}
+                );
                 break;
               default:
                 if (excludeUrl) {
-                  // this.snackBar.openSnackBar(
-                  //   'Datos de acceso incorrectos',
-                  //   'cerrar',
-                  //   'red-snackbar',
-                  //   2500
-                  // );
-                  // alert('Datos de acceso incorrectos');
+                  this.genericoService.openSnackBar(
+                    'Datos de acceso incorrectos',
+                    'cerrar',
+                    'snack-bar-error',
+                    () => {}
+                  );
                 } else {
                   if (this.authService.isRememberMe()) {
                     return this.handle401Error(request, next);
@@ -149,57 +156,64 @@ export class TokenInterceptor implements HttpInterceptor {
             }
           }
         } else if (errorRespuesta.status === 500) {
-          // this.snackBar.openSnackBar(
-          //   '¡Ups!, lo sentimos :( hay un inconveniente en esta sección',
-          //   'Cerrar',
-          //   'red-snackbar',
-          //   9000
-          // );
+          this.genericoService.openSnackBar(
+            '¡Ups!, lo sentimos :( hay un inconveniente en esta sección.',
+            'cerrar',
+            'snack-bar-error',
+            () => {}
+          );
         } else if (errorRespuesta.status === -101) {
-          // this.snackBar.openSnackBar(
-          //   'Revisar su conectividad de internet',
-          //   'Cerrar',
-          //   'red-snackbar',
-          //   9000
-          // );
+          this.genericoService.openSnackBar(
+            'Revisar su conectividad de internet.',
+            'cerrar',
+            'snack-bar-error',
+            () => {}
+          );
         } else if (errorRespuesta.status === 404) {
-          // this.snackBar.openSnackBar(
-          //   '¡Ups!, lo sentimos :( Al parecer esta acción no existe',
-          //   'Cerrar',
-          //   'red-snackbar',
-          //   9000
-          // );
+          this.genericoService.openSnackBar(
+            '¡Ups!, lo sentimos :( Al parecer esta acción no existe.',
+            'cerrar',
+            'snack-bar-error',
+            () => {}
+          );
         } else if (errorRespuesta.status === 403) {
-          // this.snackBar.openSnackBar(
-          //   'No tienes permisos necesarios',
-          //   'Cerrar',
-          //   'red-snackbar',
-          //   15000
-          // );
+          this.genericoService.openSnackBar(
+            'No tienes permisos necesarios',
+            'cerrar',
+            'snack-bar-error',
+            () => {}
+          );
         } else if (errorRespuesta.status === 0) {
-          // this.snackBar.openSnackBar(
-          //   '¡Ups! lo sentimos, No hay respuesta del servidor',
-          //   'Cerrar',
-          //   'red-snackbar',
-          //   9000
-          // );
+          this.genericoService.openSnackBar(
+            '¡Ups! lo sentimos, No hay respuesta del servidor',
+            'cerrar',
+            'snack-bar-error',
+            () => {}
+          );
         } else {
-          // this.snackBar.openSnackBar(
-          //   'Presentamos intermitencia, porfavor intentar más tarde',
-          //   'Cerrar',
-          //   'red-snackbar',
-          //   9000
-          // );
+          this.genericoService.openSnackBar(
+            'Presentamos intermitencia, porfavor intentar más tarde.',
+            'cerrar',
+            'snack-bar-error',
+            () => {}
+          );
+
         }
         this.onEnd();
         return throwError(errorRespuesta);
       })
     );
   }
+
   private cerrarSesion(): void {
     localStorage.clear();
     sessionStorage.clear();
-    // this.snackBar.openSnackBar('Sesión terminada', 'cerrar', 'red-snackbar');
+    this.genericoService.openSnackBar(
+      'Sesión terminada',
+      'cerrar',
+      'snack-bar-error',
+      () => {}
+    );
     // this.onEnd();
     this.router.navigate(['/login']);
   }

@@ -8,24 +8,25 @@ import {UrlServer} from '../helpers/UrlServer';
 })
 export class EstadoService {
 
-  private entityName = 'estado';
+  constructor(private crudService: CrudService) {}
 
-  constructor(private genericService: CrudService) {}
-
-  get(parametros: any): Observable<any[]> {
-    return this.genericService.list(parametros, UrlServer.estado);
+  list(parametros: any): Observable<any[]> {
+    return this.crudService.list(parametros, UrlServer.estado);
   }
 
   create(data: any): Observable<any> {
-    return this.genericService.create(data, UrlServer.estado);
+    return this.crudService.create(data, UrlServer.estado);
   }
 
   update(data: any): Observable<any> {
-    console.log('ENTRNDO A UPDATE SERVICE');
-    return this.genericService.update(data, UrlServer.estado);
+    return this.crudService.update(data, UrlServer.estado);
   }
 
   delete(id: number): Observable<any> {
-    return this.genericService.delete(UrlServer.estado, id);
+    return this.crudService.delete(UrlServer.estado, id);
+  }
+
+  recover(id: number): Observable<any> {
+    return this.crudService.update({ id }, UrlServer.reactivarEstado);
   }
 }

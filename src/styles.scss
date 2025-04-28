@@ -3,16 +3,27 @@
 html, body { height: 100%; padding: 0; }
 body { margin: 0; font-family: 'Poppins', sans-serif; }
 @import "variables";
+
 :root{
-  --mat-app-body-large-size: 12px;
-  --mdc-list-list-item-label-text-size: 12px;
+  --mdc-list-list-item-label-text-size-principal: 14px;
   --mdc-list-list-item-label-text-tracking: 0.01rem;
-  --mat-expansion-header-text-color: #676767;
+  --mat-expansion-header-text-color: #3e3e3e;
   --mdc-list-list-item-label-text-color: #3e3e3e;
   mat-form-field {
-    --mat-form-field-container-height: 35px;
-    --mat-form-field-container-vertical-padding: 8px;
+    --mat-form-field-container-height: 40px;
+    --mat-form-field-container-vertical-padding: 12px;
     --mdc-outlined-text-field-label-text-size: 12px
+  }
+
+  .mat-expansion-panel-body{
+    .mdc-list-item__primary-text {
+      --mat-app-body-large-size: 12px;
+      --mdc-list-list-item-label-text-size: 12px;
+    }
+  }
+
+  .mdc-switch__track::after {
+    background-color: $color-primario !important;
   }
 }
 
@@ -62,6 +73,18 @@ tr:hover {
 
 .mr-1{
   margin-right: $margin-1;
+}
+
+.mr-2{
+  margin-right: $margin-2;
+}
+
+.mr-3{
+  margin-right: $margin-3;
+}
+
+.mt-0{
+  margin-top: 0 !important;
 }
 
 .mt-1{
@@ -123,9 +146,133 @@ tr:hover {
 }
 
 .border-bottom{
-  border-bottom: 1px solid $color-gray
+  border-bottom: 1px solid $color-gray !important;
 }
 
 .spacer {
   flex: 1 1 auto;
 }
+
+
+// Para navegadores WebKit (Chrome, Safari)
+::-webkit-scrollbar {
+  width: 2px; // Ancho del scrollbar
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1; // Color del fondo del scrollbar
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $color-primario-50; // Color del scrollbar
+  border-radius: 10px; // Bordes redondeados del scrollbar
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: $color-primario-75; // Color del scrollbar al pasar el mouse
+}
+
+/*Estilos para el la ventana que se muestra de lado derecho para los filtros*/
+.content-mat-drawer {
+  width: 100%;
+  .content-login{
+    background-color: $color-primario !important;
+    border-radius: 0 !important;
+  }
+
+  .content-sidenav {
+    position: fixed;
+    width: 400px;
+    border-radius: 0.75rem !important;
+    @media (max-width: 768px) {
+      width: 100vw;
+    }
+    margin-top: 65px;
+  }
+}
+
+.mat-drawer {
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2), 0px 1px 10px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px; /* Esquinas redondeadas para un aspecto más suave */
+}
+
+.bordered-icon-button {
+  border: 1px solid $color-primario-10  ; /* Color del borde */
+  transition: background-color 0.3s; /* Transición suave para el fondo */
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.bordered-icon-button:hover {
+  background-color: $color-primario-10; /* Color de fondo al pasar el mouse */
+}
+/*Fin ventana derecha filtros*/
+
+
+.mat-mdc-paginator-range-label {
+  margin: 0 32px 0 24px;
+  width: 100px;
+}
+
+.custom-snack-bar {
+  background-color: darkred; /* Color de fondo */
+  color: white; /* Color del texto */
+  font-weight: bold; /* Negrita */
+  padding: 0 8px; /* Espaciado interno */
+  border-radius: 4px; /* Bordes redondeados */
+  // Box shadow profesional
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
+  0 6px 20px rgba(0, 0, 0, 0.19); /* Sombra suave y difusa */
+
+
+  transition: box-shadow 0.3s ease; /* Transición suave para el efecto hover */
+
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3),
+    0 12px 30px rgba(0, 0, 0, 0.25); /* Efecto hover más intenso */
+  }
+
+  &.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
+    border-radius: 0;
+    background-color: transparent !important;
+
+    .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled).mat-unthemed {
+      color: #e6e6e6 !important;
+      padding: 10px !important;
+      border-left: 4px solid #800101 !important;;
+      border-radius: 0;
+    }
+  }
+
+  .mat-mdc-snackbar-surface {
+    box-shadow: none !important;
+  }
+
+  .mat-mdc-button{
+    color: $color-blanco !important;
+    border-radius: 0.5rem;
+    &:hover{
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  .divisor{
+    height: 50px;
+    width: 10px;
+    padding-left: 1rem;
+    margin-right: 0.5rem;
+    border-right: 2px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+.snack-bar-info{
+  background-color: $color-primario;
+}
+
+.snack-bar-success{
+  background-color: darkgreen;
+}
+
+.snack-bar-error{
+  background-color: darkred;
+}
+

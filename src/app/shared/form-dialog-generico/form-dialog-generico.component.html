@@ -6,17 +6,17 @@
     <div *ngFor="let field of fields">
 
       <mat-form-field *ngIf="field.type === 'text'" appearance="outline" class="width-content">
-        <mat-label>{{ field.label }}</mat-label>
-        <input matInput [type]="field.type" [formControlName]="field.name">
+        <mat-label>{{ field.label | uppercase }}</mat-label>
+        <input matInput [type]="field.type" [formControlName]="field.name" (keydown)="onKeydown($event)">
         @if (form.get(field.name)?.value) {
-          <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue('')">
+          <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue(''); clearField(field.name)">
             <mat-icon>close</mat-icon>
           </button>
         }
       </mat-form-field>
 
       <mat-form-field *ngIf="field.type === 'select'" class="width-content" appearance="outline">
-        <mat-label>{{ field.label }}</mat-label>
+        <mat-label>{{ field.label | uppercase }}</mat-label>
         <mat-select [formControlName]="field.name">
           <mat-select-trigger>
             {{ getLabelForValue(field, form.get(field.name)?.value) || 'Selecciona una opción' }}

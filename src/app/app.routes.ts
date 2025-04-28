@@ -7,6 +7,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/login/login.component').then(m => m.LoginComponent),
   },
   {
+    path: 'tablero',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./features/tablero/tablero.component').then(m => m.TableroComponent)
+  },
+  {
     path: 'catalogos',
     canActivate: [AuthGuard],
     loadChildren: () => import('./features/catalogos/catalogos.module').then(m => m.CatalogosModule)

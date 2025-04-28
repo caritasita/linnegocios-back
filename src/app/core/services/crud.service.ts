@@ -11,7 +11,6 @@ export class CrudService {
   constructor(private http: HttpClient) {}
 
   list(p: {}, url: string): Observable<any[]> {
-    console.log(environment.apiUrl + '/'+ url)
     return this.http.get<any[]>(url, {params: p});
   }
 

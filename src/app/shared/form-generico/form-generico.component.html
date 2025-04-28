@@ -1,5 +1,5 @@
-<mat-card class="{{colorFondo}}">
-  <mat-card-header>
+<mat-card class="{{colorFondo}}" [ngClass]="{'quitar-estilo-default-card': sinEstilosCard}">
+  <mat-card-header *ngIf="showHeader">
     <mat-card-title>{{ titleDialog }}</mat-card-title>
   </mat-card-header>
 
@@ -7,31 +7,53 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div *ngFor="let field of fields">
 
-        <mat-form-field *ngIf="field.type === 'text'" class="width-content" appearance="outline">
-          <mat-label>{{ field.name }}</mat-label>
-          <input matInput [type]="field.type" [formControlName]="field.name">
+        <mat-form-field
+          *ngIf="field.type === 'text' || field.type === 'password' || field.type === 'number' || field.type === 'email'"
+          appearance="outline"
+          class="width-content"
+        >
+          <mat-label>{{ field.label | uppercase}}</mat-label>
+          <input matInput [type]="field.type" [formControlName]="field.name" (keydown)="onKeydown($event)">
           @if (form.get(field.name)?.value) {
-            <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue('')">
+            <button matSuffix mat-icon-button aria-label="Clear" (click)="form.get(field.name)?.setValue(''); clearField(field.name)">
               <mat-icon>close</mat-icon>
             </button>
           }
         </mat-form-field>
 
-        <mat-form-field *ngIf="field.type === 'select'" class="width-content" appearance="fill">
-          <mat-label>{{ field.name }}</mat-label>
+        <mat-form-field *ngIf="field.type === 'select'" class="width-content" appearance="outline">
+          <mat-label>{{ field.label | uppercase }}</mat-label>
           <mat-select [formControlName]="field.name">
-            @for (option of [{label:"México", value: 'MX'}]; track option) {
-              <mat-option [value]="option.value">{{option.label}}</mat-option>
+            <mat-select-trigger>
+              {{ getLabelForValue(field, form.get(field.name)?.value) || 'Selecciona una opción' }}
+            </mat-select-trigger>
+
+            <mat-option>
+              <ngx-mat-select-search
+                [formControl]="searchControls[field.name]"
+                placeholderLabel="Buscar..."
+                noEntriesFoundLabel="No se encontraron resultados">
+              </ngx-mat-select-search>
+            </mat-option>
+
+            @for (option of filteredOptions[field.name]; track option) {
+              <mat-option [value]="option.value" [innerText]="option.label">{{ option.label }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
+
+        <mat-slide-toggle *ngIf="field.type === 'toggle'" [formControlName]="field.name">Ver eliminados</mat-slide-toggle>
+
       </div>
     </form>
   </mat-card-content>
   <mat-card-actions>
-    <button *ngIf="mostrarBotonCancelar" class="boton-bg-primario mr-1" mat-stroked-button>Cancelar</button>
+    <div class="spacer"></div>
+    <button *ngIf="mostrarBotonCancelar" class="boton-bg-primario mr-1" mat-stroked-button (click)="onResetFiltros()">
+      {{ nombreBotonCancelar }}
+    </button>
     <button mat-flat-button class="boton-bg-primario" type="submit" (click)="onSubmit()" [disabled]="form.invalid">
-      {{ titleButtonGuardar }}
+      {{ nombreButtonGuardar }}
     </button>
   </mat-card-actions>
 </mat-card>

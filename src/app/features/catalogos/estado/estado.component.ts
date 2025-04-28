@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {MatDialog} from '@angular/material/dialog';
-import {Validators} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {EstadoService} from '../../../core/services/estado.service';
 import {ColumnasTabla} from '../pais/pais.component';
@@ -13,6 +13,13 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {PaisService} from '../../../core/services/pais.service';
 import {Pais} from '../../../shared/models/Pais';
+import {MatDrawer, MatDrawerContainer, MatSidenavModule} from '@angular/material/sidenav';
+import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form-field';
+import {MatOption} from '@angular/material/core';
+import {MatSelect, MatSelectModule} from '@angular/material/select';
+import {_MatSlideToggleRequiredValidatorModule, MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
+import {GenericoService} from '../../../core/services/generico.service';
 
 @Component({
   selector: 'app-estado',
@@ -23,42 +30,52 @@ import {Pais} from '../../../shared/models/Pais';
     MatCardModule,
     MatToolbarModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatDrawer,
+    MatSidenavModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    FormsModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    FormGenericoComponent,
   ],
   templateUrl: './estado.component.html',
-  styleUrl: './estado.component.css'
+  styleUrl: './estado.component.scss'
 })
 export class EstadoComponent implements OnInit {
   paisList: Pais[] = [];
   estadoList: Partial<Estado>[] = [];
-
-  columns: ColumnasTabla[] = [
-    {clave: 'fechaRegistro', valor: 'Fecha de registro', tipo: "fecha"},
-    {clave: 'clave', valor: 'Clave', tipo: "texto"},
-    {clave: 'nombre', valor: 'Nombre', tipo: "texto"},
-    {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
-    {clave: 'pais', valor: 'País', tipo: "texto"},
-  ];
-
-  actions = [
-    {name: 'Editar', icon: "edit", callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", callback: (item: any) => this.delete(item)},
-    {name: 'Ver detalle', icon: "visibility", callback: (item: any) => this.verDetalle(item)}
-  ];
-
+  totalRecords = 0;
+  fieldsFilters!: Field[];
+  transformedPaisList!: any;
   queryParams = {
     max: 10,
     offset: 0,
     filtroGeneral: '',
     registrosEliminados: false,
   };
-  totalRecords = 0;
+  columns: ColumnasTabla[] = [
+    {clave: 'fechaRegistro', valor: 'Fecha de registro', tipo: "fecha"},
+    {clave: 'clave', valor: 'Clave', tipo: "texto"},
+    {clave: 'nombre', valor: 'Nombre', tipo: "texto"},
+    {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
+    {clave: 'pais', valor: 'País', tipo: "texto"},
+    {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
+  ];
+  actions = [
+    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
+    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+    {name: 'Recuperar eliminado', icon: "restore_from_trash", tooltipText: 'Recuperar registro eliminado', callback: (item: any) => this.recoverRegister(item.id)}
+  ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
 
   constructor(
     private estadoService: EstadoService,
     private paisService: PaisService,
+    private genericoService: GenericoService,
     private dialog: MatDialog
   ) {}
 
@@ -68,13 +85,11 @@ export class EstadoComponent implements OnInit {
   }
 
   lista(resetOffset = false) {
-
     if (resetOffset) {
       this.queryParams.offset = 0;
     }
-
     this.estadoService
-      .get({
+      .list({
         ...this.queryParams,
         registrosActivos: !this.queryParams.registrosEliminados,
       })
@@ -88,22 +103,63 @@ export class EstadoComponent implements OnInit {
   getPaises(): void {
     this.paisService.list({all: true}).subscribe((paises: any) => {
       this.paisList = paises.data;
+      this.transformedPaisList = this.paisList.map(pais => ({
+        label: pais.nombre,
+        value: pais.id
+      }));
     });
   }
 
-  openFormDialog(data: any = {}) {
-
-    const transformedPaisList = this.paisList.map(pais => ({
-      label: pais.nombre,
-      value: pais.id
-    }));
-
-    const fields : Field[] = [
+  formFiltros(): void {
+    this.fieldsFilters = [
+      {
+        name: 'filtroGeneral',
+        label: 'Clave / Nombre',
+        type: 'text',
+      },
       {
         name: 'pais',
         label: 'País',
         type: 'select',
-        options: transformedPaisList,
+        options: this.transformedPaisList,
+      },
+      {
+        name: 'registrosEliminados',
+        label: 'Ver eliminados',
+        type: 'toggle',
+      },
+    ]
+  }
+
+  procesarfiltros(form: any) {
+    this.queryParams= ({...this.queryParams, ...form});
+    this.lista();
+  }
+
+  resetFormFiltros(){
+    this.queryParams = {
+      max: 10,
+      offset: 0,
+      filtroGeneral: '',
+      registrosEliminados: false,
+    };
+    this.lista()
+  }
+
+  public handlePageChange(event: any) {
+    this.queryParams.max = event.max;
+    this.queryParams.offset = event.offset;
+    this.lista();
+  }
+
+  openFormDialog(data: any = {}) {
+
+    const fields: Field[] = [
+      {
+        name: 'pais',
+        label: 'País',
+        type: 'select',
+        options: this.transformedPaisList,
         validation: Validators.required
       },
       {
@@ -146,19 +202,29 @@ export class EstadoComponent implements OnInit {
     });
   }
 
-  delete(objeto: any) {
+  private async delete(objeto: any) {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Está seguro de eliminar el registro?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
     this.estadoService.delete(objeto.id).subscribe(() => {
       this.lista();
     });
   }
 
-  verDetalle(item: any) {
-    alert(`ver Detalle ${item.nombre}`)
+  private async recoverRegister(id: number) {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Está seguro de recuperar el registro?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+    this.estadoService.recover(id).subscribe(() => {
+      this.lista(true);
+    });
   }
 
-  public handlePageChange(event: any) {
-    this.queryParams.max = event.max;
-    this.queryParams.offset = event.offset;
-    this.lista();
-  }
 }

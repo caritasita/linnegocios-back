@@ -12,17 +12,24 @@ import {first} from 'rxjs';
 import {CrudService} from '../../core/services/crud.service';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {TokenInterceptor} from '../../core/interceptors/token.interceptor';
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatDrawer, MatDrawerContainer} from "@angular/material/sidenav";
+import {MatIcon} from "@angular/material/icon";
+import {MatToolbar} from "@angular/material/toolbar";
+import {TablaGenericaComponent} from "../../shared/tabla-generica/tabla-generica.component";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormGenericoComponent,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-  ],
+    imports: [
+        CommonModule,
+        FormGenericoComponent,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDrawer,
+        MatDrawerContainer
+    ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   providers: [
@@ -42,7 +49,7 @@ export class LoginComponent implements OnInit {
     {
       label: 'Contraseña',
       name: 'password',
-      type: 'text',
+      type: 'password',
       validation: [Validators.required]
     }
   ];

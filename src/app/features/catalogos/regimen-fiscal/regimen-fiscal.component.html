@@ -1,32 +1,57 @@
-<mat-card class="mat-elevation-z8 bg-blanco content-boxing">
-  <mat-card-header class="p-0 bg-blanco border-bottom">
-    <mat-toolbar>
+<mat-drawer-container class="content-mat-drawer mat-elevation-z2 p-0" [hasBackdrop]="true">
+  <mat-card class="mat-elevation-z8 bg-blanco content-boxing">
+    <mat-card-header class="p-0 bg-blanco border-bottom">
       <mat-toolbar>
+        <h2>Régimen fiscales</h2>
         <div class="spacer"></div>
-        <button mat-button mat-stroked-button>
+        <button mat-button mat-stroked-button (click)="openFormDialog()" class="mr-3">
+          <mat-icon>add</mat-icon>
+          Agregar
+        </button>
+        <button mat-stroked-button mat-button (click)="drawer.toggle(); formFiltros()">
           <mat-icon>filter_alt</mat-icon>
           Filtros
         </button>
       </mat-toolbar>
+    </mat-card-header>
+
+    <mat-card-content class="p-0">
+      <ng-container *ngIf="totalRecords>0">
+        <app-tabla-generica
+          #tablaGenerica
+          [columns]="columns"
+          [data]="regimenFiscalList"
+          [totalRecords]="totalRecords"
+          [actions]="actions"
+          (pageChange)="handlePageChange($event)"
+        ></app-tabla-generica>
+      </ng-container>
+    </mat-card-content>
+
+  </mat-card>
+  <!--FILTROS-->
+  <mat-drawer #drawer class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end">
+    <mat-toolbar class="border-bottom">
+      <mat-icon class="mr-1">filter_alt</mat-icon>
+      <span>
+        Filtros
+      </span>
       <div class="spacer"></div>
-      <button mat-button mat-stroked-button (click)="openFormDialog()">
-        <mat-icon>add</mat-icon>
-        Agregar
+      <button mat-icon-button class="bordered-icon-button" (click)="drawer.toggle()">
+        <mat-icon>close_round</mat-icon>
       </button>
     </mat-toolbar>
-  </mat-card-header>
 
-  <mat-card-content class="p-0">
-    <ng-container *ngIf="totalRecords>0">
-      <app-tabla-generica
-        #tablaGenerica
-        [columns]="columns"
-        [data]="regimenFiscalList"
-        [totalRecords]="totalRecords"
-        [actions]="actions"
-        (pageChange)="handlePageChange($event)"
-      ></app-tabla-generica>
-    </ng-container>
-  </mat-card-content>
-
-</mat-card>
+    <div class="container p-3" *ngIf="fieldsFilters && fieldsFilters.length>0">
+      <app-form-generico
+        [fields]="fieldsFilters"
+        [sinEstilosCard]='true'
+        [showHeader]="false"
+        [nombreBotonCancelar]="'Limpiar'"
+        [nombreButtonGuardar]="'Buscar'"
+        (submitForm)="procesarfiltros($event)"
+        (resetFormFiltros)="resetFormFiltros()"
+      ></app-form-generico>
+    </div>
+  </mat-drawer>
+</mat-drawer-container>

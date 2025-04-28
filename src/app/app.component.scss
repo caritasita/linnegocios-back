@@ -5,7 +5,7 @@
 }
 
 .sidenav {
-  width: 250px;
+  width: 275px;
   background-color: $color-blanco;
   color: $color-blanco !important;
   border-radius: 0;
@@ -15,7 +15,7 @@
 .mat-toolbar {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   background-color: $color-primario;
   color: $color-blanco !important;
   mat-icon{
@@ -23,25 +23,39 @@
   }
 }
 
+.mat-drawer-side {
+  border-style: none;
+}
+
 .content {
   padding: 16px;
+}
+
+.menu-linnegocios {
+  width: 100%;
+  font-size: 1rem !important;
+  a{
+    padding-left: 1.5rem !important;
+    height: 50px !important;
+    border-radius: 0;
+  }
 }
 
 .mat-expansion-panel{
   background-color: transparent!important;
   box-shadow: none !important;
-  color: #ffff !important;
+  color: $color-blanco !important;
   border-radius: 0 !important;
 
   .mat-expansion-panel-header{
     &.mat-expanded{
-      height: 45px;
+      height: 50px;
     }
-    height: 45px;
+    height: 50px;
 
     .mat-expansion-panel-header-title{
       font-weight: 500 !important;
-      font-size: 12px !important;
+      font-size: 14px !important;
     }
   }
 }
@@ -63,7 +77,7 @@
 }
 
 .mat-mdc-list-item-unscoped-content .mdc-list-item__primary-text {
-  font-size: 10px !important;
+  font-size: 12px !important;
 }
 
 .mdc-list-item.mdc-list-item--with-one-line {
@@ -76,8 +90,78 @@
 .mat-icon-round{
   background-color: #e8e8e8 !important;
   border-radius: 50%;
-  padding: 0.25rem;
+  padding: 0.5rem;
   color: #706b6b !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-info-card {
+  height: 120px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 30px !important;
+  margin-bottom: 16px;
+  text-align: center;
+  border-radius: 0;
+  align-items: center;
+  padding: $margin-3;
+  color: $gray-linnegicios;
+  background-color: $color-primario-2;
+  box-shadow: 0 0 0 transparent; /* Sombra suave */
+
+  .mat-mdc-card-header {
+
+    padding: 0 !important;
+    font-size: 1rem !important;
+
+    .mat-mdc-card-title{
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      align-items: center;
+      column-gap: 0.5rem;
+      font-size: 1.25rem;
+    }
+  }
+
+  .mat-mdc-card-content{
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    font-size: 1rem;
+    justify-content: start !important;
+  }
+
+  .mat-icon-round {
+    height: 2rem;
+    width: 2rem;
+    font-size: 2rem;
+    background-color: $color-primario !important;
+    color: $color-blanco !important;
+  }
+
+}
+
+.user-photo {
+  width: 80px; /* Ancho de la foto */
+  height: 80px; /* Alto de la foto */
+  border-radius: 50%; /* Bordes redondeados para la foto */
+  margin-top: 10px; /* Espacio superior */
+}
+
+.sidenav {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Asegura que el sidenav ocupe toda la altura */
+  overflow: hidden !important;
+}
+
+mat-accordion {
+  margin-top: 120px !important;
+
+  overflow-y: visible !important; /* Habilita el desplazamiento vertical */
+  max-height: calc(100vh - 150px) !important; /* Ajusta la altura máxima según la altura de otros elementos */
 }
 
 

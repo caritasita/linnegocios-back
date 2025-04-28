@@ -1,7 +1,7 @@
 import {
   AfterViewInit,
   Component,
-  EventEmitter,
+  EventEmitter, Injectable,
   Input,
   OnChanges,
   OnInit,
@@ -10,7 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginator, MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatInputModule} from '@angular/material/input';
 import {CommonModule} from '@angular/common';
@@ -18,6 +18,32 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {ColumnasTabla} from '../../features/catalogos/pais/pais.component';
 import {DomSanitizer} from '@angular/platform-browser';
+import {MatSelectModule} from '@angular/material/select';
+import {StylePaginatorDirective} from '../../core/directivas/style-paginator.directive';
+import {MatTooltipModule} from '@angular/material/tooltip';
+
+
+@Injectable()
+export class CustomPaginatorIntl extends MatPaginatorIntl {
+  override itemsPerPageLabel = 'Registros por página';
+  override nextPageLabel = 'Siguiente página';
+  override previousPageLabel = 'Página anterior';
+  override firstPageLabel = 'Primera página';
+  override lastPageLabel = 'Última página';
+  // Puedes agregar más personalizaciones si lo necesitas
+
+  // Opcional: Puedes personalizar el texto de los rangos también
+  override getRangeLabel = (page: number, pageSize: number, length: number) => {
+    if (length === 0 || pageSize === 0) {
+      return `0 de ${length}`;
+    }
+    length = Math.max(length, 0);
+    const startIndex = page * pageSize;
+    // Si el rango está fuera de los límites
+    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
+    return `${startIndex + 1} - ${endIndex} de ${length}`;
+  };
+}
 
 @Component({
   selector: 'app-tabla-generica',
@@ -29,15 +55,21 @@ import {DomSanitizer} from '@angular/platform-browser';
     MatButtonModule,
     MatTableModule,
     MatSortModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatSelectModule,
+    StylePaginatorDirective,
+    MatTooltipModule
+  ],
+  providers: [
+    { provide: MatPaginatorIntl, useClass: CustomPaginatorIntl } // Proveer la clase personalizada
   ],
   templateUrl: './tabla-generica.component.html',
-  styleUrl: './tabla-generica.component.scss'
+  styleUrl: './tabla-generica.component.scss',
 })
 export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() data: any[] = [];
   @Input() columns: ColumnasTabla[] = [];
-  @Input() actions: { name: string, icon:string, callback: (item: any) => void }[] = [];
+  @Input() actions: { name: string, icon:string, tooltipText: string, callback: (item: any) => void }[] = [];
 
   @Input() totalRecords: number = 0;
   @Input() pageSize = 10;
@@ -60,8 +92,6 @@ export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges 
     const columnsAux = this.columns.map(c => c.clave);
     this.displayedColumns = [...columnsAux, 'actions'];
     this.dataSource = new MatTableDataSource(this.data);
-    console.log('this.dataSource');
-    console.table(this.dataSource);
   }
 
   ngAfterViewInit() {
@@ -83,11 +113,6 @@ export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges 
     this.pageChange.emit({ offset, max, page, pageSize: $event.pageSize });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
   trackByFn(index: number, item: any): number {
     return item.id;
   }
@@ -104,6 +129,5 @@ export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges 
   isObject(value: any): boolean {
     return value !== null && typeof value === 'object';
   }
-
-  protected readonly Number = Number;
 }
+

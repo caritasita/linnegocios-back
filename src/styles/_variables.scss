@@ -14,3 +14,9 @@ $color-primario-25: rgba(40, 53, 147, 0.25);
 $color-primario-50: rgba(40, 53, 147, 0.50);
 $color-primario-75: rgba(40, 53, 147, 0.75);
 $color-gray: #ececec;
+
+$gray-linnegicios: #656568;
+
+.mat-drawer-backdrop.mat-drawer-shown {
+  --mat-sidenav-scrim-color: transparent !important;
+}

@@ -1,12 +1,26 @@
 
-<div class="login-container">
-  <div class="info-login bg-primario"></div>
-<app-form-generico
-  [fields]="fields"
-  [titleDialog]="'Inicio de sesión'"
-  (submitForm)="iniciarSesion($event)"
-  [titleButtonGuardar]="'Entrar'"
-  [mostrarBotonCancelar]="false"
->
-  ></app-form-generico>
-</div>
+<mat-drawer-container class="content-mat-drawer">
+  <div class="content-login"></div>
+
+  <mat-drawer #drawer class="content-sidenav p-2 mat-elevation-z8 mt-0" mode="side" position="end" [opened]="true">
+    <app-form-generico
+      [fields]="fields"
+      [titleDialog]="'Inicio de sesión'"
+      (submitForm)="iniciarSesion($event)"
+      [nombreButtonGuardar]="'Entrar'"
+      [mostrarBotonCancelar]="false"    >
+    </app-form-generico>
+  </mat-drawer>
+</mat-drawer-container>
+
+<!--<div class="login-container">-->
+<!--  <div class="info-login bg-primario"></div>-->
+<!--<app-form-generico-->
+<!--  [fields]="fields"-->
+<!--  [titleDialog]="'Inicio de sesión'"-->
+<!--  (submitForm)="iniciarSesion($event)"-->
+<!--  [nombreButtonGuardar]="'Entrar'"-->
+<!--  [mostrarBotonCancelar]="false"-->
+<!--&gt;-->
+<!--</app-form-generico>-->
+<!--</div>-->

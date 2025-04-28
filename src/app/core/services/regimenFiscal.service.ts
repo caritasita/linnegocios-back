@@ -8,21 +8,25 @@ import {UrlServer} from '../helpers/UrlServer';
 })
 export class RegimenFiscalService {
 
-  constructor(private genericService: CrudService) {}
+  constructor(private crudService: CrudService) {}
 
   list(parametros: any): Observable<any[]> {
-    return this.genericService.list(parametros, UrlServer.regimenFiscal);
+    return this.crudService.list(parametros, UrlServer.regimenFiscal);
   }
 
   create(data: any): Observable<any> {
-    return this.genericService.create(data, UrlServer.regimenFiscal);
+    return this.crudService.create(data, UrlServer.regimenFiscal);
   }
 
   update(data: any): Observable<any> {
-    return this.genericService.update(data, UrlServer.regimenFiscal);
+    return this.crudService.update(data, UrlServer.regimenFiscal);
   }
 
   delete(id: number): Observable<any> {
-    return this.genericService.delete(UrlServer.regimenFiscal, id);
+    return this.crudService.delete(UrlServer.regimenFiscal, id);
+  }
+
+  recover(id: number): Observable<any> {
+    return this.crudService.update({ id }, UrlServer.reactivarRegimenFiscal);
   }
 }

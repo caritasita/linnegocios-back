@@ -1,6 +1,37 @@
 <mat-sidenav-container class="sidenav-container" *ngIf="isAuthenticated">
   <mat-sidenav [mode]="isMobileView ? 'over' : 'side'" class="sidenav" #drawer [opened]="!isSidenavOpen">
+
+    <mat-card class="user-info-card border-bottom">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="mat-icon-round mr-1">person</mat-icon>
+          <span>Juan Pérez</span>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <span><strong>Rol:</strong> Administrador</span>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-nav-list class="menu-linnegocios">
+      <a mat-list-item routerLink="tablero">
+        <mat-panel-title>
+          <mat-icon class="mat-icon-round mr-1">dashboard</mat-icon>
+          Tablero
+        </mat-panel-title>
+      </a>
+    </mat-nav-list>
     <mat-accordion [multi]="false">
+<!--      <mat-expansion-panel>-->
+<!--        <mat-expansion-panel-header>-->
+<!--          <a mat-list-item routerLink="tablero">-->
+<!--            <mat-panel-title>-->
+<!--              <mat-icon class="mat-icon-round mr-1">settings</mat-icon>-->
+<!--              Tablero-->
+<!--            </mat-panel-title>-->
+<!--          </a>-->
+<!--        </mat-expansion-panel-header>-->
+<!--      </mat-expansion-panel>-->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
@@ -9,172 +40,370 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-nav-list>
-          <a mat-list-item routerLink="catalogos/pais">País</a>
-          <a mat-list-item routerLink="catalogos/estado">Estado</a>
-          <a mat-list-item routerLink="catalogos/regimenFiscal">Régimen fiscal</a>
-          <a mat-list-item href="#">Tipo de comprobante</a>
-          <a mat-list-item href="#">Método de pago</a>
-          <a mat-list-item href="#">Tipo de ticket</a>
-          <a mat-list-item href="#">Giro comercial</a>
-          <a mat-list-item href="#">Tipo de nota</a>
-          <a mat-list-item href="#">Tipo de pérdida</a>
-          <a mat-list-item href="#">Tipo de crédito</a>
-          <a mat-list-item href="#">Tipo de seguimiento</a>
-          <a mat-list-item href="#">Estatus de seguimiento</a>
-          <a mat-list-item href="#">Impuesto de producto</a>
-          <a mat-list-item href="#">Proveedor de facturación</a>
-          <a mat-list-item href="#">Unidades de medida</a>
-          <a mat-list-item href="#">Metas de activación</a>
+          <a mat-list-item routerLink="catalogos/pais">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              País
+            </mat-panel-title>
+          </a>
+          <a mat-list-item routerLink="catalogos/estado">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Estado
+            </mat-panel-title>
+          </a>
+          <a mat-list-item routerLink="catalogos/regimenFiscal">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Régimen fiscal
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Tipo de comprobante
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Método de pago
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Tipo de ticket
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Giro comercial
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Tipo de nota
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Tipo de pérdida
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Tipo de crédito
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Tipo de seguimiento
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Estatus de seguimiento
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Impuesto de producto
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Proveedor de facturación
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Unidades de medida
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Metas de activación
+            </mat-panel-title>
+          </a>
         </mat-nav-list>
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
+            <mat-icon class="mat-icon-round mr-1">settings</mat-icon>
             Configuración
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-nav-list>
-          <a mat-list-item href="#">Monedero electrónico</a>
-          <a mat-list-item href="#">Cajas</a>
-          <a mat-list-item href="#">Credenciales facturación</a>
-          <a mat-list-item href="#">Comisión productos elect.</a>
-          <a mat-list-item href="#">Variables del sistema</a>
+          <!--          <a mat-list-item href="#">-->
+          <!--            <mat-panel-title>-->
+          <!--              <mat-icon class="mr-1">horizontal_rule</mat-icon>-->
+          <!--              Monedero electrónico-->
+          <!--            </mat-panel-title>-->
+          <!--          </a>-->
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Cajas
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Credenciales de facturación
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Comisión productos elect.
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Variables del sistema
+            </mat-panel-title>
+          </a>
         </mat-nav-list>
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
+            <mat-icon class="mat-icon-round mr-1">corporate_fare</mat-icon>
             Empresas
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-nav-list>
-          <a mat-list-item href="#">Empresas</a>
-          <a mat-list-item href="#">Usuario</a>
-          <a mat-list-item href="#">Roles</a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Empresas
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Usuarios
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Roles
+            </mat-panel-title>
+          </a>
         </mat-nav-list>
       </mat-expansion-panel>
+      <!--      <mat-expansion-panel>-->
+      <!--        <mat-expansion-panel-header>-->
+      <!--          <mat-panel-title>-->
+      <!--            <mat-icon class="mat-icon-round mr-1">home</mat-icon>-->
+      <!--            Proveedores-->
+      <!--          </mat-panel-title>-->
+      <!--        </mat-expansion-panel-header>-->
+      <!--        <mat-nav-list>-->
+      <!--          <a mat-list-item href="#">Proveedores</a>-->
+      <!--          <a mat-list-item href="#">Compras planeadas</a>-->
+      <!--          <a mat-list-item href="#">Compras finalizadas</a>-->
+      <!--        </mat-nav-list>-->
+      <!--      </mat-expansion-panel>-->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
-            Proveedores
+            <mat-icon class="mat-icon-round mr-1">storefront</mat-icon>
+            Negocios
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-nav-list>
-          <a mat-list-item href="#">Proveedores</a>
-          <a mat-list-item href="#">Compras planeadas</a>
-          <a mat-list-item href="#">Compras finalizadas</a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Negocios
+            </mat-panel-title>
+          </a>
+          <!--          <a mat-list-item href="#">Sucursales</a>-->
+          <!--          <a mat-list-item href="#">Cajas</a>-->
+          <!--          <a mat-list-item href="#">Cajeros</a>-->
+          <!--          <a mat-list-item href="#">Tenderos</a>-->
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Comunicados
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Publicidad
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Buzón
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Horarios de soporte
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Historial de chats
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Credenciales
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Licencias
+            </mat-panel-title>
+          </a>
         </mat-nav-list>
       </mat-expansion-panel>
+      <!--      <mat-expansion-panel>-->
+      <!--        <mat-expansion-panel-header>-->
+      <!--          <mat-panel-title>-->
+      <!--            <mat-icon class="mat-icon-round mr-1">home</mat-icon>-->
+      <!--            Clientes-->
+      <!--          </mat-panel-title>-->
+      <!--        </mat-expansion-panel-header>-->
+      <!--        <mat-nav-list>-->
+      <!--          <a mat-list-item href="#">Clientes</a>-->
+      <!--          <a mat-list-item href="#">Créditos</a>-->
+      <!--          <a mat-list-item href="#">Monedero electrónico</a>-->
+      <!--        </mat-nav-list>-->
+      <!--      </mat-expansion-panel>-->
+      <!--      <mat-expansion-panel>-->
+      <!--        <mat-expansion-panel-header>-->
+      <!--          <mat-panel-title>-->
+      <!--            <mat-icon class="mat-icon-round mr-1">home</mat-icon>-->
+      <!--            Productos físicos-->
+      <!--          </mat-panel-title>-->
+      <!--        </mat-expansion-panel-header>-->
+      <!--        <mat-nav-list>-->
+      <!--          <a mat-list-item href="#">Categorías</a>-->
+      <!--          <a mat-list-item href="#">Marcas</a>-->
+      <!--          <a mat-list-item href="#">Productos</a>-->
+      <!--          <a mat-list-item href="#">Servicios</a>-->
+      <!--          <a mat-list-item href="#">Paquetes/kits</a>-->
+      <!--        </mat-nav-list>-->
+      <!--      </mat-expansion-panel>-->
+      <!--      <mat-expansion-panel>-->
+      <!--        <mat-expansion-panel-header>-->
+      <!--          <mat-panel-title>-->
+      <!--            <mat-icon class="mat-icon-round mr-1">home</mat-icon>-->
+      <!--            Productos electrónicos-->
+      <!--          </mat-panel-title>-->
+      <!--        </mat-expansion-panel-header>-->
+      <!--        <mat-nav-list>-->
+      <!--          <a mat-list-item href="#">Credenciales</a>-->
+      <!--          <a mat-list-item href="#">Licencias</a>-->
+      <!--        </mat-nav-list>-->
+      <!--      </mat-expansion-panel>-->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
-            Negocio
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-nav-list>
-          <a mat-list-item href="#">Sucursales</a>
-          <a mat-list-item href="#">Cajas</a>
-          <a mat-list-item href="#">Cajeros</a>
-          <a mat-list-item href="#">Tendero</a>
-          <a mat-list-item href="#">Comunicados</a>
-          <a mat-list-item href="#">Publicidad</a>
-          <a mat-list-item href="#">Buzón</a>
-          <a mat-list-item href="#">Horarios de soporte</a>
-          <a mat-list-item href="#">Historial de chats</a>
-        </mat-nav-list>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
-            Clientes
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-nav-list>
-          <a mat-list-item href="#">Clientes</a>
-          <a mat-list-item href="#">Créditos</a>
-          <a mat-list-item href="#">Monedero electrónico</a>
-        </mat-nav-list>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
-            Productos físicos
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-nav-list>
-          <a mat-list-item href="#">Categorías</a>
-          <a mat-list-item href="#">Marcas</a>
-          <a mat-list-item href="#">Productos</a>
-          <a mat-list-item href="#">Servicios</a>
-          <a mat-list-item href="#">Paquetes/kits</a>
-        </mat-nav-list>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
-            Productos electrónicos
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-nav-list>
-          <a mat-list-item href="#">Credenciales</a>
-          <a mat-list-item href="#">Licencias</a>
-        </mat-nav-list>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
+            <mat-icon class="mat-icon-round mr-1">local_mall</mat-icon>
             Ecommerce
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-nav-list>
-          <a mat-list-item href="#">Repartidores</a>
-          <a mat-list-item href="#">Pedidos</a>
-          <a mat-list-item href="#">Movitos de cancelación</a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Repartidores
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Pedidos
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Motivos de cancelación
+            </mat-panel-title>
+          </a>
         </mat-nav-list>
       </mat-expansion-panel>
+      <!--      <mat-expansion-panel>-->
+      <!--        <mat-expansion-panel-header>-->
+      <!--          <mat-panel-title>-->
+      <!--            <mat-icon class="mat-icon-round mr-1">home</mat-icon>-->
+      <!--            Reportes-->
+      <!--          </mat-panel-title>-->
+      <!--        </mat-expansion-panel-header>-->
+      <!--        <mat-nav-list>-->
+      <!--          <a mat-list-item href="#">Ventas</a>-->
+      <!--          <a mat-list-item href="#">Facturas</a>-->
+      <!--          <a mat-list-item href="#">Existencias mínimas</a>-->
+      <!--          <a mat-list-item href="#">Dinero en inventario</a>-->
+      <!--          <a mat-list-item href="#">Deudas a proveedor</a>-->
+      <!--          <a mat-list-item href="#">Créditos</a>-->
+      <!--          <a mat-list-item href="#">Apartados</a>-->
+      <!--          <a mat-list-item href="#">Movimientos en caja</a>-->
+      <!--          <a mat-list-item href="#">Bosals</a>-->
+      <!--          <a mat-list-item href="#">Cortes de caja</a>-->
+      <!--          <a mat-list-item href="#">Cortes de inventario</a>-->
+      <!--          <a mat-list-item href="#">Monedero electrónico</a>-->
+      <!--          <a mat-list-item href="#">Cotización</a>-->
+      <!--        </mat-nav-list>-->
+      <!--      </mat-expansion-panel>-->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
-            Reportes
-          </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-nav-list>
-          <a mat-list-item href="#">Ventas</a>
-          <a mat-list-item href="#">Facturas</a>
-          <a mat-list-item href="#">Existencias mínimas</a>
-          <a mat-list-item href="#">Dinero en inventario</a>
-          <a mat-list-item href="#">Deudas a proveedor</a>
-          <a mat-list-item href="#">Créditos</a>
-          <a mat-list-item href="#">Apartados</a>
-          <a mat-list-item href="#">Movimientos en caja</a>
-          <a mat-list-item href="#">Bosals</a>
-          <a mat-list-item href="#">Cortes de caja</a>
-          <a mat-list-item href="#">Cortes de inventario</a>
-          <a mat-list-item href="#">Monedero electrónico</a>
-          <a mat-list-item href="#">Cotización</a>
-        </mat-nav-list>
-      </mat-expansion-panel>
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <mat-icon class="mat-icon-round mr-1">home</mat-icon>
+            <mat-icon class="mat-icon-round mr-1">support_agent</mat-icon>
             Agentes
           </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-nav-list>
-          <a mat-list-item href="#">Movimientos de saldo</a>
-          <a mat-list-item href="#">Saldo de agentes</a>
-          <a mat-list-item href="#">Configuración de agentes</a>
-          <a mat-list-item href="#">Complimiento de meta</a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Movimientos de saldo
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Saldo de agentes
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Configuración de agentes
+            </mat-panel-title>
+          </a>
+          <a mat-list-item href="#">
+            <mat-panel-title>
+              <mat-icon class="mr-1">horizontal_rule</mat-icon>
+              Cumplimiento de meta
+            </mat-panel-title>
+          </a>
         </mat-nav-list>
       </mat-expansion-panel>
     </mat-accordion>
@@ -182,23 +411,25 @@
 
   <mat-sidenav-content>
     <mat-toolbar>
-      <button mat-icon-button (click)="toggleSidenav()" class="example-icon" aria-label="Example icon-button with menu icon">
+      <button mat-icon-button (click)="toggleSidenav()" class="example-icon"
+              aria-label="Example icon-button with menu icon">
         <mat-icon>menu</mat-icon>
       </button>
       <span class="spacer"></span>
-      <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon" [matMenuTriggerFor]="appMenu">
+      <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"
+              [matMenuTriggerFor]="appMenu">
         <mat-icon>account_circle</mat-icon>
       </button>
       <mat-menu #appMenu="matMenu">
         <button mat-menu-item (click)="logout()">
           <mat-icon>logout</mat-icon>
-          Cerrar sesión     {{isSidenavOpen}}
+          Cerrar sesión     {{ isSidenavOpen }}
 
         </button>
       </mat-menu>
     </mat-toolbar>
     <div class="content">
-      <router-outlet />
+      <router-outlet/>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
