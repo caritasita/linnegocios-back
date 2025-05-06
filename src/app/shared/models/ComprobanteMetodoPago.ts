@@ -2,6 +2,7 @@ import { Catalogo } from './catalogo';
 import { Pais } from './Pais';
 import { MetodoDePago } from './MetodoDePago';
 import { TipoComprobante } from './tipo-comprobante';
+import {Archivo} from './Archivo';
 
 export class ComprobanteMetodoPago extends Catalogo {
 

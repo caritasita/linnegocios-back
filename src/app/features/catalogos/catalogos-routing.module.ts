@@ -8,7 +8,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./tipo-comprobante/tipo-comprobante.component').then(m => m.TipoComprobanteComponent)
+    loadComponent: () => import('./comprobante-metodo-pago/comprobante-metodo-pago.component').then(m => m.ComprobanteMetodoPagoComponent)
   }, // Ruta por defecto
   {
     path: 'pais',
