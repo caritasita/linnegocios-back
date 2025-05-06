@@ -13,7 +13,7 @@
         </ng-container>
         <ng-template #textTemplate>
           @if (column.tipo === 'fecha') {
-            {{ element[column.clave] | date:'dd/MM/yyyy HH:mm:ss a' }}
+            {{ element[column.clave] | date:'dd-MM-yyyy HH:mm a' }}
           } @else if (column.tipo == 'boleano') {
             {{ element[column.clave] ? 'Activo' : 'Inactivo' }}
           } @else {

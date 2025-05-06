@@ -2,7 +2,7 @@
 <h4 mat-dialog-title>{{ titleDialog }}</h4>
 
 <mat-dialog-content class="pt-4">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <form [formGroup]="form">
     <div *ngFor="let field of fields">
 
       <mat-form-field *ngIf="field.type === 'text'" appearance="outline" class="width-content">
@@ -36,5 +36,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button class="boton-bg-primario" mat-stroked-button (click)="onClose()">Cancelar</button>
-  <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="form.invalid" (click)="onSubmit()">Guardar</button>
+  <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="form.invalid" (click)="onSubmit()">{{data.id ? 'Actualizar' : 'Guardar'}}</button>
 </mat-dialog-actions>

@@ -1,7 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
 html, body { height: 100%; padding: 0; }
-body { margin: 0; font-family: 'Poppins', sans-serif; }
+body { margin: 0; font-family: 'Lato', sans-serif !important;}
 @import "variables";
 
 :root{
@@ -231,7 +232,7 @@ tr:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3),
     0 12px 30px rgba(0, 0, 0, 0.25); /* Efecto hover más intenso */
   }
-
+  //
   &.mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
     border-radius: 0;
     background-color: transparent !important;
@@ -274,5 +275,19 @@ tr:hover {
 
 .snack-bar-error{
   background-color: darkred;
+}
+
+.mdc-data-table__header-cell{
+  font-weight: 700 !important;
+  letter-spacing: 0.2px !important
+}
+.mdc-data-table__cell{
+  &:first-child, &:last-child{
+    padding: 0 16px !important;
+
+  }
+  padding: 0 8px !important;
+  font-family: 'Lato', serif;
+  letter-spacing: 0.2px !important
 }
 

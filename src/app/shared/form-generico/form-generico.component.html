@@ -4,7 +4,7 @@
   </mat-card-header>
 
   <mat-card-content class="pt-4 p-3">
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form [formGroup]="form">
       <div *ngFor="let field of fields">
 
         <mat-form-field
