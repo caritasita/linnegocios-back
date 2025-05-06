@@ -13,6 +13,8 @@ import {AuthService} from '../services/auth.service';
 import {environment} from '../../../environments/environment.development';
 import {Router} from '@angular/router';
 import {GenericoService} from '../services/generico.service';
+import {LoadingComponent} from '../../features/loading/loading.component';
+import {LoadingService} from '../services/loading.service';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -27,7 +29,8 @@ export class TokenInterceptor implements HttpInterceptor {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private genericoService: GenericoService
+    private genericoService: GenericoService,
+    private loadingService: LoadingService
   ) {
   }
 
@@ -35,6 +38,8 @@ export class TokenInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
+
+    this.loadingService.show();
 
     const excludeUrl = request.url.includes('login');
     const token = this.authService.getAccesToken();
@@ -254,6 +259,6 @@ export class TokenInterceptor implements HttpInterceptor {
   }
 
   private onEnd(): void {
-    // this.hideLoader();
+    this.loadingService.hide();
   }
 }

@@ -11,6 +11,7 @@ import {CommonModule} from '@angular/common';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {TokenInterceptor} from './core/interceptors/token.interceptor';
 import {MatCardModule} from '@angular/material/card';
+import {LoadingComponent} from './features/loading/loading.component';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ import {MatCardModule} from '@angular/material/card';
     RouterLink,
     CommonModule,
     MatCardModule,
+    LoadingComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
