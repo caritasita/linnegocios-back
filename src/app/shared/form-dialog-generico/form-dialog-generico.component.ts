@@ -8,6 +8,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {MatCardModule} from '@angular/material/card';
 
 @Component({
   selector: 'app-form-generico',
@@ -21,7 +22,8 @@ import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
-    NgxMatSelectSearchModule
+    NgxMatSelectSearchModule,
+    MatCardModule
   ],
   templateUrl: './form-dialog-generico.component.html',
   styleUrl: './form-dialog-generico.component.css',
@@ -49,29 +51,39 @@ export class FormDialogGenericoComponent implements OnInit {
     this.titleDialog = this.dialogData.titleDialog;
     this.data = this.dialogData.data || {};
 
-    const formGroup: { [key: string]: FormControl } = {};
+    const formGroup: { [key: string]: FormControl | FormGroup } = {}; // Permite FormGroup anidado
     this.fields.forEach((field: any) => {
-      formGroup[field.name] = new FormControl(
-        this.data[field.name] || '',
-        field.validation
-      );
-
-      if (field.type === 'select') {
-        this.searchControls[field.name] = new FormControl();
-        this.filteredOptions[field.name] = field.options; // Inicializa las opciones filtradas
-
-        // Filtrar opciones en base al input de búsqueda
-        this.searchControls[field.name].valueChanges.subscribe(value => {
-          this.filteredOptions[field.name] = field.options.filter((option: any) =>{
-            return option.label.toString().toLowerCase().includes(value.toString().toLowerCase());
-          }
-          );
+      if (field.type === 'file') {
+        // Crear un FormGroup anidado para el campo "imagen"
+        formGroup[field.name] = this.fb.group({
+          contentType: [this.data.imagen?.contentType || null],
+          nombre: [this.data.imagen?.nombre || null],
+          size: [this.data.imagen?.size || null],
+          encodeImage: [this.data.imagen?.encodeImage || null]
         });
+      } else {
+        // Crear un FormControl para los demás campos
+        formGroup[field.name] = new FormControl(
+          this.data[field.name] || '',
+          field.validation
+        );
 
-        // Establecer el valor del FormControl al ID correspondiente
-        const selectedOption = this.data[field.name];
-        if (selectedOption) {
-          formGroup[field.name].setValue(selectedOption.id); // Selecciona el ID a editar
+        if (field.type === 'select') {
+          this.searchControls[field.name] = new FormControl();
+          this.filteredOptions[field.name] = field.options; // Inicializa las opciones filtradas
+
+          // Filtrar opciones en base al input de búsqueda
+          this.searchControls[field.name].valueChanges.subscribe(value => {
+            this.filteredOptions[field.name] = field.options.filter((option: any) => {
+              return option.label.toString().toLowerCase().includes(value.toString().toLowerCase());
+            });
+          });
+
+          // Establecer el valor del FormControl al ID correspondiente
+          const selectedOption = this.data[field.name];
+          if (selectedOption) {
+            formGroup[field.name].setValue(selectedOption.id); // Selecciona el ID a editar
+          }
         }
       }
     });
@@ -79,7 +91,7 @@ export class FormDialogGenericoComponent implements OnInit {
     this.form = this.fb.group(formGroup);
 
     //Al editar un registro, el único campo que se deshabilita es la clave.
-    if(this.data?.id) {
+    if (this.data?.id) {
       this.form.get('clave')?.disable();
     }
   }
@@ -110,6 +122,19 @@ export class FormDialogGenericoComponent implements OnInit {
   clearField(fieldName: string): void {
     this.form.get(fieldName)?.setValue('');
   }
+
+  imagePreview: string | null = null;
+
+  onImagePicked(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 }
 
 export interface Field {
@@ -118,6 +143,7 @@ export interface Field {
   type: string;
   options?: OptionField[];
   validation?: any;
+  hideInput?: boolean;
 }
 
 export interface OptionField {

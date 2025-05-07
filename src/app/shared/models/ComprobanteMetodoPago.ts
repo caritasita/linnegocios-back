@@ -6,12 +6,12 @@ import {Archivo} from './Archivo';
 
 export class ComprobanteMetodoPago extends Catalogo {
 
-  valor: number;
-  pais: Pais;
-  imagen: Archivo;
-  tipo: string;
-  tipoComprobante: TipoComprobante;
-  simbolo: string;
-  metodoDePago: MetodoDePago;
+  valor!: number;
+  pais!: Pais;
+  imagen!: Archivo;
+  tipo!: string;
+  tipoComprobante!: TipoComprobante;
+  simbolo!: string;
+  metodoDePago!: MetodoDePago;
 
 }

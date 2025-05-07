@@ -27,6 +27,6 @@ export class ComprobanteFormaPagoService {
   }
 
   recover(id: number): Observable<any> {
-    return this.crudService.update({ id }, UrlServer.reactivarEstado);
+    return this.crudService.update({ id }, UrlServer.reactivarComprobanteMetodoPago);
   }
 }

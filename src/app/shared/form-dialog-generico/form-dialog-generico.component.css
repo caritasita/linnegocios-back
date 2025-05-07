@@ -1,0 +1,14 @@
+.container {
+  max-width: 500px;
+  margin: 20px auto;
+}
+.image-preview {
+  margin-bottom: 15px;
+  text-align: center;
+}
+.image-preview img {
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}

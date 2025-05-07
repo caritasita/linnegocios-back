@@ -63,10 +63,10 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
     {clave: 'fechaRegistro', valor: 'Fecha de registro', tipo: "fecha"},
     {clave: 'clave', valor: 'Clave', tipo: "texto"},
     {clave: 'nombre', valor: 'Nombre', tipo: "texto"},
-    {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
-    {clave: 'tipoComprobante', valor: 'Tipo de comprobante', tipo: "texto"},
     {clave: 'metodoDePago', valor: 'Metodo de pago', tipo: "texto"},
+    {clave: 'tipoComprobante', valor: 'Tipo de comprobante', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
+    {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
   ];
   actions = [
     {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
@@ -146,12 +146,7 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'TipoDeComprobante',
+        name: 'tipoComprobante',
         label: 'Tipo de comprobante',
         type: 'select',
         options: this.transformedTipoComprobanteList,
@@ -195,10 +190,9 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
 
     const fields: Field[] = [
       {
-        name: 'tipoComprobante',
-        label: 'Tipo de comprobante',
-        type: 'select',
-        options: this.transformedTipoComprobanteList,
+        name: 'clave',
+        label: 'Clave',
+        type: 'text',
         validation: Validators.required
       },
       {
@@ -208,10 +202,16 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
         validation: Validators.required
       },
       {
-        name: 'metodoDePago',
-        label: 'Método de pago',
+        name: 'nombre',
+        label: 'Nombre',
+        type: 'text',
+        validation: Validators.required
+      },
+      {
+        name: 'tipoComprobante',
+        label: 'Tipo de comprobante',
         type: 'select',
-        options: this.transformedMetodoPagoList,
+        options: this.transformedTipoComprobanteList,
         validation: Validators.required
       },
       {
@@ -228,28 +228,28 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
         validation: Validators.required
       },
       {
-        name: 'clave',
-        label: 'Clave',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'nombre',
-        label: 'Nombre',
-        type: 'text',
+        name: 'metodoDePago',
+        label: 'Método de pago',
+        type: 'select',
+        options: this.transformedMetodoPagoList,
         validation: Validators.required
       },
       {
         name: 'descripcion',
         label: 'Descripción',
         type: 'text',
-        validation: Validators.required
+      },
+      {
+        name: 'imagen',
+        label: 'Imagen',
+        type: 'file',
+        hideInput: true
       },
     ]
 
-    let titleDialog = 'Registrar estado'
+    let titleDialog = 'Registrar tipo de ticket'
     if (data.id) {
-      titleDialog = 'Editar estado'
+      titleDialog = 'Editar tipo de ticket'
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
@@ -264,12 +264,13 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
       if (data.id) {
-        result = ({...result, id: data.id})
+        result = ({...result, id: data.id, valor:Number(result.valor), clave: data.clave})
         this.comprobanteFormaPagoService.update(result).subscribe((respueta) => {
           if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
           this.lista();
         });
       } else {
+        result = ({...result, valor:Number(result.valor)})
         this.comprobanteFormaPagoService.create(result).subscribe((respueta) => {
           if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
           this.lista();
