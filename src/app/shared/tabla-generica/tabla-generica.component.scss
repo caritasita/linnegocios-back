@@ -1,0 +1,34 @@
+@import "variables";
+.table-container {
+  overflow-x: auto; /* Activa el scroll horizontal */
+  width: 100%; /* Asegura que el contenedor ocupe todo el ancho disponible */
+}
+
+table {
+  min-width: 100%; /* Ajusta este valor según la cantidad de columnas */
+}
+
+/* Estilo general para navegadores WebKit (Chrome, Safari) */
+.table-container::-webkit-scrollbar {
+  height: 4px; /* Altura del scrollbar horizontal */
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Fondo del track del scrollbar */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: $color-primario; /* Color del scrollbar */
+  border-radius: 10px; /* Bordes redondeados */
+  border: 2px solid #f1f1f1; /* Espaciado entre el scrollbar y el track */
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background-color: $color-primario-75; /* Color del scrollbar al pasar el mouse */
+}
+
+/* Para navegadores compatibles con scrollbar-color (Firefox) */
+.table-container {
+  scrollbar-color: $color-primario #f1f1f1; /* Color del thumb y del track */
+  scrollbar-width: thin; /* Grosor del scrollbar */
+}

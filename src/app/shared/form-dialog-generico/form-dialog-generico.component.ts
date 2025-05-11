@@ -90,7 +90,8 @@ export class FormDialogGenericoComponent implements OnInit {
           // Establecer el valor del FormControl al ID correspondiente
           const selectedOption = this.data[field.name];
           if (selectedOption) {
-            formGroup[field.name].setValue(selectedOption.id || selectedOption.clave); // Selecciona el ID a editar
+            // Cuando NO es un objeto se obtiene el valor directo
+            formGroup[field.name].setValue(selectedOption.id || selectedOption.clave || selectedOption); // Selecciona el ID a editar
           }
         }
       }

@@ -54,7 +54,7 @@ constructor(private router: Router) {
 
     this.isAuthenticated = !!localStorage.getItem('user_access');
     if(this.isAuthenticated){
-      this.router.navigateByUrl('/catalogos').then((r) => {});
+      this.router.navigateByUrl('/configuraciones').then((r) => {});
     }
   }
 
