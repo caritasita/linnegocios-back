@@ -35,7 +35,7 @@ import {FormGenericoComponent} from '../../../shared/form-generico/form-generico
   templateUrl: './regimen-fiscal.component.html',
   styleUrl: './regimen-fiscal.component.css'
 })
-export class RegimenFiscalComponent implements OnInit{
+export class RegimenFiscalComponent implements OnInit {
   totalRecords: number = 0;
   regimenFiscalList: any[] = [];
   fieldsFilters!: Field[];
@@ -45,7 +45,7 @@ export class RegimenFiscalComponent implements OnInit{
     filtroGeneral: '',
     registrosEliminados: false,
   };
-  columns : ColumnasTabla[] = [
+  columns: ColumnasTabla[] = [
     {clave: 'fechaRegistro', valor: 'Fecha de registro', tipo: "fecha"},
     {clave: 'clave', valor: 'Clave', tipo: "texto"},
     {clave: 'nombre', valor: 'Nombre', tipo: "texto"},
@@ -55,7 +55,12 @@ export class RegimenFiscalComponent implements OnInit{
   actions = [
     {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
     {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'Recuperar eliminado', icon: "restore_from_trash", tooltipText: 'Recuperar registro eliminado', callback: (item: any) => this.recoverRegister(item.id)}
+    {
+      name: 'Recuperar eliminado',
+      icon: "restore_from_trash",
+      tooltipText: 'Recuperar registro eliminado',
+      callback: (item: any) => this.recoverRegister(item.id)
+    }
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -64,7 +69,8 @@ export class RegimenFiscalComponent implements OnInit{
     private regimenFiscalService: RegimenFiscalService,
     private genericoService: GenericoService,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     this.lista();
@@ -101,11 +107,11 @@ export class RegimenFiscalComponent implements OnInit{
   }
 
   procesarfiltros(form: any) {
-    this.queryParams= ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
 
-  resetFormFiltros(){
+  resetFormFiltros() {
     this.queryParams = {
       max: 10,
       offset: 0,
@@ -123,25 +129,31 @@ export class RegimenFiscalComponent implements OnInit{
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[] = [
-      {
-        name: 'clave',
-        label: 'Clave',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'nombre',
-        label: 'Nombre',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'descripcion',
-        label: 'Descripción',
-        type: 'text',
-        validation: Validators.required
-      }
+    const fields: Field[][] = [
+      [
+        {
+          name: 'clave',
+          label: 'Clave',
+          type: 'text',
+          validation: Validators.required
+        }
+      ],
+      [
+        {
+          name: 'nombre',
+          label: 'Nombre',
+          type: 'text',
+          validation: Validators.required
+        }
+      ],
+      [
+        {
+          name: 'descripcion',
+          label: 'Descripción',
+          type: 'text',
+          validation: Validators.required
+        }
+      ]
     ]
 
     let titleDialog = 'Registrar régimen fiscal'
@@ -162,12 +174,14 @@ export class RegimenFiscalComponent implements OnInit{
       if (data.id) {
         result = ({...result, id: data.id})
         this.regimenFiscalService.update(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       } else {
         this.regimenFiscalService.create(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       }

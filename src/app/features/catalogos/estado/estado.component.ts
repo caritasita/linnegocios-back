@@ -13,11 +13,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {PaisService} from '../../../core/services/pais.service';
 import {Pais} from '../../../shared/models/Pais';
-import {MatDrawer, MatDrawerContainer, MatSidenavModule} from '@angular/material/sidenav';
-import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form-field';
-import {MatOption} from '@angular/material/core';
-import {MatSelect, MatSelectModule} from '@angular/material/select';
-import {_MatSlideToggleRequiredValidatorModule, MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatDrawer, MatSidenavModule} from '@angular/material/sidenav';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {GenericoService} from '../../../core/services/generico.service';
 
@@ -67,7 +66,12 @@ export class EstadoComponent implements OnInit {
   actions = [
     {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
     {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'Recuperar eliminado', icon: "restore_from_trash", tooltipText: 'Recuperar registro eliminado', callback: (item: any) => this.recoverRegister(item.id)}
+    {
+      name: 'Recuperar eliminado',
+      icon: "restore_from_trash",
+      tooltipText: 'Recuperar registro eliminado',
+      callback: (item: any) => this.recoverRegister(item.id)
+    }
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -77,7 +81,8 @@ export class EstadoComponent implements OnInit {
     private paisService: PaisService,
     private genericoService: GenericoService,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     this.lista();
@@ -132,11 +137,11 @@ export class EstadoComponent implements OnInit {
   }
 
   procesarfiltros(form: any) {
-    this.queryParams= ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
 
-  resetFormFiltros(){
+  resetFormFiltros() {
     this.queryParams = {
       max: 10,
       offset: 0,
@@ -154,26 +159,32 @@ export class EstadoComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[] = [
-      {
-        name: 'pais',
-        label: 'País',
-        type: 'select',
-        options: this.transformedPaisList,
-        validation: Validators.required
-      },
-      {
-        name: 'clave',
-        label: 'Clave',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'nombre',
-        label: 'Nombre',
-        type: 'text',
-        validation: Validators.required
-      },
+    const fields: Field[][] = [
+      [
+        {
+          name: 'pais',
+          label: 'País',
+          type: 'select',
+          options: this.transformedPaisList,
+          validation: Validators.required
+        }
+      ],
+      [
+        {
+          name: 'clave',
+          label: 'Clave',
+          type: 'text',
+          validation: Validators.required
+        }
+      ],
+      [
+        {
+          name: 'nombre',
+          label: 'Nombre',
+          type: 'text',
+          validation: Validators.required
+        }
+      ],
     ]
 
     let titleDialog = 'Registrar estado'
@@ -195,12 +206,14 @@ export class EstadoComponent implements OnInit {
       if (data.id) {
         result = ({...result, id: data.id})
         this.estadoService.update(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       } else {
         this.estadoService.create(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       }

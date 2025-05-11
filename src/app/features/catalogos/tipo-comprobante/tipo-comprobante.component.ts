@@ -36,7 +36,7 @@ import {TipoComprobanteService} from '../../../core/services/tipo-comprobante.se
   templateUrl: './tipo-comprobante.component.html',
   styleUrl: './tipo-comprobante.component.css'
 })
-export class TipoComprobanteComponent implements OnInit{
+export class TipoComprobanteComponent implements OnInit {
 
   dataList: TipoComprobante[] = [];
   estadoList: Partial<Estado>[] = [];
@@ -59,7 +59,12 @@ export class TipoComprobanteComponent implements OnInit{
   actions = [
     {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
     {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'Recuperar eliminado', icon: "restore_from_trash", tooltipText: 'Recuperar registro eliminado', callback: (item: any) => this.recoverRegister(item.id)}
+    {
+      name: 'Recuperar eliminado',
+      icon: "restore_from_trash",
+      tooltipText: 'Recuperar registro eliminado',
+      callback: (item: any) => this.recoverRegister(item.id)
+    }
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -68,7 +73,8 @@ export class TipoComprobanteComponent implements OnInit{
     private tipoComprobanteService: TipoComprobanteService,
     private genericoService: GenericoService,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     this.lista();
@@ -106,11 +112,11 @@ export class TipoComprobanteComponent implements OnInit{
   }
 
   procesarfiltros(form: any) {
-    this.queryParams= ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
 
-  resetFormFiltros(){
+  resetFormFiltros() {
     this.queryParams = {
       max: 10,
       offset: 0,
@@ -128,24 +134,30 @@ export class TipoComprobanteComponent implements OnInit{
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[] = [
-      {
-        name: 'clave',
-        label: 'Clave',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'nombre',
-        label: 'Nombre',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'descripcion',
-        label: 'Descripción',
-        type: 'text',
-      },
+    const fields: Field[][] = [
+      [
+        {
+          name: 'clave',
+          label: 'Clave',
+          type: 'text',
+          validation: Validators.required
+        }
+      ],
+      [
+        {
+          name: 'nombre',
+          label: 'Nombre',
+          type: 'text',
+          validation: Validators.required
+        }
+      ],
+      [
+        {
+          name: 'descripcion',
+          label: 'Descripción',
+          type: 'text',
+        }
+      ],
     ]
 
     let titleDialog = 'Registrar tipo de comprobante'
@@ -167,12 +179,14 @@ export class TipoComprobanteComponent implements OnInit{
       if (data.id) {
         result = ({...result, id: data.id})
         this.tipoComprobanteService.update(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       } else {
         this.tipoComprobanteService.create(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       }

@@ -40,7 +40,7 @@ import {MetodoDePago} from '../../../shared/models/MetodoDePago';
     TablaGenericaComponent
   ],
   templateUrl: './comprobante-metodo-pago.component.html',
-  styleUrl: './comprobante-metodo-pago.component.css'
+  styleUrl: './comprobante-metodo-pago.component.scss'
 })
 export class ComprobanteMetodoPagoComponent implements OnInit{
   estadoList: Partial<Estado>[] = [];
@@ -188,63 +188,80 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[] = [
-      {
-        name: 'clave',
-        label: 'Clave',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'simbolo',
-        label: 'Símbolo',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'nombre',
-        label: 'Nombre',
-        type: 'text',
-        validation: Validators.required
-      },
-      {
-        name: 'tipoComprobante',
-        label: 'Tipo de comprobante',
-        type: 'select',
-        options: this.transformedTipoComprobanteList,
-        validation: Validators.required
-      },
-      {
-        name: 'valor',
-        label: 'Valor',
-        type: 'number',
-        validation: Validators.required
-      },
-      {
-        name: 'pais',
-        label: 'País',
-        type: 'select',
-        options: this.transformedPaisList,
-        validation: Validators.required
-      },
-      {
-        name: 'metodoDePago',
-        label: 'Método de pago',
-        type: 'select',
-        options: this.transformedMetodoPagoList,
-        validation: Validators.required
-      },
-      {
-        name: 'descripcion',
-        label: 'Descripción',
-        type: 'text',
-      },
-      {
-        name: 'imagen',
-        label: 'Imagen',
-        type: 'file',
-        hideInput: true
-      },
+    const fields: Field[][] = [
+      [
+        {
+          name: 'clave',
+          label: 'Clave',
+          type: 'text',
+          validation: Validators.compose([Validators.required]),
+          fillColumn: 'fill-two-column'
+        },
+        {
+          name: 'simbolo',
+          label: 'Símbolo',
+          type: 'text',
+          validation: Validators.required,
+          fillColumn: 'fill-one-column'
+        },
+      ],
+      [
+        {
+          name: 'nombre',
+          label: 'Nombre',
+          type: 'text',
+          validation: Validators.required,
+          fillColumn: 'fill-one-column'
+        },
+      ],
+      [
+        {
+          name: 'tipoComprobante',
+          label: 'Tipo de comprobante',
+          type: 'select',
+          options: this.transformedTipoComprobanteList,
+          validation: Validators.required,
+          fillColumn: 'fill-two-column'
+        },
+        {
+          name: 'valor',
+          label: 'Valor',
+          type: 'number',
+          validation: Validators.required,
+          fillColumn: 'fill-one-column'
+        },
+      ],
+      [
+        {
+          name: 'pais',
+          label: 'País',
+          type: 'select',
+          options: this.transformedPaisList,
+          validation: Validators.required
+        },
+        {
+          name: 'metodoDePago',
+          label: 'Método de pago',
+          type: 'select',
+          options: this.transformedMetodoPagoList,
+          validation: Validators.required
+        },
+      ],
+      [
+        {
+          name: 'descripcion',
+          label: 'Descripción',
+          type: 'text',
+        },
+      ],
+      [
+        {
+          name: 'imagen',
+          label: 'Imagen',
+          type: 'file',
+          hideInput: true
+        },
+      ]
     ]
 
     let titleDialog = 'Registrar tipo de ticket'
@@ -258,8 +275,10 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
         fields,
         data
       },
+      panelClass: 'dialog-linnegocios',
       disableClose: true,
-      width: '50vw',
+      minWidth: '50vw',
+      maxWidth: '75vw',
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {

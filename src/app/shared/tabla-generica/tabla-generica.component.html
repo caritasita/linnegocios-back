@@ -16,8 +16,16 @@
             {{ element[column.clave] | date:'dd-MM-yyyy HH:mm a' }}
           } @else if (column.tipo == 'boleano') {
             {{ element[column.clave] ? 'Activo' : 'Inactivo' }}
+          } @else if (column.tipo == 'moneda') {
+            {{ element[column.clave] | currency }}
+          } @else if (column.tipo == 'porcentaje') {
+            {{ (element[column.clave] / 100) | percent }}
           } @else {
-            {{ isObject(element[column.clave]) ? element[column.clave].nombre : element[column.clave] }}
+            @if (isObject(element[column.clave])) {
+              {{ element[column.clave].nombre || '---' }}
+            } @else {
+              {{ element[column.clave] || '---' }}
+            }
           }
 
         </ng-template>
@@ -28,14 +36,16 @@
       <th mat-header-cell *matHeaderCellDef> Acciones</th>
       <td mat-cell *matCellDef="let element">
         <ng-container *ngFor="let action of actions">
-          <button mat-icon-button *ngIf="element.activo && action.icon !== 'restore_from_trash'"
-                  (click)="action.callback(element)">
-            <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
-          </button>
-          <button mat-icon-button *ngIf="!element.activo && action.icon === 'restore_from_trash'"
-                  (click)="action.callback(element)">
-            <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
-          </button>
+          @if (element.activo && action.icon !== 'restore_from_trash') {
+            <button mat-icon-button (click)="action.callback(element)">
+              <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
+            </button>
+          }
+          @if (!element.hasOwnProperty('activo') || !element.activo && action.icon === 'restore_from_trash') {
+            <button mat-icon-button (click)="action.callback(element)">
+              <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
+            </button>
+          }
         </ng-container>
       </td>
     </ng-container>

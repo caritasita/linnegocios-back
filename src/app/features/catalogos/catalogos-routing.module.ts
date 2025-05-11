@@ -8,7 +8,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./comprobante-metodo-pago/comprobante-metodo-pago.component').then(m => m.ComprobanteMetodoPagoComponent)
+    loadComponent: () => import('./impuestos-producto/impuestos-producto.component').then(m => m.ImpuestosProductoComponent)
   }, // Ruta por defecto
   {
     path: 'pais',
@@ -51,10 +51,6 @@ const routes: Routes = [
     loadComponent: () => import('./estatus-seguimiento-negocio/estatus-seguimiento-negocio.component').then(m => m.EstatusSeguimientoNegocioComponent)
   },
   {
-    path: 'impuestosProducto',
-    loadComponent: () => import('./impuestos-producto/impuestos-producto.component').then(m => m.ImpuestosProductoComponent)
-  },
-  {
     path: 'metaActivacion',
     loadComponent: () => import('./meta-activacion/meta-activacion.component').then(m => m.MetaActivacionComponent)
   },
@@ -65,6 +61,10 @@ const routes: Routes = [
   {
     path: 'experienciaAgente',
     loadComponent: () => import('./experiencia-agente/experiencia-agente.component').then(m => m.ExperienciaAgenteComponent)
+  },
+  {
+    path: 'impuestosProducto',
+    loadComponent: () => import('./impuestos-producto/impuestos-producto.component').then(m => m.ImpuestosProductoComponent)
   },
 
   { path: '**', loadComponent: () => import('./pais/pais.component').then(m => m.PaisComponent) },

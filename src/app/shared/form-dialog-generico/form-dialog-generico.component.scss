@@ -1,0 +1,34 @@
+.container {
+  max-width: 500px;
+  margin: 20px auto;
+}
+.image-preview {
+  margin-bottom: 15px;
+  text-align: center;
+}
+.image-preview img {
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.form-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  column-gap: 24px; /* Espaciado entre columnas y filas */
+  margin-bottom: 12px;
+  .fill-one-column{
+    grid-column: span 1;
+  }
+
+  .fill-two-column{
+    grid-column: span 2;
+  }
+
+  .fill-three-column{
+    grid-column: span 3;
+  }
+}
+
+

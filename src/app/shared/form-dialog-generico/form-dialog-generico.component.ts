@@ -9,6 +9,8 @@ import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatCardModule} from '@angular/material/card';
+import {FormErrorsComponent} from '../form-errors/form-errors.component';
+import {MatSlideToggle} from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-form-generico',
@@ -23,16 +25,20 @@ import {MatCardModule} from '@angular/material/card';
     MatInputModule,
     MatSelectModule,
     NgxMatSelectSearchModule,
-    MatCardModule
+    MatCardModule,
+    FormErrorsComponent,
+    MatSlideToggle
   ],
   templateUrl: './form-dialog-generico.component.html',
-  styleUrl: './form-dialog-generico.component.css',
+  styleUrl: './form-dialog-generico.component.scss',
 })
 export class FormDialogGenericoComponent implements OnInit {
-  @Input() fields: Field[] = [];
+  @Input() fields: Field[][] = [];
   @Input() data: any = {};
   @Input() titleDialog: string = "Registrar";
   @Output() submitForm = new EventEmitter<any>();
+
+  fieldsFlat!: Field[];
 
   form!: FormGroup;
   searchControls: { [key: string]: FormControl } = {};
@@ -51,8 +57,10 @@ export class FormDialogGenericoComponent implements OnInit {
     this.titleDialog = this.dialogData.titleDialog;
     this.data = this.dialogData.data || {};
 
+    this.fieldsFlat= this.fields.flat()
+
     const formGroup: { [key: string]: FormControl | FormGroup } = {}; // Permite FormGroup anidado
-    this.fields.forEach((field: any) => {
+    this.fieldsFlat.forEach((field: any) => {
       if (field.type === 'file') {
         // Crear un FormGroup anidado para el campo "imagen"
         formGroup[field.name] = this.fb.group({
@@ -82,7 +90,7 @@ export class FormDialogGenericoComponent implements OnInit {
           // Establecer el valor del FormControl al ID correspondiente
           const selectedOption = this.data[field.name];
           if (selectedOption) {
-            formGroup[field.name].setValue(selectedOption.id); // Selecciona el ID a editar
+            formGroup[field.name].setValue(selectedOption.id || selectedOption.clave); // Selecciona el ID a editar
           }
         }
       }
@@ -144,6 +152,7 @@ export interface Field {
   options?: OptionField[];
   validation?: any;
   hideInput?: boolean;
+  fillColumn?: string;
 }
 
 export interface OptionField {

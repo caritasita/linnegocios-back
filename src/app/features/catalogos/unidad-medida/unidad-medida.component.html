@@ -1,1 +1,20 @@
-<p>unidad-medida works!</p>
+<mat-drawer-container class="content-mat-drawer mat-elevation-z2 p-0" [hasBackdrop]="true">
+  <mat-card class="mat-elevation-z8 bg-blanco content-boxing">
+    <mat-card-header class="p-0 bg-blanco border-bottom">
+      <mat-toolbar>
+        <span>Unidades de medida</span>
+        <div class="spacer"></div>
+      </mat-toolbar>
+    </mat-card-header>
+
+    <mat-card-content class="p-0">
+        <app-tabla-generica
+          #tablaGenerica
+          [columns]="columns"
+          [data]="dataList"
+          [totalRecords]="totalRecords"
+        ></app-tabla-generica>
+    </mat-card-content>
+
+  </mat-card>
+</mat-drawer-container>

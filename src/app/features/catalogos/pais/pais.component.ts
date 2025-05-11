@@ -49,7 +49,7 @@ export class PaisComponent implements OnInit {
     filtroGeneral: '',
     registrosEliminados: false,
   };
-  columns : ColumnasTabla[] = [
+  columns: ColumnasTabla[] = [
     {clave: 'fechaRegistro', valor: 'Fecha de registro', tipo: "fecha"},
     {clave: 'clave', valor: 'Clave', tipo: "texto"},
     {clave: 'nombre', valor: 'Nombre', tipo: "texto"},
@@ -59,7 +59,12 @@ export class PaisComponent implements OnInit {
   actions = [
     {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
     {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'Recuperar eliminado', icon: "restore_from_trash", tooltipText: 'Recuperar registro eliminado', callback: (item: any) => this.recoverRegister(item.id)}
+    {
+      name: 'Recuperar eliminado',
+      icon: "restore_from_trash",
+      tooltipText: 'Recuperar registro eliminado',
+      callback: (item: any) => this.recoverRegister(item.id)
+    }
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -106,11 +111,11 @@ export class PaisComponent implements OnInit {
   }
 
   procesarfiltros(form: any) {
-    this.queryParams= ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
 
-  resetFormFiltros(){
+  resetFormFiltros() {
     this.queryParams = {
       max: 10,
       offset: 0,
@@ -139,14 +144,14 @@ export class PaisComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields : Field[] = [
-      {name: 'clave' ,label: 'Clave', type: 'text', validation: Validators.required},
-      {name: 'nombre', label: 'Nombre', type: 'text', validation: Validators.required}
+    const fields: Field[][] = [
+      [{name: 'clave', label: 'Clave', type: 'text', validation: Validators.required}],
+      [{name: 'nombre', label: 'Nombre', type: 'text', validation: Validators.required}]
     ]
 
-    let titleDialog= 'Registrar país'
-    if(data.id) {
-      titleDialog= 'Editar pais'
+    let titleDialog = 'Registrar país'
+    if (data.id) {
+      titleDialog = 'Editar pais'
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
@@ -164,12 +169,14 @@ export class PaisComponent implements OnInit {
       if (data.id) {
         result = ({...result, id: data.id})
         this.paisService.update(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       } else {
         this.paisService.create(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
         });
       }
