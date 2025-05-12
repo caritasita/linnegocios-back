@@ -1,5 +1,5 @@
 export class Rol {
-  id: number;
-  authority: string;
-  vistasBloqueadas: string[];
+  id!: number;
+  authority!: string;
+  vistasBloqueadas!: string[];
 }

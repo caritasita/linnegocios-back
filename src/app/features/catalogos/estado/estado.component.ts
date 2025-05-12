@@ -45,7 +45,7 @@ import {GenericoService} from '../../../core/services/generico.service';
 })
 export class EstadoComponent implements OnInit {
   paisList: Pais[] = [];
-  estadoList: Partial<Estado>[] = [];
+  dataList: Partial<Estado>[] = [];
   totalRecords = 0;
   fieldsFilters!: Field[];
   transformedPaisList!: any;
@@ -98,10 +98,10 @@ export class EstadoComponent implements OnInit {
         ...this.queryParams,
         registrosActivos: !this.queryParams.registrosEliminados,
       })
-      .subscribe((estados: any) => {
+      .subscribe((response: any) => {
 
-        this.estadoList = estados.data;
-        this.totalRecords = estados.count;
+        this.dataList = response.data;
+        this.totalRecords = response.count;
       });
   }
 

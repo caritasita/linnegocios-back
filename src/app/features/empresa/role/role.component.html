@@ -2,7 +2,7 @@
   <mat-card class="bg-blanco content-boxing p-0">
     <mat-card-header class="p-0 bg-blanco border-bottom">
       <mat-toolbar>
-        <span>Estados</span>
+        <span>Roles</span>
         <div class="spacer"></div>
         <button mat-button mat-stroked-button (click)="openFormDialog()" class="mr-3">
           <mat-icon>add</mat-icon>
@@ -16,14 +16,14 @@
     </mat-card-header>
 
     <mat-card-content class="p-0">
-        <app-tabla-generica
-          #tablaGenerica
-          [columns]="columns"
-          [data]="dataList"
-          [totalRecords]="totalRecords"
-          [actions]="actions"
-          (pageChange)="handlePageChange($event)"
-        ></app-tabla-generica>
+      <app-tabla-generica
+        #tablaGenerica
+        [columns]="columns"
+        [data]="dataList"
+        [totalRecords]="totalRecords"
+        [actions]="actions"
+        (pageChange)="handlePageChange($event)"
+      ></app-tabla-generica>
     </mat-card-content>
   </mat-card>
 

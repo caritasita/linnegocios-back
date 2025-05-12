@@ -150,6 +150,7 @@ export interface Field {
   label: string;
   name: string;
   type: string;
+  maxLenght?: number;
   options?: OptionField[];
   validation?: any;
   hideInput?: boolean;

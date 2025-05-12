@@ -4,14 +4,16 @@
   <form [formGroup]="form">
     <div *ngFor="let grupo of fields" class="form-container">
       <div *ngFor="let field of grupo" class="{{field.fillColumn}}">
-        @if (['text', 'number', 'email', 'tel'].includes(field.type)) {
+        @if (['text', 'number', 'email', 'tel'].includes(field.type) && !field.hideInput) {
           <mat-form-field appearance="outline"
                           class="width-content">
             <mat-label>{{ field.label | uppercase }}</mat-label>
             <input matInput
                    [type]="field.type"
                    [formControlName]="field.name"
-                   (keydown)="onKeydown($event)">
+                   (keydown)="onKeydown($event)"
+                   [maxlength]="field?.maxLenght || 10000"
+            >
 
             <!-- Botón para limpiar el campo -->
             <button *ngIf="form.get(field.name)?.value && (!data.id || field.name !== 'clave')"
@@ -49,7 +51,7 @@
           </mat-card>
         }
 
-        <mat-form-field *ngIf="field.type === 'select'" class="width-content" appearance="outline">
+        <mat-form-field *ngIf="field.type === 'select' && !field.hideInput" class="width-content" appearance="outline">
           <mat-label>{{ field.label | uppercase }}</mat-label>
           <mat-select [formControlName]="field.name">
             <mat-select-trigger>
@@ -71,7 +73,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-slide-toggle *ngIf="field.type === 'toggle'" [formControlName]="field.name">{{field.label}}</mat-slide-toggle>
+        <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.hideInput" [formControlName]="field.name">{{field.label}}</mat-slide-toggle>
 
       </div>
     </div>

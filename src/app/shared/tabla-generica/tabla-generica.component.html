@@ -1,7 +1,4 @@
 <div class="table-container mat-elevation-z0">
-  <!--  <div class="table-header">-->
-  <!--    <input matInput (keyup)="applyFilter($event)" placeholder="Filtrar">-->
-  <!--  </div>-->
   <table mat-table [dataSource]="dataSource" matSort>
 
     <ng-container *ngFor="let column of columns; trackBy: trackByFn" [matColumnDef]="column.clave">

@@ -306,7 +306,11 @@ tr:hover {
 .mdc-data-table__header-cell {
   font-weight: 500 !important;
   letter-spacing: 0.2px !important;
-  padding: 0 6px !important;
+  &:first-child, &:last-child {
+    padding: 0 16px !important;
+
+  }
+  padding: 0 8px !important;
 
 }
 
