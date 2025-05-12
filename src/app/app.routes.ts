@@ -26,5 +26,10 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     loadChildren: () => import('./features/empresa/empresa.module').then(m => m.EmpresaModule)
   },
+  {
+    path: 'negocios',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./features/negocio/negocio.module').then(m => m.NegocioModule)
+  },
   { path: '**', redirectTo: 'login' } // Redirigir cualquier otra ruta a login
 ];

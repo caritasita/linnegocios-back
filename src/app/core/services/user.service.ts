@@ -26,6 +26,10 @@ export class UserService {
     return this.crudService.delete(UrlServer.user, id);
   }
 
+  resetPassword(idUser: number): Observable<any> {
+    return this.crudService.create({ idUser }, UrlServer.resetPassword);
+  }
+
   recover(id: number): Observable<any> {
     return this.crudService.update({ id }, UrlServer.reactivarUser);
   }

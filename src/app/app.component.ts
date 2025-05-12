@@ -54,7 +54,7 @@ constructor(private router: Router) {
 
     this.isAuthenticated = !!localStorage.getItem('user_access');
     if(this.isAuthenticated){
-      this.router.navigateByUrl('/empresas').then((r) => {});
+      this.router.navigateByUrl('/negocios').then((r) => {});
     }
   }
 

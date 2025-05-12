@@ -60,9 +60,9 @@ export class UserComponent implements OnInit {
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
   actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'ResetDatosDeAcceso', icon: "lock_reset", tooltipText: 'Resetear contraseña', callback: (item: any) => this.delete(item)},
+    {name: 'editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
+    {name: 'eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+    {name: 'resetDatosDeAcceso', icon: "lock_reset", tooltipText: 'Resetear contraseña', callback: (item: any) => this.resetPassword(item?.id)},
     {
       name: 'Recuperar eliminado',
       icon: "restore_from_trash",
@@ -294,6 +294,21 @@ export class UserComponent implements OnInit {
 
     this.userService.delete(objeto.id).subscribe(() => {
       this.lista();
+    });
+  }
+
+  private async resetPassword(id: number) {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Está seguro de resetear la contraseña del usuario?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
+    this.userService.resetPassword(id).subscribe(() => {
+      this.lista()
+      this.genericoService.openSnackBar('Contraseña reseteada correctamente.', 'Aceptar', 'snack-bar-success', () => {
+      });
     });
   }
 
