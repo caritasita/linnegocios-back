@@ -7,6 +7,7 @@ import {HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi
 import {TokenInterceptor} from './core/interceptors/token.interceptor';
 import {AuthService} from './core/services/auth.service';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {DatePipe} from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     AuthService,
     MatSnackBarModule,
     provideAnimationsAsync(),
+    DatePipe,
     {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},
   ]
 };

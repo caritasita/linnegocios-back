@@ -35,6 +35,7 @@
   width: 100%;
   font-size: 1rem !important;
   a{
+    font-weight: 700 !important;
     padding-left: 1rem !important;
     height: 50px !important;
     border-radius: 0;
@@ -156,6 +157,7 @@
   flex-direction: column;
   height: 100vh; /* Asegura que el sidenav ocupe toda la altura */
   overflow: hidden !important;
+
 }
 
 mat-accordion {

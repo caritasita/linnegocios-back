@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 
 import { NegocioRoutingModule } from './negocio-routing.module';
 
@@ -8,7 +8,9 @@ import { NegocioRoutingModule } from './negocio-routing.module';
   declarations: [],
   imports: [
     CommonModule,
-    NegocioRoutingModule
-  ]
+    NegocioRoutingModule,
+    DatePipe
+  ],
+  providers: [DatePipe]
 })
 export class NegocioModule { }

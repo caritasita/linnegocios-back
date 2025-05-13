@@ -1,6 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 html, body {
   height: 100%;
@@ -9,7 +8,7 @@ html, body {
 
 body {
   margin: 0;
-  font-family: 'Lato', sans-serif !important;
+  font-family: 'Roboto', sans-serif !important;
 }
 
 @import "variables";
@@ -79,6 +78,18 @@ tr:hover {
     background-color: $color-primario-50 !important; /* Color para el botón deshabilitado */
     color: $color-blanco; /* Color del texto para el botón deshabilitado */
   }
+}
+
+.ml-1 {
+  margin-left: $margin-1;
+}
+
+.ml-2 {
+  margin-left: $margin-2;
+}
+
+.ml-3 {
+  margin-left: $margin-3;
 }
 
 .mr-1 {
@@ -214,7 +225,7 @@ tr:hover {
 }
 
 .mat-drawer {
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2), 0px 1px 10px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0px 1px 10px rgba(0, 0, 0, 0.1) !important;
   border-radius: 8px; /* Esquinas redondeadas para un aspecto más suave */
 }
 
@@ -304,7 +315,6 @@ tr:hover {
 }
 
 .mdc-data-table__header-cell {
-  font-weight: 500 !important;
   letter-spacing: 0.2px !important;
   &:first-child, &:last-child {
     padding: 0 16px !important;
@@ -319,8 +329,9 @@ tr:hover {
     padding: 0 16px !important;
 
   }
+  font-weight: 400 !important;
   padding: 6px 8px !important;
-  font-family: 'Lato', serif;
+  font-family: 'Roboto', serif;
   letter-spacing: 0.2px !important
 }
 
@@ -329,9 +340,16 @@ tr:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-.font-size-title-fila-tabla{
-  font-size: 0.7rem;
-  margin-right: 8px;
-  font-weight: 800 !important;
+.fz-title-fila-tabla{
+  margin-right: 6px;
+  font-weight: 700 !important;
+}
+
+.size-comentario-tabla{
+  width: 300px !important;
+  @media (max-width: 1366px) {
+    width: 200px !important;
+  }
+  font-size: 0.75rem;
 }
 

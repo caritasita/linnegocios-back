@@ -110,9 +110,9 @@ export class CredencialesFacturacionEmpresaComponent implements OnInit {
     return data.map((item: any) => ({
       id: item?.id,
       empresa: item?.empresa,
-      datosFacturacion: `<b class="font-size-title-fila-tabla">Proveedor:</b> ${item.proveedorFacturacion.nombre} <br>
- <b class="font-size-title-fila-tabla">Usuario:</b> ${item.usuario} <br>
-  <b class="font-size-title-fila-tabla">URL:</b> ${item.url}`,
+      datosFacturacion: `<b class="fz-title-fila-tabla">Proveedor:</b> ${item.proveedorFacturacion.nombre} <br>
+ <b class="fz-title-fila-tabla">Usuario:</b> ${item.usuario} <br>
+  <b class="fz-title-fila-tabla">URL:</b> ${item.url}`,
       proveedorFacturacion: item?.proveedorFacturacion,
       usuario: item?.usuario,
       url: item?.url,
