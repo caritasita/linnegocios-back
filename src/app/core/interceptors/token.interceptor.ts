@@ -10,11 +10,10 @@ import {
 
 import {BehaviorSubject, catchError, filter, map, Observable, switchMap, take, throwError} from 'rxjs';
 import {AuthService} from '../services/auth.service';
-import {environment} from '../../../environments/environment.development';
 import {Router} from '@angular/router';
 import {GenericoService} from '../services/generico.service';
-import {LoadingComponent} from '../../features/loading/loading.component';
 import {LoadingService} from '../services/loading.service';
+import {environment} from '../../../environments/environment';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {

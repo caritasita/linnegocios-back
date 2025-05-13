@@ -9,6 +9,16 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+
+  private BLOCKED_ROLES = [
+    'ROLE_TENDERO',
+    'ROLE_CAJERO',
+    'ROLE_CAJERO_ADMIN',
+    'ROLE_CLIENTE',
+    'ROLE_CLIENTE_ECOMMERCE',
+    'ROLE_REPARTIDOR',
+  ];
+
   login(username: string, password: string, rememberMe: boolean) {
     const params = { username, password };
     return this.http.post<User>(`api/login`, params).pipe(
@@ -95,5 +105,25 @@ export class AuthService {
   isRememberMe() {
     const isRemermee = this.getKeyLocalStorage('rememberme');
     return isRemermee;
+  }
+
+  getRoles() {
+    return this.getKeyLocalStorage('roles');
+  }
+
+  isAdmin() {
+    return this.getRoles().includes('ROLE_ADMIN');
+  }
+
+  isCajero() {
+    return this.getRoles().includes('ROLE_CAJERO');
+  }
+
+  isCajeroAdmin() {
+    return this.getRoles().includes('ROLE_CAJERO_ADMIN');
+  }
+
+  isTendero() {
+    return this.getRoles().includes('ROLE_TENDERO');
   }
 }

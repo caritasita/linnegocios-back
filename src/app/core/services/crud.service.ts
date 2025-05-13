@@ -27,4 +27,13 @@ export class CrudService {
   delete(url: string, id: number): Observable<any> {
     return this.http.delete(`${url}/${id}`);
   }
+
+  updateById(object: any, url: string): Observable<any> {
+    if (object.id) {
+      url = url + '/' + object.id;
+    }
+    return this.http.put(url, object).pipe(map(data => {
+      return data;
+    }));
+  }
 }

@@ -10,7 +10,7 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {GenericoService} from '../../../core/services/generico.service';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {Negocio} from '../../../shared/models/negocio';
 import {NegocioService} from '../../../core/services/negocio.service';
@@ -41,8 +41,8 @@ import {GiroComercial} from '../../../shared/models/GiroComercial';
 })
 export class NegocioComponent implements OnInit {
   dataList: Partial<Negocio>[] = [];
-  estadosList: Partial<Estado>[]= [];
-  giroComercialList: GiroComercial[]= [];
+  estadosList: Partial<Estado>[] = [];
+  giroComercialList: GiroComercial[] = [];
 
   totalRecords = 0;
   fieldsFilters!: Field[];
@@ -58,15 +58,46 @@ export class NegocioComponent implements OnInit {
     {clave: 'datosContacto', valor: 'Datos de contacto', tipo: "texto"},
     {clave: 'informacionNegocio', valor: 'Información del negocio', tipo: "texto"},
     {clave: 'seguimiento', valor: 'Seguimiento', tipo: "texto"},
-    {clave: 'autopago', valor: 'Autopago', tipo: "texto"},
+    // {clave: 'autopago', valor: 'Autopago', tipo: "texto"},
   ];
   actions = [
-    {name: 'Editar', icon: "key", tooltipText: 'Asignar ID TAE', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Editar', icon: "edit_calendar", tooltipText: 'Registrar seguimiento', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Editar', icon: "history_2", tooltipText: 'Reiniciar negocio', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Editar', icon: "more_time", tooltipText: 'Cambiar tipo de licencia', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Editar', icon: "list_alt", tooltipText: 'Log asignación agente', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Editar', icon: "person_search", tooltipText: 'Buscar agente', callback: (item: any) => this.openFormDialog(item)},
+    {
+      name: 'Editar',
+      icon: "key",
+      tooltipText: 'Credenciales electrónicas',
+      hideIcon: false,
+      callback: (item: any) => this.activarCredencialElectrnico(item)
+    },
+    {
+      name: 'Editar',
+      icon: "edit_calendar",
+      tooltipText: 'Registrar seguimiento',
+      callback: (item: any) => this.openFormDialog(item)
+    },
+    {
+      name: 'Reiniciar negocio',
+      icon: "history_2",
+      tooltipText: 'Reiniciar negocio',
+      callback: (item: any) => this.resetBusiness(item)
+    },
+    {
+      name: 'Editar',
+      icon: "more_time",
+      tooltipText: 'Cambiar tipo de licencia',
+      callback: (item: any) => this.promoteLicence(item)
+    },
+    {
+      name: 'Editar',
+      icon: "list_alt",
+      tooltipText: 'Log asignación agente',
+      callback: (item: any) => this.openFormDialog(item)
+    },
+    {
+      name: 'Editar',
+      icon: "person_search",
+      tooltipText: 'Buscar agente',
+      callback: (item: any) => this.openFormDialog(item)
+    },
     {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
     {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
   ];
@@ -99,6 +130,7 @@ export class NegocioComponent implements OnInit {
       .subscribe((response: any) => {
         console.log('response.data');
         this.dataList = this.generarTablaPersonalizada(response.data);
+        console.table(this.dataList);
         this.totalRecords = response.count;
       });
   }
@@ -120,24 +152,25 @@ export class NegocioComponent implements OnInit {
       informacionNegocio: `<br>
 <b class="fz-title-fila-tabla">F. registro: </b> ${this.genericoService.getFormatedDateTime(item.licencia.fechaCreacion)}<br>
 <b class="fz-title-fila-tabla">F. vigencia: </b> ${this.genericoService.getFormatedDateTime(item.licencia.fechaLimitePago)} <br>
-<b class="fz-title-fila-tabla">F. verificación: </b> ${this.genericoService.getFormatedDateTime(item.fechaVerificacion)}<br>
-<b class="fz-title-fila-tabla">Giro:</b> ${item.giroComercial[0].nombre}<br>
+<b class="fz-title-fila-tabla">F. verificación: </b> ${this.genericoService.getFormatedDateTime(item.fechaVerificacion) || '---'}<br>
+<b class="fz-title-fila-tabla">F. última venta: </b>${item.fechaUltimaVenta ? this.genericoService.getFormatedDateTime(item.fechaUltimaVenta) : '---'}<br>
 <b class="fz-title-fila-tabla">Estatus:</b> <span> ${item.activo ? 'Activo' : 'Eliminado'}</span>
 <b class="fz-title-fila-tabla ml-2">Verificado:</b> <span>${item.fechaVerificacion ? 'SI' : 'NO'}</span><br>
-<b class="fz-title-fila-tabla">F. última venta: </b>${item.fechaUltimaVenta ? this.genericoService.getFormatedDateTime(item.fechaUltimaVenta) : '---'}<br>
-<b class="fz-title-fila-tabla">D. facturación:</b> <span> ${item.datosFacturaNegocio ? 'SI' : 'NO'}</span>
-<b class="fz-title-fila-tabla ml-2">Días sin venta:</b> <span>${item.fechaUltimaVenta ? item.diasSinVenta : '---'}</span><br>
+<b class="fz-title-fila-tabla">D. facturación:</b> <span> ${item.datosFacturaNegocio ? 'SI' : 'NO'}</span> <br>
+<b class="fz-title-fila-tabla">Días sin venta:</b> <span>${item.fechaUltimaVenta ? item.diasSinVenta : '---'}</span><br>
 <b class="fz-title-fila-tabla">Inventario:</b><span>${item.conteoInventarios > 0 ? 'SI' : 'NO'}</span>
-<b class="fz-title-fila-tabla ml-2">Cant. Regis.:</b><span>${item.conteoInventarios || 0}</span><br><br>
+<b class="fz-title-fila-tabla ml-2">Cant. Regis.:</b><span>${item.conteoInventarios || 0}</span><br>
+<b class="fz-title-fila-tabla">Giro:</b> ${item.giroComercial[0]?.nombre || '---'}<br><br>
 `,
       seguimiento: `<br>
 <b class="fz-title-fila-tabla">Agente:</b> ${item.agente.nombre ? item.agente.nombre + item.agente.apeidoPaterno + item.agente.apeidoMaterno : '---'}<br>
 <b class="fz-title-fila-tabla">Existe seguimiento:</b><span> ${item.existSeguimiento ? 'Si' : 'No'}</span><br>
 <b class="fz-title-fila-tabla">Último seguimiento:</b><br>
-${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : 'Sin seguimiento'}<br>
+${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '---'}<br>
 <b class="fz-title-fila-tabla">Último comentario:</b><br>
-<div class="size-comentario-tabla">${item.ultimoSeguimiento ? item.ultimoSeguimiento.mensaje : ''}</div><br>
-        `
+<div class="size-comentario-tabla">${item.ultimoSeguimiento ? item.ultimoSeguimiento.mensaje : '---'}</div><br>
+        `,
+      ...data[0],
     }));
   }
 
@@ -311,7 +344,52 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : 'S
 
     this.negocioService.delete(objeto.id).subscribe(() => {
       this.lista();
+      this.genericoService.openSnackBar('Registro eliminado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+      });
     });
   }
 
+  private async activarCredencialElectrnico(negocio: Negocio) {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Está seguro de restablecer las credenciales del negocio?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+    this.crudService
+      .update({id: negocio.idLinntae, idNegocio: negocio.id}, UrlServer.resetearCredencialesTae)
+      .subscribe(() => {
+        // this.resetOffset();
+      });
+  }
+
+  private async resetBusiness(negocio: Negocio) {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Está seguro de reiniciar el negocio? \n (Esta acción eliminara todo lo relacionado al negocio)'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+    this.crudService
+      .update({id: negocio.id}, UrlServer.resetearNegocio)
+      .subscribe(() => {
+        this.genericoService.openSnackBar('Negocio reiniciado exitosamente.', 'Aceptar', 'snack-bar-success', () => {
+        });
+        // this.resetOffset();
+      });
+  }
+
+  private promoteLicence(negocio: Negocio) {
+
+    const isConfirmed = this.genericoService.confirmDialog(
+      '¿Promover a licencia de tipo Soporte?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+    this.crudService.updateById({id: negocio.id}, UrlServer.promoteLicence).subscribe((response) => {
+      this.genericoService.openSnackBar(response.mensaje, 'Aceptar', 'snack-bar-success', () => {});
+        // this.resetOffset();
+    });
+  }
 }
