@@ -16,7 +16,7 @@ import {MatInputModule} from '@angular/material/input';
 import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
-import {ColumnasTabla} from '../../features/catalogos/pais/pais.component';
+import {ActionsTabla, ColumnasTabla} from '../../features/catalogos/pais/pais.component';
 import {DomSanitizer} from '@angular/platform-browser';
 import {MatSelectModule} from '@angular/material/select';
 import {StylePaginatorDirective} from '../../core/directivas/style-paginator.directive';
@@ -69,7 +69,7 @@ export class CustomPaginatorIntl extends MatPaginatorIntl {
 export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() data: any[] = [];
   @Input() columns: ColumnasTabla[] = [];
-  @Input() actions: { name: string, icon:string, tooltipText: string, callback: (item: any) => void }[] = [];
+  @Input() actions: ActionsTabla[] = [];
 
   @Input() totalRecords: number = 0;
   @Input() pageSize = 10;

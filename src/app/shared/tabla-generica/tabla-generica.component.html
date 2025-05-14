@@ -33,12 +33,7 @@
       <th mat-header-cell *matHeaderCellDef> Acciones</th>
       <td mat-cell *matCellDef="let element">
         <ng-container *ngFor="let action of actions">
-          @if (element.activo && action.icon !== 'restore_from_trash') {
-            <button mat-icon-button (click)="action.callback(element)">
-              <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
-            </button>
-          }
-          @if (!element.hasOwnProperty('activo') || !element.activo && action.icon === 'restore_from_trash') {
+          @if (!action?.hideAction?.(element)) {
             <button mat-icon-button (click)="action.callback(element)">
               <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
             </button>

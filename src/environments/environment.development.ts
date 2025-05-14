@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   demo: false,
   laboratorio: false,
-  apiUrl: 'http://localhost:8080/',
+  apiEndpoint: 'http://localhost:8080/',
   firebase: {
     apiKey: 'AIzaSyDT5smnApAxovQfI49KH5dPMw2HgqKqovg',
     authDomain: 'linnegocios-repartidor-test.firebaseapp.com',

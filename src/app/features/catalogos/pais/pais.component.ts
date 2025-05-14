@@ -19,6 +19,14 @@ export interface ColumnasTabla {
   tipo: string,
 }
 
+export interface ActionsTabla {
+  name: string,
+  icon: string,
+  tooltipText: string
+  hideAction?: (b : any) => boolean,
+  callback: (item: any) => void,
+}
+
 @Component({
   selector: 'app-pais',
   standalone: true,

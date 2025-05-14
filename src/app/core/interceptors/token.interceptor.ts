@@ -63,7 +63,7 @@ export class TokenInterceptor implements HttpInterceptor {
       headers: request.headers.set('Accept', 'application/json'),
     });
     if (!request.url.includes('linntae.mx')) {
-      request = request.clone({url: environment.apiUrl + request.url});
+      request = request.clone({url: environment.apiEndpoint + request.url});
     }
 
     return next.handle(request).pipe(
@@ -102,6 +102,10 @@ export class TokenInterceptor implements HttpInterceptor {
             status: errorRespuesta.status,
           };
           // this.errorDialogService.openDialog(data);
+          if (errorRespuesta.error && errorRespuesta.error._embedded && errorRespuesta.error._embedded.errors) {
+            const errorMessage = errorRespuesta.error._embedded.errors[0].message;
+            this.genericoService.errorDialog(errorMessage)
+          }
         } else if (errorRespuesta.status === 401) {
           if (errorRespuesta.error) {
             switch (errorRespuesta.error.message) {

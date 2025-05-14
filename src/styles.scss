@@ -80,6 +80,13 @@ tr:hover {
   }
 }
 
+.bg-danger{
+  color: $color-danger-dark !important;
+  &:hover{
+    background-color: $color-danger-light;
+  }
+}
+
 .ml-1 {
   margin-left: $margin-1;
 }

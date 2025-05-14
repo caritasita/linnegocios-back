@@ -8,7 +8,7 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {DatePipe, NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../../catalogos/pais/pais.component';
+import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
@@ -18,6 +18,9 @@ import {Estado} from '../../../shared/models/Estado';
 import {CrudService} from '../../../core/services/crud.service';
 import {UrlServer} from '../../../core/helpers/UrlServer';
 import {GiroComercial} from '../../../shared/models/GiroComercial';
+import {hasPermission} from '../../../core/helpers/utilities';
+import {permisosCredencialElectronico} from '../../../core/helpers/permissions.data';
+import {ValidationMessagesService} from '../../../core/services/validation-messages.service';
 
 @Component({
   selector: 'app-negocio',
@@ -60,46 +63,105 @@ export class NegocioComponent implements OnInit {
     {clave: 'seguimiento', valor: 'Seguimiento', tipo: "texto"},
     // {clave: 'autopago', valor: 'Autopago', tipo: "texto"},
   ];
-  actions = [
+  actions: ActionsTabla[] = [
     {
       name: 'Editar',
       icon: "key",
       tooltipText: 'Credenciales electrónicas',
-      hideIcon: false,
+      hideAction: (item: any) => {
+        if (item.idLinntae) {
+          return item.activo && item.idLinntae
+            ? hasPermission(permisosCredencialElectronico.update)
+            : hasPermission(permisosCredencialElectronico.save);
+        }
+        return false;
+      },
       callback: (item: any) => this.activarCredencialElectrnico(item)
+    },
+    {
+      name: 'Editar',
+      icon: "key",
+      tooltipText: 'Asignar ID TAE',
+      hideAction: (item: any) => {
+        if (!item.idLinntae) {
+          return hasPermission(permisosCredencialElectronico.save);
+        }
+        return false;
+      },
+      callback: (item: any) => this.asignarIdTae(item)
     },
     {
       name: 'Editar',
       icon: "edit_calendar",
       tooltipText: 'Registrar seguimiento',
+      hideAction: (item: any) => {
+        return false;
+      },
       callback: (item: any) => this.openFormDialog(item)
     },
     {
       name: 'Reiniciar negocio',
       icon: "history_2",
       tooltipText: 'Reiniciar negocio',
+      hideAction: (item: any) => {
+        return false;
+      },
       callback: (item: any) => this.resetBusiness(item)
     },
     {
       name: 'Editar',
       icon: "more_time",
+      tooltipText: 'Aumentar días licencia demo',
+      hideAction: (item: any) => {
+        return false;
+      },
+      callback: (item: any) => this.promoteLicence(item)
+    },
+    {
+      name: 'Editar',
+      icon: "workspace_premium",
       tooltipText: 'Cambiar tipo de licencia',
+      hideAction: (item: any) => {
+        return false;
+      },
       callback: (item: any) => this.promoteLicence(item)
     },
     {
       name: 'Editar',
       icon: "list_alt",
       tooltipText: 'Log asignación agente',
+      hideAction: (item: any) => {
+        return false;
+      },
       callback: (item: any) => this.openFormDialog(item)
     },
     {
       name: 'Editar',
       icon: "person_search",
       tooltipText: 'Buscar agente',
+      hideAction: (item: any) => {
+        return false;
+      },
       callback: (item: any) => this.openFormDialog(item)
     },
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+    {
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      hideAction: (item: any) => {
+        return false;
+      },
+      callback: (item: any) => this.openFormDialog(item)
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      hideAction: (item: any) => {
+        return false;
+      },
+      callback: (item: any) => this.delete(item)
+    },
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -108,7 +170,8 @@ export class NegocioComponent implements OnInit {
     private negocioService: NegocioService,
     private genericoService: GenericoService,
     private crudService: CrudService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private validationMessagesService: ValidationMessagesService
   ) {
   }
 
@@ -363,6 +426,60 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       });
   }
 
+  private asignarIdTae(negocio: Negocio) {
+    // const config: MatDialogConfig = {
+    //   data: negocio,
+    //   disableClose: true,
+    // };
+    // const dialogConfirm = this.dialog.open(
+    //   CredencialElectronicoComponent,
+    //   config,
+    // );
+    // dialogConfirm.afterClosed().subscribe((res) => {
+    //   if (!res) {
+    //     return;
+    //   }
+    //   this.resetOffset();
+    // });
+
+    const fields: Field[][] = [
+      [
+        {
+          name: 'idTae',
+          label: 'ID de linntae',
+          type: 'text',
+          validation: Validators.compose([Validators.required, this.validationMessagesService.soloNumeros()])
+        }
+      ],
+    ]
+
+    const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
+      data: {
+        titleDialog: 'Registrar ID de  Linntae',
+        fields,
+      },
+      disableClose: true,
+      minWidth: '30vw',
+    });
+
+    dialogRef.componentInstance.submitForm.subscribe(result => {
+      console.log('result');
+      console.table(result.idTae);
+      console.log('negocio');
+      console.table(negocio.id);
+      this.crudService
+        .update({
+            id: result.idTae,
+            idNegocio: negocio.id,
+            opc: 'asignarIdTae'
+          },
+          UrlServer.resetearCredencialesTae)
+        .subscribe(() => {
+          dialogRef.close();
+        });
+    });
+  }
+
   private async resetBusiness(negocio: Negocio) {
     const isConfirmed = await this.genericoService.confirmDialog(
       '¿Está seguro de reiniciar el negocio? \n (Esta acción eliminara todo lo relacionado al negocio)'
@@ -379,17 +496,18 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       });
   }
 
-  private promoteLicence(negocio: Negocio) {
+  private async promoteLicence(negocio: Negocio) {
 
-    const isConfirmed = this.genericoService.confirmDialog(
+    const isConfirmed = await this.genericoService.confirmDialog(
       '¿Promover a licencia de tipo Soporte?'
     );
     if (!isConfirmed) {
       return;
     }
     this.crudService.updateById({id: negocio.id}, UrlServer.promoteLicence).subscribe((response) => {
-      this.genericoService.openSnackBar(response.mensaje, 'Aceptar', 'snack-bar-success', () => {});
-        // this.resetOffset();
+      this.genericoService.openSnackBar(response.mensaje, 'Aceptar', 'snack-bar-success', () => {
+      });
+      // this.resetOffset();
     });
   }
 }

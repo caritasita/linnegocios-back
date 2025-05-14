@@ -5,6 +5,7 @@ import {firstValueFrom} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SnackbarGenericoComponent} from '../../shared/snackbar-generico/snackbar-generico.component';
 import {DatePipe} from '@angular/common';
+import {ErrorDialogComponent} from '../../shared/error-dialog/error-dialog.component';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,14 @@ export class GenericoService {
 
   confirmDialog(message: string): Promise<boolean> {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message }
+    });
+
+    return firstValueFrom(dialogRef.afterClosed());
+  }
+
+  errorDialog(message: string): Promise<boolean> {
+    const dialogRef = this.dialog.open(ErrorDialogComponent, {
       data: { message }
     });
 
