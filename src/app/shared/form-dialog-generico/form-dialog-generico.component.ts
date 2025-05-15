@@ -33,14 +33,15 @@ import {MatSlideToggle} from '@angular/material/slide-toggle';
   styleUrl: './form-dialog-generico.component.scss',
 })
 export class FormDialogGenericoComponent implements OnInit {
-  @Input() fields: Field[][] = [];
+  @Input() fieldForms: FieldForm[] = [];
   @Input() data: any = {};
   @Input() titleDialog: string = "Registrar";
   @Output() submitForm = new EventEmitter<any>();
 
-  fieldsFlat!: Field[];
+  fieldsFlat!: FieldForm[];
 
   form!: FormGroup;
+  forms: {[key: string]: FormGroup} = {};
   searchControls: { [key: string]: FormControl } = {};
   filteredOptions: { [key: string]: any[] } = {};
 
@@ -53,13 +54,35 @@ export class FormDialogGenericoComponent implements OnInit {
 
   ngOnInit() {
 
-    this.fields = this.dialogData.fields;
+    this.fieldForms = this.dialogData.fieldForms;
     this.titleDialog = this.dialogData.titleDialog;
     this.data = this.dialogData.data || {};
+    console.log('this.fieldForms');
+    console.table(this.fieldForms);
 
-    this.fieldsFlat= this.fields.flat()
+    // this.fieldsFlat= this.fields.flat()
 
+    for(const key of this.fieldForms){
+      // if(this.fieldForms.hasOwnProperty(key.form)){
+        this.forms[key.form] = this.createForm(key.fields)
+      console.log(`this.forms ${key.form}`);
+      console.table(this.forms[key.form].controls);
+      // }
+    }
+
+
+
+    //Al editar un registro, el único campo que se deshabilita es la clave.
+    if (this.data?.id) {
+      this.form.get('clave')?.disable();
+    }
+  }
+
+  createForm(formulario: any): FormGroup {
+    console.log('formulario');
+    console.table(formulario);
     const formGroup: { [key: string]: FormControl | FormGroup } = {}; // Permite FormGroup anidado
+    this.fieldsFlat = formulario.flat()
     this.fieldsFlat.forEach((field: any) => {
       if (field.type === 'file') {
         // Crear un FormGroup anidado para el campo "imagen"
@@ -97,12 +120,17 @@ export class FormDialogGenericoComponent implements OnInit {
       }
     });
 
-    this.form = this.fb.group(formGroup);
+    return this.fb.group(formGroup);
+  }
 
-    //Al editar un registro, el único campo que se deshabilita es la clave.
-    if (this.data?.id) {
-      this.form.get('clave')?.disable();
-    }
+  getKeys(obj: any): string[] {
+    return Object.keys(obj);
+  }
+
+  getControlNames(formGroup: FormGroup): string[] {
+    console.log('Object.keys(formGroup.controls)');
+    console.table(Object.keys(formGroup.controls));
+    return Object.keys(formGroup.controls);
   }
 
   getLabelForValue(field: Field, value: any): string {
@@ -144,6 +172,15 @@ export class FormDialogGenericoComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
+
+  getFields(key: string): Field[][] | undefined {
+    return this.fieldForms.find((item: any) => item.form === key)?.fields;
+  }
+}
+
+export interface FieldForm {
+  form: string;
+  fields?: Field[][];
 }
 
 export interface Field {

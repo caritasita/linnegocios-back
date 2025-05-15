@@ -7,7 +7,11 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {DatePipe, NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
@@ -298,69 +302,73 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'giroComercial',
-          label: 'Giro comercial',
-          type: 'select',
-          options: this.transformedGiroComercialList,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'telefono',
-          label: 'Telefono',
-          type: 'text',
-          validation: Validators.required
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          type: 'email',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'cp',
-          label: 'Código postal',
-          type: 'text',
-          validation: Validators.required
-        },
-        {
-          name: 'estado',
-          label: 'Estado',
-          type: 'select',
-          options: this.transformedEstadoList,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'comisionRecargas',
-          label: 'Comisión recargas',
-          type: 'number',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'activo',
-          label: 'Activar distribución',
-          type: 'toggle',
-        }
-      ],
-
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'negocio',
+        fields: [
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'giroComercial',
+              label: 'Giro comercial',
+              type: 'select',
+              options: this.transformedGiroComercialList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'telefono',
+              label: 'Telefono',
+              type: 'text',
+              validation: Validators.required
+            },
+            {
+              name: 'email',
+              label: 'Email',
+              type: 'email',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'cp',
+              label: 'Código postal',
+              type: 'text',
+              validation: Validators.required
+            },
+            {
+              name: 'estado',
+              label: 'Estado',
+              type: 'select',
+              options: this.transformedEstadoList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'comisionRecargas',
+              label: 'Comisión recargas',
+              type: 'number',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'activo',
+              label: 'Activar distribución',
+              type: 'toggle',
+            }
+          ]
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar negocio'
@@ -371,7 +379,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
@@ -427,21 +435,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
   }
 
   private asignarIdTae(negocio: Negocio) {
-    // const config: MatDialogConfig = {
-    //   data: negocio,
-    //   disableClose: true,
-    // };
-    // const dialogConfirm = this.dialog.open(
-    //   CredencialElectronicoComponent,
-    //   config,
-    // );
-    // dialogConfirm.afterClosed().subscribe((res) => {
-    //   if (!res) {
-    //     return;
-    //   }
-    //   this.resetOffset();
-    // });
-
     const fields: Field[][] = [
       [
         {
@@ -463,10 +456,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
-      console.log('result');
-      console.table(result.idTae);
-      console.log('negocio');
-      console.table(negocio.id);
       this.crudService
         .update({
             id: result.idTae,
