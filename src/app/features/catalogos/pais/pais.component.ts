@@ -3,7 +3,11 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {PaisService} from '../../../core/services/pais.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatIcon} from '@angular/material/icon';
@@ -23,7 +27,7 @@ export interface ActionsTabla {
   name: string,
   icon: string,
   tooltipText: string
-  hideAction?: (b : any) => boolean,
+  hideAction?: (b: any) => boolean,
   callback: (item: any) => void,
 }
 
@@ -64,14 +68,42 @@ export class PaisComponent implements OnInit {
     {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        if(!item.activo) {
+          return item.activo
+        }
+        return true
+      }
     }
   ];
 
@@ -133,17 +165,6 @@ export class PaisComponent implements OnInit {
     this.lista()
   }
 
-  // Transformar los datos para la tabla
-  // get datosTabla(): any {
-  //   return this.paisList.map(pais => ({
-  //     id: pais?.id,
-  //     fechaRegistro: pais?.fechaRegistro,
-  //     clave: pais?.clave,
-  //     nombre: pais?.nombre,
-  //     descripcion: pais?.descripcion,
-  //   }));
-  // }
-
   public handlePageChange(event: any) {
     this.queryParams.max = event.max;
     this.queryParams.offset = event.offset;
@@ -152,20 +173,51 @@ export class PaisComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [{name: 'clave', label: 'Clave', type: 'text', validation: Validators.required}],
-      [{name: 'nombre', label: 'Nombre', type: 'text', validation: Validators.required}]
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'pais',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              disabled: false,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar país'
     if (data.id) {
       titleDialog = 'Editar pais'
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
@@ -173,22 +225,22 @@ export class PaisComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
-
       if (data.id) {
         result = ({...result, id: data.id})
         this.paisService.update(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
           });
           this.lista();
+          dialogRef.close();
         });
       } else {
         this.paisService.create(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
           });
           this.lista();
+          dialogRef.close();
         });
       }
-      dialogRef.close();
     });
   }
 

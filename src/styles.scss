@@ -367,3 +367,15 @@ tr:hover {
   font-size: 0.75rem;
 }
 
+/* Cambiar el fondo del input cuando es readonly */
+mat-form-field input[readonly] {
+  background-color: #f5f5f5; /* Cambia este color según tus necesidades */
+  cursor: not-allowed; /* Opcional: Cambia el cursor para indicar que no es editable */
+}
+
+/* Cambiar el fondo de todo el mat-form-field cuando el input es readonly */
+.mat-mdc-text-field-wrapper:has(input[readonly]) {
+  background-color: $color-primario-5; /* Cambia este color según tus necesidades */
+  cursor: not-allowed;
+}
+

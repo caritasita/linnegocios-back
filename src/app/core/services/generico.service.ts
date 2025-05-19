@@ -6,6 +6,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {SnackbarGenericoComponent} from '../../shared/snackbar-generico/snackbar-generico.component';
 import {DatePipe} from '@angular/common';
 import {ErrorDialogComponent} from '../../shared/error-dialog/error-dialog.component';
+import {FieldForm} from '../../shared/form-dialog-generico/form-dialog-generico.component';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,22 @@ export class GenericoService {
 
   getFormatedDateTime(dateTime: any): string | any {
     return this.datePipe.transform(dateTime, 'dd-MM-yyyy h:mm a');
+  }
+
+  /*Busca en el json que crear el formulario generico el campo que buscar, si lo encuentra le agrega el parametro disabled ya sea true o false*/
+  setFieldDisabled(fieldForms: FieldForm[], fieldName: string, disabled: boolean): void {
+    for (let form of fieldForms) {
+      for (let group of form?.fields || []) {
+        for (let field of group) {
+          if (field.name === fieldName) {
+            field.disabled = disabled; // Cambiar el estado
+            console.log(`Estado de '${fieldName}' cambiado a ${disabled ? 'disabled' : 'enabled'}`);
+            return; // Salir de la función después de encontrar y actualizar
+          }
+        }
+      }
+    }
+    console.log(`Campo '${fieldName}' no encontrado.`);
   }
 
 

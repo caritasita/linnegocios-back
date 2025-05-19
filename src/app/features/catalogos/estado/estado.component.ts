@@ -2,9 +2,13 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {MatDialog} from '@angular/material/dialog';
 import {FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {EstadoService} from '../../../core/services/estado.service';
-import {ColumnasTabla} from '../pais/pais.component';
+import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
 import {Estado} from '../../../shared/models/Estado';
 import {CommonModule} from '@angular/common';
 import {MatCardModule} from '@angular/material/card';
@@ -63,14 +67,42 @@ export class EstadoComponent implements OnInit {
     {clave: 'pais', valor: 'País', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
+    {
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
     {
       name: 'Recuperar eliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        if(!item.activo) {
+          return item.activo
+        }
+        return true
+      }
     }
   ];
 
@@ -159,43 +191,60 @@ export class EstadoComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'pais',
-          label: 'País',
-          type: 'select',
-          options: this.transformedPaisList,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'clave',
-          label: 'Clave',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'estado',
+        fields: [
+          [
+            {
+              name: 'pais',
+              label: 'País',
+              value: 'pais',
+              type: 'select',
+              options: this.transformedPaisList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar estado'
     if (data.id) {
       titleDialog = 'Editar estado'
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,

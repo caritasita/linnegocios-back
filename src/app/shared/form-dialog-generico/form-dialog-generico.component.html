@@ -1,32 +1,34 @@
-<ng-container *ngFor="let key of getKeys(forms)">
+<ng-container>
   <h4 mat-dialog-title>{{ titleDialog }}</h4>
 
-  <mat-dialog-content class="pt-4">
+  <mat-dialog-content class="pt-4" *ngFor="let key of getKeys(forms)">
     <form [formGroup]="forms[key]">
       <div *ngFor="let grupo  of getFields(key)" class="form-container">
         <div *ngFor="let field of grupo" class="{{field.fillColumn}}">
-          @if (['text', 'number', 'email', 'tel'].includes(field.type) && !field.hideInput) {
+          @if (['text', 'number', 'email', 'tel'].includes(field.type) && !field.hideInput && !field.hideIf || this.getValueByPath(this.data, field.hideIf)) {
             <mat-form-field appearance="outline"
                             class="width-content">
-              <mat-label>{{ field.label | uppercase }}</mat-label>
+              <mat-label>{{ field.label | uppercase }} {{ this.getValueByPath(this.data, field.hideIf) }}</mat-label>
               <input matInput
                      [type]="field.type"
                      [formControlName]="field.name"
                      (keydown)="onKeydown($event)"
+                     [minLength]="field?.minLength || 10000"
                      [maxlength]="field?.maxLenght || 10000"
+                     [readonly]="field?.disabled || false"
               >
 
               <!-- Botón para limpiar el campo -->
-<!--              <button *ngIf="form.get(field.name)?.value && (!data.id || field.name !== 'clave')"-->
-<!--                      matSuffix mat-icon-button aria-label="Clear"-->
-<!--                      (click)="form.get(field.name)?.setValue(''); clearField(field.name)">-->
-<!--                <mat-icon>close</mat-icon>-->
-<!--              </button>-->
+              <button *ngIf="(forms[key].get(field.name)?.value && !field?.disabled)"
+                      matSuffix mat-icon-button aria-label="Clear"
+                      (click)="forms[key].get(field.name)?.setValue(''); clearField(field.name)">
+                <mat-icon>close</mat-icon>
+              </button>
               <!-- Componente para mostrar mensajes de validación -->
-<!--              <mat-error-->
-<!--                *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">-->
-<!--                <app-form-errors [control]="form.get(field.name)"></app-form-errors>-->
-<!--              </mat-error>-->
+              <mat-error
+                *ngIf="forms[key].get(field.name)?.invalid && (forms[key].get(field.name)?.dirty || forms[key].get(field.name)?.touched)">
+                <app-form-errors [control]="forms[key].get(field.name)"></app-form-errors>
+              </mat-error>
 
             </mat-form-field>
           }
@@ -57,10 +59,9 @@
                           appearance="outline">
             <mat-label>{{ field.label | uppercase }}</mat-label>
             <mat-select [formControlName]="field.name">
-<!--              <mat-select-trigger>-->
-<!--                {{ getLabelForValue(field, form.get(field.name)?.value) || 'Selecciona una opción' }}-->
-<!--              </mat-select-trigger>-->
-
+              <mat-select-trigger>
+                {{ getLabelForValue(field, forms[key].get(field.name)?.value) || 'Selecciona una opción' }}
+              </mat-select-trigger>
               <mat-option>
                 <ngx-mat-select-search [formControl]="searchControls[field.name]" placeholderLabel="Buscar..."
                                        noEntriesFoundLabel="No se encontraron resultados"></ngx-mat-select-search>
@@ -71,10 +72,50 @@
               }
             </mat-select>
             <!-- Componente para mostrar mensajes de validación -->
-<!--            <mat-error-->
-<!--              *ngIf="form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)">-->
-<!--              <app-form-errors [control]="form.get(field.name)"></app-form-errors>-->
-<!--            </mat-error>-->
+            <mat-error
+              *ngIf="forms[key].get(field.name)?.invalid && (forms[key].get(field.name)?.dirty || forms[key].get(field.name)?.touched)">
+              <app-form-errors [control]="forms[key].get(field.name)"></app-form-errors>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="field.type === 'multiselect' && !field.hideInput" class="width-content"
+                          appearance="outline">
+            <mat-label>{{ field.label | uppercase }}</mat-label>
+            <mat-select [formControlName]="field.name" multiple>
+              <!-- Trigger personalizado para mostrar las opciones seleccionadas -->
+              <mat-select-trigger>
+                {{ filteredOptions[field.name][0].label }}
+
+                @if ((getSelectedOptions(forms[key].get(field.name)).length || 0) > 1) {
+                  <span class="contador_seleccionados">
+                    (+{{ (getSelectedOptions(forms[key].get(field.name)).length || 0) - 1 }}
+                    {{ getSelectedOptions(forms[key].get(field.name)).length === 2 ? 'mas' : 'mas' }})
+                  </span>
+                }
+              </mat-select-trigger>
+
+              <!-- Campo de búsqueda dentro del selector -->
+              <mat-option>
+                <ngx-mat-select-search
+                  [formControl]="searchControls[field.name]"
+                  placeholderLabel="Buscar..."
+                  noEntriesFoundLabel="No se encontraron resultados">
+                </ngx-mat-select-search>
+              </mat-option>
+
+              <!-- Opciones filtradas -->
+              <ng-container *ngFor="let option of filteredOptions[field.name]">
+                <mat-option [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+
+            <!-- Mensajes de validación -->
+            <mat-error
+              *ngIf="forms[key].get(field.name)?.invalid && (forms[key].get(field.name)?.dirty || forms[key].get(field.name)?.touched)">
+              <app-form-errors [control]="forms[key].get(field.name)"></app-form-errors>
+            </mat-error>
           </mat-form-field>
 
           <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.hideInput"
@@ -87,8 +128,8 @@
   </mat-dialog-content>
   <mat-dialog-actions>
     <button class="boton-bg-primario" mat-stroked-button (click)="onClose()">Cancelar</button>
-<!--    <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="form.invalid"-->
-<!--            (click)="onSubmit()">{{ data.id ? 'Actualizar' : 'Guardar' }}-->
-<!--    </button>-->
+    <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="!isFormsValid"
+            (click)="onSubmit()">{{ data.id ? 'Actualizar' : 'Guardar' }}
+    </button>
   </mat-dialog-actions>
 </ng-container>

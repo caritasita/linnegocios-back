@@ -1,12 +1,12 @@
 import {Component, EventEmitter, Inject, Input, OnInit, Output} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
-import {MatSelectModule} from '@angular/material/select';
+import {MatSelect, MatSelectModule} from '@angular/material/select';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatCardModule} from '@angular/material/card';
 import {FormErrorsComponent} from '../form-errors/form-errors.component';
@@ -25,6 +25,7 @@ import {MatSlideToggle} from '@angular/material/slide-toggle';
     MatInputModule,
     MatSelectModule,
     NgxMatSelectSearchModule,
+    FormsModule,
     MatCardModule,
     FormErrorsComponent,
     MatSlideToggle
@@ -57,30 +58,15 @@ export class FormDialogGenericoComponent implements OnInit {
     this.fieldForms = this.dialogData.fieldForms;
     this.titleDialog = this.dialogData.titleDialog;
     this.data = this.dialogData.data || {};
-    console.log('this.fieldForms');
-    console.table(this.fieldForms);
-
-    // this.fieldsFlat= this.fields.flat()
 
     for(const key of this.fieldForms){
       // if(this.fieldForms.hasOwnProperty(key.form)){
         this.forms[key.form] = this.createForm(key.fields)
-      console.log(`this.forms ${key.form}`);
-      console.table(this.forms[key.form].controls);
       // }
-    }
-
-
-
-    //Al editar un registro, el único campo que se deshabilita es la clave.
-    if (this.data?.id) {
-      this.form.get('clave')?.disable();
     }
   }
 
   createForm(formulario: any): FormGroup {
-    console.log('formulario');
-    console.table(formulario);
     const formGroup: { [key: string]: FormControl | FormGroup } = {}; // Permite FormGroup anidado
     this.fieldsFlat = formulario.flat()
     this.fieldsFlat.forEach((field: any) => {
@@ -95,11 +81,11 @@ export class FormDialogGenericoComponent implements OnInit {
       } else {
         // Crear un FormControl para los demás campos
         formGroup[field.name] = new FormControl(
-          this.data[field.name] || '',
+          this.getValueByPath(this.data, field.value || '') || '',
           field.validation
         );
 
-        if (field.type === 'select') {
+        if (field.type === 'select' || field.type === 'multiselect') {
           this.searchControls[field.name] = new FormControl();
           this.filteredOptions[field.name] = field.options; // Inicializa las opciones filtradas
 
@@ -112,9 +98,15 @@ export class FormDialogGenericoComponent implements OnInit {
 
           // Establecer el valor del FormControl al ID correspondiente
           const selectedOption = this.data[field.name];
-          if (selectedOption) {
+          if (field.type === 'select' && selectedOption) {
             // Cuando NO es un objeto se obtiene el valor directo
             formGroup[field.name].setValue(selectedOption.id || selectedOption.clave || selectedOption); // Selecciona el ID a editar
+          } else if(field.type === 'multiselect') {
+            formGroup[field.name].setValue(
+              Array.isArray(selectedOption)
+              ? selectedOption.map(option => option.id || option.clave || option) // Mapear los valores seleccionados
+              : [selectedOption?.id || selectedOption?.clave || selectedOption]
+            ); // Selecciona el ID a editar
           }
         }
       }
@@ -123,13 +115,15 @@ export class FormDialogGenericoComponent implements OnInit {
     return this.fb.group(formGroup);
   }
 
+  getValueByPath(obj: any, path: string = ''): any {
+    return path.split('.').reduce((acc, key) => acc?.[key], obj);
+  }
+
   getKeys(obj: any): string[] {
     return Object.keys(obj);
   }
 
   getControlNames(formGroup: FormGroup): string[] {
-    console.log('Object.keys(formGroup.controls)');
-    console.table(Object.keys(formGroup.controls));
     return Object.keys(formGroup.controls);
   }
 
@@ -138,11 +132,19 @@ export class FormDialogGenericoComponent implements OnInit {
     return option ? option.label : '';
   }
 
-  onSubmit() {
-    if (this.form.valid) {
-      this.submitForm.emit(this.form.value);
-      this.dialogRef?.close(this.form.value); // Cierra el diálogo si es necesario
+  // Método para obtener las opciones seleccionadas
+  getSelectedOptions(nameSalect: any): any[] {
+    const selectedValues = nameSalect.value || [];
+    return selectedValues;
+  }
 
+  onSubmit() {
+    if (this.isFormsValid) { // Verifica si todos los formularios son válidos
+      const formValues = this.getFormValues(); // Obtiene los valores de los formularios
+      this.submitForm.emit(formValues); // Emite los valores hacia el componente padre o servicio
+      // this.dialogRef?.close(formValues); // Cierra el diálogo y envía los valores si es necesario
+    } else {
+      console.error('El formulario no es válido');
     }
   }
 
@@ -176,6 +178,18 @@ export class FormDialogGenericoComponent implements OnInit {
   getFields(key: string): Field[][] | undefined {
     return this.fieldForms.find((item: any) => item.form === key)?.fields;
   }
+
+  get isFormsValid(): boolean {
+    return Object.keys(this.forms).every(key => this.forms[key].valid);
+  }
+
+  getFormValues(): any {
+    const values:any = {};
+    Object.keys(this.forms).forEach(key => {
+      values[key] = this.forms[key].value; // Obtiene los valores de cada FormGroup
+    });
+    return values;
+  }
 }
 
 export interface FieldForm {
@@ -186,12 +200,16 @@ export interface FieldForm {
 export interface Field {
   label: string;
   name: string;
+  value?: string;
   type: string;
+  minLength?: number;
   maxLenght?: number;
   options?: OptionField[];
   validation?: any;
   hideInput?: boolean;
+  hideIf?: string;
   fillColumn?: string;
+  disabled?: boolean;
 }
 
 export interface OptionField {

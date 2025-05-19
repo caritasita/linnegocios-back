@@ -280,8 +280,6 @@ export class StylePaginatorDirective implements OnInit, AfterViewInit, OnChanges
   public ngAfterViewInit() {
     this.rangeStart = 0;
     this.rangeEnd = this.showTotalPagesPrivate - 1;
-    console.log('TOTALES');
-    console.table(this.matPag.length);
     this.initPageRange();
   }
 

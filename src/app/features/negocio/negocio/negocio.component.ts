@@ -69,7 +69,7 @@ export class NegocioComponent implements OnInit {
   ];
   actions: ActionsTabla[] = [
     {
-      name: 'Editar',
+      name: 'Credenciales electrónicas',
       icon: "key",
       tooltipText: 'Credenciales electrónicas',
       hideAction: (item: any) => {
@@ -83,7 +83,7 @@ export class NegocioComponent implements OnInit {
       callback: (item: any) => this.activarCredencialElectrnico(item)
     },
     {
-      name: 'Editar',
+      name: 'Asignar ID TAE',
       icon: "key",
       tooltipText: 'Asignar ID TAE',
       hideAction: (item: any) => {
@@ -95,7 +95,7 @@ export class NegocioComponent implements OnInit {
       callback: (item: any) => this.asignarIdTae(item)
     },
     {
-      name: 'Editar',
+      name: 'Registrar seguimiento',
       icon: "edit_calendar",
       tooltipText: 'Registrar seguimiento',
       hideAction: (item: any) => {
@@ -113,7 +113,7 @@ export class NegocioComponent implements OnInit {
       callback: (item: any) => this.resetBusiness(item)
     },
     {
-      name: 'Editar',
+      name: 'Aumentar días liencia demo',
       icon: "more_time",
       tooltipText: 'Aumentar días licencia demo',
       hideAction: (item: any) => {
@@ -122,7 +122,7 @@ export class NegocioComponent implements OnInit {
       callback: (item: any) => this.promoteLicence(item)
     },
     {
-      name: 'Editar',
+      name: 'Cambiar tipo de licencia',
       icon: "workspace_premium",
       tooltipText: 'Cambiar tipo de licencia',
       hideAction: (item: any) => {
@@ -131,7 +131,7 @@ export class NegocioComponent implements OnInit {
       callback: (item: any) => this.promoteLicence(item)
     },
     {
-      name: 'Editar',
+      name: 'Log de asignación de agente',
       icon: "list_alt",
       tooltipText: 'Log asignación agente',
       hideAction: (item: any) => {
@@ -140,7 +140,7 @@ export class NegocioComponent implements OnInit {
       callback: (item: any) => this.openFormDialog(item)
     },
     {
-      name: 'Editar',
+      name: 'Buscar agente',
       icon: "person_search",
       tooltipText: 'Buscar agente',
       hideAction: (item: any) => {
@@ -195,16 +195,14 @@ export class NegocioComponent implements OnInit {
         registrosActivos: !this.queryParams.registrosEliminados,
       })
       .subscribe((response: any) => {
-        console.log('response.data');
         this.dataList = this.generarTablaPersonalizada(response.data);
-        console.table(this.dataList);
         this.totalRecords = response.count;
       });
   }
 
   // Transformar los datos para la tabla
   generarTablaPersonalizada(data: any): any {
-    return data.map((item: any) => ({
+    return data.map((item: any, index: number) => ({
       id: item?.id,
       datosContacto: ` <br>
 <b class="fz-title-fila-tabla">ID:</b> ${item.id || '---'} <b class="fz-title-fila-tabla ml-3"">ID TAE:</b> ${item.idLinntae || '---'} <br>
@@ -237,7 +235,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 <b class="fz-title-fila-tabla">Último comentario:</b><br>
 <div class="size-comentario-tabla">${item.ultimoSeguimiento ? item.ultimoSeguimiento.mensaje : '---'}</div><br>
         `,
-      ...data[0],
+      ...data[index],
     }));
   }
 
@@ -302,14 +300,15 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
   openFormDialog(data: any = {}) {
 
-    const fieldForms: FieldForm[] = [
+    let fieldForms: FieldForm[] = [
       {
         form: 'negocio',
         fields: [
           [
             {
               name: 'nombre',
-              label: 'Nombre',
+              label: 'Nombre del negocio',
+              value: 'nombre',
               type: 'text',
               validation: Validators.required
             }
@@ -318,7 +317,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
             {
               name: 'giroComercial',
               label: 'Giro comercial',
-              type: 'select',
+              value: 'giroComercial',
+              type: 'multiselect',
               options: this.transformedGiroComercialList,
               validation: Validators.required
             }
@@ -327,26 +327,41 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
             {
               name: 'telefono',
               label: 'Telefono',
-              type: 'text',
-              validation: Validators.required
+              value: 'telefono',
+              type: 'tel',
+              maxLenght: 10,
+              validation: Validators.compose([Validators.required, this.validationMessagesService.telefonoValido()]),
+
             },
             {
               name: 'email',
               label: 'Email',
+              value: 'email',
               type: 'email',
-              validation: Validators.required
+              validation: Validators.compose([Validators.required, Validators.email])
             }
           ],
           [
             {
               name: 'cp',
               label: 'Código postal',
+              value: 'cp',
               type: 'text',
-              validation: Validators.required
+              minLength: 4,
+              maxLenght: 6,
+              validation: Validators.compose(
+                [
+                  Validators.required,
+                  this.validationMessagesService.soloNumeros(),
+                  Validators.minLength(4),
+                  Validators.maxLength(6)
+                ]
+              )
             },
             {
               name: 'estado',
               label: 'Estado',
+              value: 'estado',
               type: 'select',
               options: this.transformedEstadoList,
               validation: Validators.required
@@ -356,25 +371,78 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
             {
               name: 'comisionRecargas',
               label: 'Comisión recargas',
+              value: 'comisionRecargas',
               type: 'number',
+              disabled: true,
               validation: Validators.required
             }
-          ],
+          ]
+        ]
+      },
+      {
+        form: 'configuracionDistribucion',
+        fields: [
           [
             {
               name: 'activo',
               label: 'Activar distribución',
+              value: 'configuracionDistribucion.activo',
               type: 'toggle',
-            }
+            },
+          ],
+          [
+            {
+              name: 'comision',
+              label: 'Comisión por distribución',
+              value: 'configuracionDistribucion.comision',
+              hideIf: 'configuracionDistribucion.activo',
+              type: 'number',
+              validation: Validators.compose([this.validationMessagesService.soloNumeros])
+            },
           ]
+        ]
+      },
+      {
+        form: 'tendero',
+        fields: [
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre del tendero',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            },
+            {
+              name: 'apeidoPaterno',
+              label: 'Apellido paterno',
+              value: 'apeidoPaterno',
+              type: 'text',
+              validation: Validators.required
+            },
+            {
+              name: 'apeidoMaterno',
+              label: 'Apellido materno',
+              value: 'apeidoMaterno',
+              type: 'text',
+            },
+          ],
         ]
       }
     ]
 
     let titleDialog = 'Registrar negocio'
+    data.comisionRecargas= 6;
     if (data.id) {
       titleDialog = 'Editar negocio'
+      //Se quitan del json los campos que forman parte del tendero
+      fieldForms = fieldForms.filter(ff => ff.form !== 'tendero')
+      // data.comision= data.configuracionDistribucion.comision
+      // data.activo= data.configuracionDistribucion.activo
     }
+
+    // console.log('data');
+    // console.table(data);
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
@@ -387,21 +455,33 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
+
+      /*Quitamos configuracionDistribucion de raíz y lo agregamos a nivel negocio, ya que así es como lo recive de lado del back*/
+      result.negocio.configuracionDistribucion = result.configuracionDistribucion;
+      delete result.configuracionDistribucion;
+
       if (data.id) {
         result = ({...result, id: data.id})
         this.negocioService.update(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
           });
           this.lista();
+          dialogRef.close();
         });
       } else {
+
+        result.id = data.id
+        result.tendero.username = result.negocio.telefono
+        result.tendero.telefono = result.negocio.telefono
+        result = ({...result})
+
         this.negocioService.create(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
           });
           this.lista();
+          dialogRef.close();
         });
       }
-      dialogRef.close();
     });
   }
 

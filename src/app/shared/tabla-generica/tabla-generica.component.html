@@ -31,10 +31,10 @@
 
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Acciones</th>
-      <td mat-cell *matCellDef="let element">
+      <td mat-cell *matCellDef="let row">
         <ng-container *ngFor="let action of actions">
-          @if (!action?.hideAction?.(element)) {
-            <button mat-icon-button (click)="action.callback(element)">
+          @if (!action?.hideAction?.(row)) {
+            <button mat-icon-button (click)="action.callback(row)">
               <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
             </button>
           }
