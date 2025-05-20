@@ -395,7 +395,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               name: 'comision',
               label: 'Comisión por distribución',
               value: 'configuracionDistribucion.comision',
-              hideIf: 'configuracionDistribucion.activo',
+              dependsOn: 'configuracionDistribucion.activo',
               type: 'number',
               validation: Validators.compose([this.validationMessagesService.soloNumeros])
             },

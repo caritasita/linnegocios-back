@@ -234,7 +234,7 @@ export class UserComponent implements OnInit {
           name: 'enabled',
           label: 'Estatus',
           type: 'toggle',
-          hideInput: true
+          visibility: true
         },
 
       ],

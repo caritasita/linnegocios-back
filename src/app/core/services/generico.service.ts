@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../../shared/confirm-dialog/confirm-dialog.component';
-import {firstValueFrom} from 'rxjs';
+import {BehaviorSubject, firstValueFrom} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SnackbarGenericoComponent} from '../../shared/snackbar-generico/snackbar-generico.component';
 import {DatePipe} from '@angular/common';
@@ -63,6 +63,16 @@ export class GenericoService {
       }
     }
     console.log(`Campo '${fieldName}' no encontrado.`);
+  }
+
+
+  private fieldVisibility = new BehaviorSubject<any>({});
+  fieldVisibility$ = this.fieldVisibility.asObservable();
+  updateFieldVisibility(fieldName: string, value: boolean) {
+    const currentState = this.fieldVisibility.getValue();
+    console.log(`value --> ${value}`);
+    currentState[fieldName] = value;
+    this.fieldVisibility.next(currentState);
   }
 
 

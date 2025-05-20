@@ -11,6 +11,7 @@ import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatCardModule} from '@angular/material/card';
 import {FormErrorsComponent} from '../form-errors/form-errors.component';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
+import {GenericoService} from '../../core/services/generico.service';
 
 @Component({
   selector: 'app-form-generico',
@@ -49,7 +50,8 @@ export class FormDialogGenericoComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    public dialogRef: MatDialogRef<FormDialogGenericoComponent>
+    public dialogRef: MatDialogRef<FormDialogGenericoComponent>,
+    private genericoService: GenericoService
   ) {
   }
 
@@ -64,6 +66,30 @@ export class FormDialogGenericoComponent implements OnInit {
         this.forms[key.form] = this.createForm(key.fields)
       // }
     }
+
+
+    this.genericoService.fieldVisibility$.subscribe((visibility) => {
+      this.fieldForms.forEach(ff => {
+        if(ff.fields) {
+          ff.fields.forEach((field: any) => {
+            field.forEach((f: any) =>{
+              if(f.dependsOn) {
+                const partes = f.dependsOn.split('.')
+                if (partes[0] === ff.form) {
+                  console.log(`Visibility ${visibility[partes[1]]}`);
+                  f.visibility = !visibility[partes[1]];
+                }
+              }
+            })
+          });
+        }
+      })
+
+    });
+  }
+
+  onCheckboxChange(fieldName: string, event: any) {
+    this.genericoService.updateFieldVisibility(fieldName, event?.checked);
   }
 
   createForm(formulario: any): FormGroup {
@@ -206,8 +232,8 @@ export interface Field {
   maxLenght?: number;
   options?: OptionField[];
   validation?: any;
-  hideInput?: boolean;
-  hideIf?: string;
+  visibility?: boolean;
+  dependsOn?: string;
   fillColumn?: string;
   disabled?: boolean;
 }

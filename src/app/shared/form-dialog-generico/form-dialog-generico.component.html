@@ -5,10 +5,10 @@
     <form [formGroup]="forms[key]">
       <div *ngFor="let grupo  of getFields(key)" class="form-container">
         <div *ngFor="let field of grupo" class="{{field.fillColumn}}">
-          @if (['text', 'number', 'email', 'tel'].includes(field.type) && !field.hideInput && !field.hideIf || this.getValueByPath(this.data, field.hideIf)) {
+          @if (['text', 'number', 'email', 'tel'].includes(field.type) && !field.visibility) {
             <mat-form-field appearance="outline"
                             class="width-content">
-              <mat-label>{{ field.label | uppercase }} {{ this.getValueByPath(this.data, field.hideIf) }}</mat-label>
+              <mat-label>{{ field.label | uppercase }}</mat-label>
               <input matInput
                      [type]="field.type"
                      [formControlName]="field.name"
@@ -33,7 +33,7 @@
             </mat-form-field>
           }
 
-          @if (field.type === 'file' && !field.hideInput) {
+          @if (field.type === 'file' && !field.visibility) {
             <mat-card class="container quitar-estilo-default-card">
               <div class="image-preview" *ngIf="imagePreview">
                 <img [src]="imagePreview" alt="Vista previa de la imagen"/>
@@ -55,7 +55,7 @@
             </mat-card>
           }
 
-          <mat-form-field *ngIf="field.type === 'select' && !field.hideInput" class="width-content"
+          <mat-form-field *ngIf="field.type === 'select' && !field.visibility" class="width-content"
                           appearance="outline">
             <mat-label>{{ field.label | uppercase }}</mat-label>
             <mat-select [formControlName]="field.name">
@@ -78,7 +78,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field *ngIf="field.type === 'multiselect' && !field.hideInput" class="width-content"
+          <mat-form-field *ngIf="field.type === 'multiselect' && !field.visibility" class="width-content"
                           appearance="outline">
             <mat-label>{{ field.label | uppercase }}</mat-label>
             <mat-select [formControlName]="field.name" multiple>
@@ -118,7 +118,8 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.hideInput"
+          <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.visibility"
+                            (change)="onCheckboxChange(field.name, $event)"
                             [formControlName]="field.name">{{ field.label }}
           </mat-slide-toggle>
 

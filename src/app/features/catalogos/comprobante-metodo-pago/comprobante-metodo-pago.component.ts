@@ -259,7 +259,7 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
           name: 'imagen',
           label: 'Imagen',
           type: 'file',
-          hideInput: true
+          visibility: true
         },
       ]
     ]
