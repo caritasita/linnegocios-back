@@ -49,14 +49,13 @@ export class GenericoService {
     return this.datePipe.transform(dateTime, 'dd-MM-yyyy h:mm a');
   }
 
-  /*Busca en el json que crear el formulario generico el campo que buscar, si lo encuentra le agrega el parametro disabled ya sea true o false*/
+  /*Busca en el json que crear el formulario generico el campo, si lo encuentra le agrega el parametro disabled ya sea true o false*/
   setFieldDisabled(fieldForms: FieldForm[], fieldName: string, disabled: boolean): void {
     for (let form of fieldForms) {
       for (let group of form?.fields || []) {
         for (let field of group) {
           if (field.name === fieldName) {
             field.disabled = disabled; // Cambiar el estado
-            console.log(`Estado de '${fieldName}' cambiado a ${disabled ? 'disabled' : 'enabled'}`);
             return; // Salir de la función después de encontrar y actualizar
           }
         }
@@ -70,7 +69,6 @@ export class GenericoService {
   fieldVisibility$ = this.fieldVisibility.asObservable();
   updateFieldVisibility(fieldName: string, value: boolean) {
     const currentState = this.fieldVisibility.getValue();
-    console.log(`value --> ${value}`);
     currentState[fieldName] = value;
     this.fieldVisibility.next(currentState);
   }

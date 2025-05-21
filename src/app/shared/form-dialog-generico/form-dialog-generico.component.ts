@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Inject, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -12,6 +12,7 @@ import {MatCardModule} from '@angular/material/card';
 import {FormErrorsComponent} from '../form-errors/form-errors.component';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {GenericoService} from '../../core/services/generico.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-form-generico',
@@ -34,7 +35,7 @@ import {GenericoService} from '../../core/services/generico.service';
   templateUrl: './form-dialog-generico.component.html',
   styleUrl: './form-dialog-generico.component.scss',
 })
-export class FormDialogGenericoComponent implements OnInit {
+export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   @Input() fieldForms: FieldForm[] = [];
   @Input() data: any = {};
   @Input() titleDialog: string = "Registrar";
@@ -43,9 +44,11 @@ export class FormDialogGenericoComponent implements OnInit {
   fieldsFlat!: FieldForm[];
 
   form!: FormGroup;
-  forms: {[key: string]: FormGroup} = {};
+  forms: { [key: string]: FormGroup } = {};
   searchControls: { [key: string]: FormControl } = {};
   filteredOptions: { [key: string]: any[] } = {};
+
+  private subscription!: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -55,36 +58,65 @@ export class FormDialogGenericoComponent implements OnInit {
   ) {
   }
 
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
   ngOnInit() {
 
     this.fieldForms = this.dialogData.fieldForms;
     this.titleDialog = this.dialogData.titleDialog;
     this.data = this.dialogData.data || {};
 
-    for(const key of this.fieldForms){
+    for (const key of this.fieldForms) {
       // if(this.fieldForms.hasOwnProperty(key.form)){
-        this.forms[key.form] = this.createForm(key.fields)
+      this.forms[key.form] = this.createForm(key.fields)
       // }
     }
 
+    this.listenCheckbox();
+    this.obtenerEstatusActualCheckbox();
 
-    this.genericoService.fieldVisibility$.subscribe((visibility) => {
+  }
+
+  listenCheckbox() {
+    this.subscription = this.genericoService.fieldVisibility$.subscribe((visibility) => {
       this.fieldForms.forEach(ff => {
-        if(ff.fields) {
+        if (ff.fields) {
           ff.fields.forEach((field: any) => {
-            field.forEach((f: any) =>{
-              if(f.dependsOn) {
-                const partes = f.dependsOn.split('.')
-                if (partes[0] === ff.form) {
-                  console.log(`Visibility ${visibility[partes[1]]}`);
-                  f.visibility = !visibility[partes[1]];
-                }
+            field.forEach((f: any) => {
+              if (f.dependsOn) {
+                const partes = f.dependsOn.split('.');
+                // if (partes[0] === ff.form) {
+                  const valorActual= visibility[partes[1]];
+
+                  console.log(`Visibility: ${valorActual}`);
+                  f.visibility = !valorActual;
+                // }
               }
-            })
+            });
           });
         }
-      })
+      });
+    });
+  }
 
+  obtenerEstatusActualCheckbox(){
+    this.fieldForms.forEach(ff => {
+      if (ff.fields) {
+        ff.fields.forEach((field: any) => {
+          field.forEach((f: any) => {
+            if (f.dependsOn) {
+              const partes = f.dependsOn.split('.');
+              // if (partes[0] === ff.form) {
+                let valorActual = this.getValueByPath(this.data, f.dependsOn || '');
+                valorActual = (valorActual === null || valorActual === false) ? false : valorActual;
+                f.visibility = !valorActual;
+              // }
+            }
+          });
+        });
+      }
     });
   }
 
@@ -127,11 +159,11 @@ export class FormDialogGenericoComponent implements OnInit {
           if (field.type === 'select' && selectedOption) {
             // Cuando NO es un objeto se obtiene el valor directo
             formGroup[field.name].setValue(selectedOption.id || selectedOption.clave || selectedOption); // Selecciona el ID a editar
-          } else if(field.type === 'multiselect') {
+          } else if (field.type === 'multiselect') {
             formGroup[field.name].setValue(
               Array.isArray(selectedOption)
-              ? selectedOption.map(option => option.id || option.clave || option) // Mapear los valores seleccionados
-              : [selectedOption?.id || selectedOption?.clave || selectedOption]
+                ? selectedOption.map(option => option.id || option.clave || option) // Mapear los valores seleccionados
+                : [selectedOption?.id || selectedOption?.clave || selectedOption]
             ); // Selecciona el ID a editar
           }
         }
@@ -210,7 +242,7 @@ export class FormDialogGenericoComponent implements OnInit {
   }
 
   getFormValues(): any {
-    const values:any = {};
+    const values: any = {};
     Object.keys(this.forms).forEach(key => {
       values[key] = this.forms[key].value; // Obtiene los valores de cada FormGroup
     });
