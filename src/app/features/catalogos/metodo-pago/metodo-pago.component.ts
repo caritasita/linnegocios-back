@@ -1,7 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {TipoComprobante} from '../../../shared/models/tipo-comprobante';
 import {Estado} from '../../../shared/models/Estado';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {TipoComprobanteService} from '../../../core/services/tipo-comprobante.service';
@@ -57,13 +61,41 @@ export class MetodoPagoComponent implements OnInit {
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
   actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+    {
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
     {
       name: 'Recuperar eliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        if(!item.activo) {
+          return item.activo
+        }
+        return true
+      }
     }
   ];
 
@@ -134,41 +166,51 @@ export class MetodoPagoComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'clave',
-          label: 'Clave',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'descripcion',
-          label: 'Descripción',
-          type: 'text',
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'metodoDePago',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              disabled: false,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar tipo de comprobante'
     if (data.id) {
-      titleDialog = 'Editar tipo de comprobante'
+      titleDialog = 'Editar tipo de comprobante';
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,

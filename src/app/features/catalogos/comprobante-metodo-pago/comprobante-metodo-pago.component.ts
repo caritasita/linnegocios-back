@@ -9,7 +9,11 @@ import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {Pais} from '../../../shared/models/Pais';
 import {Estado} from '../../../shared/models/Estado';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../pais/pais.component';
 import {EstadoService} from '../../../core/services/estado.service';
 import {PaisService} from '../../../core/services/pais.service';
@@ -42,7 +46,7 @@ import {MetodoDePago} from '../../../shared/models/MetodoDePago';
   templateUrl: './comprobante-metodo-pago.component.html',
   styleUrl: './comprobante-metodo-pago.component.scss'
 })
-export class ComprobanteMetodoPagoComponent implements OnInit{
+export class ComprobanteMetodoPagoComponent implements OnInit {
   estadoList: Partial<Estado>[] = [];
   paisList: Partial<Pais>[] = [];
   tipoComprobanteList: TipoComprobante[] = []
@@ -69,9 +73,42 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
     {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
   ];
   actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'Recuperar eliminado', icon: "restore_from_trash", tooltipText: 'Recuperar registro eliminado', callback: (item: any) => this.recoverRegister(item.id)}
+    {
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        if (item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        if (item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Recuperar eliminado',
+      icon: "restore_from_trash",
+      tooltipText: 'Recuperar registro eliminado',
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        if (!item.activo) {
+          return item.activo
+        }
+        return true
+      }
+    }
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -83,7 +120,8 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
     private tipoComprobanteService: TipoComprobanteService,
     private genericoService: GenericoService,
     private dialog: MatDialog
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     this.lista();
@@ -109,7 +147,7 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
 
   private listTipoComprobante(): void {
     this.tipoComprobanteService
-      .list({ all: true })
+      .list({all: true})
       .subscribe((response: any) => {
         this.tipoComprobanteList = response?.data;
         this.transformedTipoComprobanteList = this.tipoComprobanteList.map(item => ({
@@ -122,7 +160,7 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
 
   private listMetodoDePagoService(): void {
     this.metodoPagoService
-      .list({ all: true })
+      .list({all: true})
       .subscribe((response: any) => {
         this.metodoDePagoList = response.data;
         console.table(this.metodoDePagoList)
@@ -166,11 +204,11 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
   }
 
   procesarfiltros(form: any) {
-    this.queryParams= ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
 
-  resetFormFiltros(){
+  resetFormFiltros() {
     this.queryParams = {
       max: 10,
       offset: 0,
@@ -188,91 +226,103 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'clave',
-          label: 'Clave',
-          type: 'text',
-          validation: Validators.compose([Validators.required]),
-          fillColumn: 'fill-two-column'
-        },
-        {
-          name: 'simbolo',
-          label: 'Símbolo',
-          type: 'text',
-          validation: Validators.required,
-          fillColumn: 'fill-one-column'
-        },
-      ],
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required,
-          fillColumn: 'fill-one-column'
-        },
-      ],
-      [
-        {
-          name: 'tipoComprobante',
-          label: 'Tipo de comprobante',
-          type: 'select',
-          options: this.transformedTipoComprobanteList,
-          validation: Validators.required,
-          fillColumn: 'fill-two-column'
-        },
-        {
-          name: 'valor',
-          label: 'Valor',
-          type: 'number',
-          validation: Validators.required,
-          fillColumn: 'fill-one-column'
-        },
-      ],
-      [
-        {
-          name: 'pais',
-          label: 'País',
-          type: 'select',
-          options: this.transformedPaisList,
-          validation: Validators.required
-        },
-        {
-          name: 'metodoDePago',
-          label: 'Método de pago',
-          type: 'select',
-          options: this.transformedMetodoPagoList,
-          validation: Validators.required
-        },
-      ],
-      [
-        {
-          name: 'descripcion',
-          label: 'Descripción',
-          type: 'text',
-        },
-      ],
-      [
-        {
-          name: 'imagen',
-          label: 'Imagen',
-          type: 'file',
-          visibility: true
-        },
-      ]
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'comprobanteMetodoPago',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              validation: Validators.compose([Validators.required]),
+              fillColumn: 'fill-two-column'
+            },
+            {
+              name: 'simbolo',
+              label: 'Símbolo',
+              value: 'simbolo',
+              type: 'text',
+              validation: Validators.required,
+              fillColumn: 'fill-one-column'
+            },
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required,
+              fillColumn: 'fill-one-column'
+            },
+          ],
+          [
+            {
+              name: 'tipoComprobante',
+              label: 'Tipo de comprobante',
+              type: 'select',
+              options: this.transformedTipoComprobanteList,
+              validation: Validators.required,
+              fillColumn: 'fill-two-column'
+            },
+            {
+              name: 'valor',
+              label: 'Valor',
+              value: 'valor',
+              type: 'number',
+              validation: Validators.required,
+              fillColumn: 'fill-one-column'
+            },
+          ],
+          [
+            {
+              name: 'pais',
+              label: 'País',
+              type: 'select',
+              options: this.transformedPaisList,
+              validation: Validators.required
+            },
+            {
+              name: 'metodoDePago',
+              label: 'Método de pago',
+              type: 'select',
+              options: this.transformedMetodoPagoList,
+              validation: Validators.required
+            },
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'imagen',
+              label: 'Imagen',
+              type: 'file',
+              visibility: true
+            },
+          ]
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar tipo de ticket'
     if (data.id) {
       titleDialog = 'Editar tipo de ticket'
     }
+    // console.log('DATA COMPROBANTE');
+    // console.table(data);
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       panelClass: 'dialog-linnegocios',
@@ -281,21 +331,28 @@ export class ComprobanteMetodoPagoComponent implements OnInit{
       maxWidth: '75vw',
     });
 
-    dialogRef.componentInstance.submitForm.subscribe(result => {
+    dialogRef.componentInstance.submitForm.subscribe((result: any) => {
+      console.table(result);
+      result = result.comprobanteMetodoPago
+
       if (data.id) {
-        result = ({...result, id: data.id, valor:Number(result.valor), clave: data.clave})
+        result = ({...result, id: data.id, valor: Number(result.valor), clave: data.clave})
         this.comprobanteFormaPagoService.update(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
+          dialogRef.close();
         });
       } else {
-        result = ({...result, valor:Number(result.valor)})
+
+        result = ({...result, valor: Number(result.valor)})
         this.comprobanteFormaPagoService.create(result).subscribe((respueta) => {
-          if(respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () =>{});
+          if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+          });
           this.lista();
+          dialogRef.close();
         });
       }
-      dialogRef.close();
     });
   }
 

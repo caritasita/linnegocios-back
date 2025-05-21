@@ -77,6 +77,9 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
     this.listenCheckbox();
     this.obtenerEstatusActualCheckbox();
 
+    console.log('DATA EN GENERICO');
+    console.table(this.data);
+
   }
 
   listenCheckbox() {

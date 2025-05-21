@@ -437,8 +437,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       titleDialog = 'Editar negocio'
       //Se quitan del json los campos que forman parte del tendero
       fieldForms = fieldForms.filter(ff => ff.form !== 'tendero')
-      // data.comision= data.configuracionDistribucion.comision
-      // data.activo= data.configuracionDistribucion.activo
     }
 
     // console.log('data');
