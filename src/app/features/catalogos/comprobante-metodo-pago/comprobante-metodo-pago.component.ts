@@ -332,9 +332,7 @@ export class ComprobanteMetodoPagoComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe((result: any) => {
-      console.table(result);
       result = result.comprobanteMetodoPago
-
       if (data.id) {
         result = ({...result, id: data.id, valor: Number(result.valor), clave: data.clave})
         this.comprobanteFormaPagoService.update(result).subscribe((respueta) => {
