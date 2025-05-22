@@ -7,8 +7,12 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../../catalogos/pais/pais.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
@@ -59,15 +63,42 @@ export class UserComponent implements OnInit {
     {clave: 'role', valor: 'Rol', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
-    {name: 'resetDatosDeAcceso', icon: "lock_reset", tooltipText: 'Resetear contraseña', callback: (item: any) => this.resetPassword(item?.id)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        return !item.activo
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return !item.activo
+      }
+    },
+    {
+      name: 'resetDatosDeAcceso',
+      icon: "lock_reset",
+      tooltipText: 'Resetear contraseña',
+      callback: (item: any) => this.resetPassword(item?.id),
+      hideAction: (item: any) => {
+        return !item.activo
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        return item.activo
+      }
     }
   ];
 
@@ -115,6 +146,7 @@ export class UserComponent implements OnInit {
       username: item?.username,
       role: item?.role,
       activo: item?.enabled,
+      accountLocked: item.accountLocked
     }));
   }
 
@@ -171,93 +203,111 @@ export class UserComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'role',
-          label: 'Rol',
-          type: 'select',
-          options: this.transformedRoleList,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        },
-        {
-          name: 'apeidoPaterno',
-          label: 'Apellido paterno',
-          type: 'text',
-          validation: Validators.required
-        },
-        {
-          name: 'apeidoMaterno',
-          label: 'Apellido materno',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'email',
-          label: 'Correo electrónico',
-          type: 'email',
-          validation: Validators.compose([Validators.required, Validators.email])
-        },
-        {
-          name: 'telefono',
-          label: 'Teléfono',
-          type: 'tel',
-          maxLenght: 10,
-          validation: Validators.compose([Validators.required, this.validationMessagesService.telefonoValido()])
-        },
-      ],
-      [
-        {
-          name: 'username',
-          label: 'Usuario',
-          type: 'text',
-          validation: Validators.required
-        },
-      ],
-      [
-        {
-          name: 'accountLocked',
-          label: 'Bloquear',
-          type: 'toggle',
-        },
-        {
-          name: 'enabled',
-          label: 'Estatus',
-          type: 'toggle',
-          visibility: true
-        },
-
-      ],
-
+    let fieldForms: FieldForm[] = [
+      {
+        form: 'user',
+        fields: [
+          [
+            {
+              name: 'role',
+              label: 'Rol',
+              value: 'role',
+              type: 'select',
+              options: this.transformedRoleList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            },
+            {
+              name: 'apeidoPaterno',
+              label: 'Apellido paterno',
+              value: 'apeidoPaterno',
+              type: 'text',
+              validation: Validators.required
+            },
+            {
+              name: 'apeidoMaterno',
+              label: 'Apellido materno',
+              value: 'apeidoMaterno',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'email',
+              label: 'Correo electrónico',
+              value: 'email',
+              type: 'email',
+              validation: Validators.compose([Validators.required, Validators.email])
+            },
+            {
+              name: 'telefono',
+              label: 'Teléfono',
+              value: 'telefono',
+              type: 'tel',
+              maxLenght: 10,
+              validation: Validators.compose([Validators.required, this.validationMessagesService.telefonoValido()])
+            },
+          ],
+          [
+            {
+              name: 'username',
+              label: 'Usuario',
+              value: 'username',
+              type: 'text',
+              validation: Validators.required
+            },
+          ],
+          [
+            {
+              name: 'accountLocked',
+              label: 'Bloquear',
+              value: 'accountLocked',
+              type: 'toggle',
+            },
+            {
+              name: 'enabled',
+              label: 'Estatus',
+              type: 'toggle',
+              visibility: true
+            }
+          ]
+        ]
+      }
     ]
+
 
     let titleDialog = 'Registrar usuario'
     if (data.id) {
 
       titleDialog = 'Editar usuario'
 
-      // Eliminar el campo 'role'
-      fields.forEach((group, groupIndex) => {
-        fields[groupIndex] = group.filter(field => field.name !== 'role');
-      });
+      fieldForms = fieldForms.filter(form => ({
+        ...form,
+        fields: form.fields?.map(group =>
+          group.map(field => {
+            if(field.name === 'role'){
+              field.visibility= true;
+            }
+          })
+        )
+      }));
     }
-    console.log('fields');
-    console.table(fields);
+    // console.log('fields');
+    // console.table(fields);
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
@@ -266,7 +316,10 @@ export class UserComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
+      result= result.user
       if (data.id) {
+        console.log('entrando a EDITAR');
+
         result = ({...result, id: data.id, enabled: true})
         this.userService.update(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
@@ -274,6 +327,7 @@ export class UserComponent implements OnInit {
           this.lista();
         });
       } else {
+        console.log('entrando a CREAR');
         this.userService.create(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
           });

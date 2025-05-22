@@ -92,8 +92,6 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
                 const partes = f.dependsOn.split('.');
                 // if (partes[0] === ff.form) {
                   const valorActual= visibility[partes[1]];
-
-                  console.log(`Visibility: ${valorActual}`);
                   f.visibility = !valorActual;
                 // }
               }

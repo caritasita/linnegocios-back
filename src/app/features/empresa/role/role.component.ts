@@ -1,7 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Pais} from '../../../shared/models/Pais';
 import {Estado} from '../../../shared/models/Estado';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {EstadoService} from '../../../core/services/estado.service';
@@ -18,6 +22,8 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {Rol} from '../../../shared/models/rol';
 import {RoleService} from '../../../core/services/role.service';
+import {hasAllPermission, hasPermission} from '../../../core/helpers/utilities';
+import {permisosRol} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-role',
@@ -55,10 +61,42 @@ export class RoleComponent implements OnInit {
     {clave: 'authority', valor: 'Nombre', tipo: "texto"}
   ];
   actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Gestionar permisos', icon: "admin_panel_settings", tooltipText: 'Gestionar permisos', callback: (item: any) => this.abrirGestorDePermisos(item)},
-    {name: 'Gestionar permisos V2', icon: "admin_panel_settings", tooltipText: 'Gestionar permisos V2', callback: (item: any) => this.abrirNuevoGestorDePermisos(item)},
-    {name: 'Clonar paquetes de permisos', icon: "folder_copy", tooltipText: 'Clonar paquetes de permisos', callback: (item: any) => this.abrirNuevoGestorDePermisos(item)},
+    {
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: Rol) => {
+        return hasPermission(permisosRol.update) && !this.rolesNoEditables.includes(item.authority.toUpperCase())
+      }
+    },
+    {
+      name: 'Gestionar permisos',
+      icon: "admin_panel_settings",
+      tooltipText: 'Gestionar permisos',
+      callback: (item: any) => this.abrirGestorDePermisos(item),
+      hideAction: (item: Rol) => {
+        return item.authority !== 'ROLE_ADMIN' && hasAllPermission([permisosRol.actualizarPermiso, permisosRol.show]);
+      }
+    },
+    {
+      name: 'Gestionar permisos V2',
+      icon: "admin_panel_settings",
+      tooltipText: 'Gestionar permisos V2',
+      callback: (item: any) => this.abrirNuevoGestorDePermisos(item),
+      hideAction: (item: Rol) => {
+        return item.pdv && hasAllPermission([permisosRol.actualizarPermiso, permisosRol.show]);
+      }
+    },
+    {
+      name: 'Clonar paquetes de permisos',
+      icon: "folder_copy",
+      tooltipText: 'Clonar paquetes de permisos',
+      callback: (item: any) => this.abrirNuevoGestorDePermisos(item),
+      hideAction: (item: Rol) => {
+        return item.pdv && hasAllPermission([permisosRol.actualizarPermiso, permisosRol.show]);
+      }
+    },
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -123,22 +161,30 @@ export class RoleComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'authority',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'pdv',
-          label: '¿Para punto de venta?',
-          type: 'toggle',
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'role',
+        fields: [
+          [
+            {
+              name: 'authority',
+              label: 'Nombre',
+              value: 'authority',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'pdv',
+              label: '¿Para punto de venta?',
+              value: 'authority',
+              type: 'toggle',
+            }
+          ],
+        ]
+      }
+
     ]
 
     let titleDialog = 'Registrar estado'
@@ -149,7 +195,7 @@ export class RoleComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
@@ -157,6 +203,7 @@ export class RoleComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
+      result= result.role
       if (data.id) {
         result = ({...result, id: data.id})
         this.roleService.update(result).subscribe((respueta) => {
@@ -173,7 +220,17 @@ export class RoleComponent implements OnInit {
       }
       dialogRef.close();
     });
+
   }
+
+  rolesNoEditables: Readonly<string[]> = [
+    'ROLE_REPARTIDOR_ECOMMERCE',
+    'ROLE_CLIENTE_ECOMMERCE',
+    'ROLE_TENDERO',
+    'ROLE_CAJERO_ADMIN',
+    'ROLE_CAJERO',
+  ];
+
 
   private async abrirGestorDePermisos(objeto: any) {
     alert('Sin funcionalidad');
