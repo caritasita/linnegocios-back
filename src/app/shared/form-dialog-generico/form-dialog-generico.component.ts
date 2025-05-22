@@ -139,7 +139,12 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
           size: [this.data.imagen?.size || null],
           encodeImage: [this.data.imagen?.encodeImage || null]
         });
-      } else {
+      }else if(field.type === 'toggle'){
+        formGroup[field.name] = new FormControl(
+          this.getValueByPath(this.data, field.value || '') || false,
+          field.validation
+        );
+      }else {
         // Crear un FormControl para los demás campos
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || '',

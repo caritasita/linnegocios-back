@@ -1,10 +1,14 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {ColumnasTabla} from '../pais/pais.component';
+import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
 import {MetaActivacionService} from '../../../core/services/meta-activacion.service';
 import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
@@ -14,6 +18,8 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {ValidationMessagesService} from '../../../core/services/validation-messages.service';
+import {hasPermission} from '../../../core/helpers/utilities';
+import {permisosMetaActivacion} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-meta-activacion',
@@ -55,9 +61,25 @@ export class MetaActivacionComponent implements OnInit {
     {clave: 'lastUpdatedBy', valor: 'Última actualización por', tipo: "texto"},
   ];
 
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
+    {
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosMetaActivacion.update)
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosMetaActivacion.delete)
+      }
+    }
   ];
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
@@ -136,33 +158,51 @@ export class MetaActivacionComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'clave', label: 'Clave', type: 'text', validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'porcentajeMeta', label: 'Porcentaje meta', type: 'number', validation: Validators.compose([Validators.required, this.validationMessagesService.fueraDeRango(1, 100)])
-        }
-      ],
-      [
-        {
-          name: 'bonoExtra', label: 'Bono extra por cumplimiento de meta', type: 'text', validation: Validators.required
-        }
-      ]
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'metaActivacion',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'porcentajeMeta',
+              label: 'Porcentaje meta',
+              value: 'porcentajeMeta',
+              type: 'number',
+              validation: Validators.compose([Validators.required, this.validationMessagesService.fueraDeRango(1, 100)])
+            }
+          ],
+          [
+            {
+              name: 'bonoExtra',
+              label: 'Bono extra por cumplimiento de meta',
+              value: 'bonoExtra',
+              type: 'text',
+              validation: Validators.required
+            }
+          ]
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar meta de activación'
     if (data.id) {
-      titleDialog = 'Editar meta de activación'
+      titleDialog = 'Editar meta de activación';
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true);
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,

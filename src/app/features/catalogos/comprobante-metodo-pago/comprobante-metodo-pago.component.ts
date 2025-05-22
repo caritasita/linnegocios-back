@@ -316,8 +316,6 @@ export class ComprobanteMetodoPagoComponent implements OnInit {
     if (data.id) {
       titleDialog = 'Editar tipo de ticket'
     }
-    // console.log('DATA COMPROBANTE');
-    // console.table(data);
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {

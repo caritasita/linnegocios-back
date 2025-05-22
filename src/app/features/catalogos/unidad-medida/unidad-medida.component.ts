@@ -7,10 +7,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {GenericoService} from '../../../core/services/generico.service';
-import {MatDialog} from '@angular/material/dialog';
-import {Validators} from '@angular/forms';
+import {Field} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../pais/pais.component';
 import {UnidadMedidaService} from '../../../core/services/unidad-medida.service';
 
@@ -18,17 +15,11 @@ import {UnidadMedidaService} from '../../../core/services/unidad-medida.service'
   selector: 'app-unidad-medida',
   standalone: true,
   imports: [
-    FormGenericoComponent,
-    MatButton,
     MatCard,
     MatCardContent,
     MatCardHeader,
-    MatDrawer,
     MatDrawerContainer,
-    MatIcon,
-    MatIconButton,
     MatToolbar,
-    NgIf,
     TablaGenericaComponent
   ],
   templateUrl: './unidad-medida.component.html',

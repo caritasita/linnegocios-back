@@ -8,7 +8,7 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {
-  Field,
+  Field, FieldForm,
   FormDialogGenericoComponent,
   OptionField
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -18,6 +18,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {ImpuestoProducto} from '../../../shared/models/ImpuestoProducto.model';
 import {ImpuestosProductoService} from '../../../core/services/impuestos-producto.service';
+import {hasPermission} from '../../../core/helpers/utilities';
+import {permisosImpuestoProducto} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-impuestos-producto',
@@ -62,7 +64,15 @@ export class ImpuestosProductoComponent implements OnInit {
     {clave: 'usuarioRegistro', valor: 'Usuario registró', tipo: "texto"},
   ];
   actions = [
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosImpuestoProducto.delete)
+      }
+    },
   ];
 
 
@@ -152,47 +162,57 @@ export class ImpuestosProductoComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'clave',
-          label: 'Clave',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'porcentaje',
-          label: 'Porcentaje',
-          type: 'number',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'tipoImpuesto',
-          label: 'Impuesto',
-          type: 'select',
-          options: this.transformedTipoImpuestoList,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'descripcion',
-          label: 'Descripción',
-          type: 'text',
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'impuestosProducto',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'porcentaje',
+              label: 'Porcentaje',
+              value: 'porcentaje',
+              type: 'number',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'tipoImpuesto',
+              label: 'Impuesto',
+              value: 'tipoImpuesto',
+              type: 'select',
+              options: this.transformedTipoImpuestoList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar impuesto producto'
@@ -200,14 +220,15 @@ export class ImpuestosProductoComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
       width: '50vw',
     });
 
-    dialogRef.componentInstance.submitForm.subscribe(result => {
+    dialogRef.componentInstance.submitForm.subscribe((result: any) => {
+      result = result.impuestosProducto
       this.impuestosProductoService.create(result).subscribe((respueta) => {
         if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
         });

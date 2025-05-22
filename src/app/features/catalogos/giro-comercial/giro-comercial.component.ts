@@ -9,8 +9,12 @@ import {NgIf} from "@angular/common";
 import {TablaGenericaComponent} from "../../../shared/tabla-generica/tabla-generica.component";
 import {Pais} from '../../../shared/models/Pais';
 import {Estado} from '../../../shared/models/Estado';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../pais/pais.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
 import {EstadoService} from '../../../core/services/estado.service';
 import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
@@ -56,14 +60,42 @@ export class GiroComercialComponent implements OnInit {
     {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        if(!item.activo) {
+          return item.activo
+        }
+        return true
+      }
     }
   ];
 
@@ -96,16 +128,6 @@ export class GiroComercialComponent implements OnInit {
         this.totalRecords = estados.count;
       });
   }
-
-  // getPaises(): void {
-  //   this.paisService.list({all: true}).subscribe((paises: any) => {
-  //     this.paisList = paises.data;
-  //     this.transformedPaisList = this.paisList.map(pais => ({
-  //       label: pais.nombre,
-  //       value: pais.id
-  //     }));
-  //   });
-  // }
 
   formFiltros(): void {
     this.fieldsFilters = [
@@ -140,42 +162,50 @@ export class GiroComercialComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'clave',
-          label: 'Clave',
-          type: 'text',
-          validation: Validators.compose([Validators.required]),
-        }
-      ],
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'descripcion',
-          label: 'Descripción',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'giroComercial',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              disabled: false,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+        ]
+      }
     ]
-
     let titleDialog = 'Registrar giro comercial'
     if (data.id) {
       titleDialog = 'Editar giro comercial'
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
@@ -183,6 +213,7 @@ export class GiroComercialComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
+      result = result.giroComercial
       if (data.id) {
         result = ({...result, id: data.id})
         this.giroComercialService.update(result).subscribe((respueta) => {

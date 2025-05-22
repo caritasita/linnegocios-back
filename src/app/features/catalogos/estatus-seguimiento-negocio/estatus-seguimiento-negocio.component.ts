@@ -1,11 +1,15 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {ColumnasTabla} from '../pais/pais.component';
+import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
 import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
@@ -54,14 +58,42 @@ export class EstatusSeguimientoNegocioComponent implements OnInit {
     {clave: 'usuarioActualizo', valor: 'Usuario actualizó', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        if(item.activo) {
+          return !item.activo
+        }
+        return true
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        if(!item.activo) {
+          return item.activo
+        }
+        return true
+      }
     }
   ];
 
@@ -147,30 +179,59 @@ export class EstatusSeguimientoNegocioComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {name: 'clave', label: 'Clave', type: 'text', validation: Validators.required}
-      ],
-      [
-        {name: 'nombre', label: 'Nombre', type: 'text', validation: Validators.required}
-      ],
-      [
-        {name: 'descripcion', label: 'Descripción', type: 'text'}
-      ],
-      [
-        {name: 'isLeadBasura', label: 'Activa la opción si el estatus se usará para negocios que serán tomados como leads basura', type: 'toggle'}
-      ]
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'estatusSeguimientoNegocio',
+        fields: [
+          [
+            {
+              name: 'clave',
+              label: 'Clave',
+              value: 'clave',
+              type: 'text',
+              disabled: false,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+          [
+            {
+              name: 'isLeadBasura',
+              label: 'Activa la opción si el estatus se usará para negocios que serán tomados como leads basura',
+              value: 'isLeadBasura',
+              type: 'toggle'
+            }
+          ]
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar estatus seguimiento del negocio'
     if (data.id) {
-      titleDialog = 'Editar estatus seguimiento del negocio'
+      titleDialog = 'Editar estatus seguimiento del negocio';
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
