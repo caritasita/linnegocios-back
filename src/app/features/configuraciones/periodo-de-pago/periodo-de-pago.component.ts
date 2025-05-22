@@ -1,11 +1,11 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Pais} from '../../../shared/models/Pais';
-import {Estado} from '../../../shared/models/Estado';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../../catalogos/pais/pais.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {EstadoService} from '../../../core/services/estado.service';
-import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
@@ -43,7 +43,6 @@ export class PeriodoDePagoComponent implements OnInit {
   dataList: Partial<ConfiguracionCobroMes>[] = [];
   totalRecords = 0;
   fieldsFilters!: Field[];
-  transformedPaisList!: any;
   queryParams = {
     max: 10,
     offset: 0,
@@ -56,14 +55,33 @@ export class PeriodoDePagoComponent implements OnInit {
     {clave: 'descuento', valor: 'Descuento', tipo: "porcentaje"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        return !item.activo
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return !item.activo
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        return item.activo
+      }
     }
   ];
 
@@ -134,42 +152,51 @@ export class PeriodoDePagoComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'meses',
-          label: 'Meses',
-          type: 'number',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'descuento',
-          label: 'Descuento',
-          type: 'number',
-          validation: Validators.required
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'configuracionCobroMes',
+        fields: [
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'meses',
+              label: 'Meses',
+              value: 'meses',
+              type: 'number',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descuento',
+              label: 'Descuento',
+              value: 'descuento',
+              type: 'number',
+              validation: Validators.required
+            }
+          ],
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar periodo de pago'
     if (data.id) {
-      titleDialog = 'Editar periodo de pago'
+      titleDialog = 'Editar periodo de pago';
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,

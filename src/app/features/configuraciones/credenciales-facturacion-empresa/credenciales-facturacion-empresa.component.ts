@@ -1,6 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../../catalogos/pais/pais.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -18,6 +22,8 @@ import {UrlServer} from '../../../core/helpers/UrlServer';
 import {Empresa} from '../../../shared/models/Empresa';
 import {ProveedorFacturacion} from '../../../shared/models/proveedor-facturacion';
 import {EmpresaCredencial} from '../../../shared/models/empresa-credencial';
+import {hasPermission} from '../../../core/helpers/utilities';
+import {permisosEmpresaCredencial} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-credenciales-facturacion-empresa',
@@ -56,20 +62,36 @@ export class CredencialesFacturacionEmpresaComponent implements OnInit {
   columns: ColumnasTabla[] = [
     {clave: 'empresa', valor: 'Empresa', tipo: "texto"},
     {clave: 'datosFacturacion', valor: 'Datos de facturación', tipo: "texto"},
-    // {clave: 'usuario', valor: 'Usuario facturación', tipo: "texto"},
-    // {clave: 'url', valor: 'URL facturación', tipo: "texto"},
-    // {clave: 'creditos', valor: 'Créditos', tipo: "texto"},
     {clave: 'usuarioRegistro', valor: 'Usuario registró', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosEmpresaCredencial.update) || !item.activo
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosEmpresaCredencial.delete) || !item.activo
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        return hasPermission(permisosEmpresaCredencial.delete) || item.activo
+      }
     }
   ];
 
@@ -175,60 +197,69 @@ export class CredencialesFacturacionEmpresaComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'empresa',
-          label: 'Empresa',
-          type: 'select',
-          options: this.transformedEmpresaList,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'usuario',
-          label: 'Usuario facturación',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'password',
-          label: 'Contraseña facturación',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'url',
-          label: 'URL facturación',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'proveedorFacturacion',
-          label: 'Proveedor',
-          type: 'select',
-          options: this.transformedProveedorList,
-          validation: Validators.required
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'empresaCredencial',
+        fields: [
+          [
+            {
+              name: 'empresa',
+              label: 'Empresa',
+              type: 'select',
+              options: this.transformedEmpresaList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'usuario',
+              label: 'Usuario facturación',
+              value: 'usuario',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'password',
+              label: 'Contraseña facturación',
+              value: 'password',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'url',
+              label: 'URL facturación',
+              value: 'url',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'proveedorFacturacion',
+              label: 'Proveedor',
+              type: 'select',
+              options: this.transformedProveedorList,
+              validation: Validators.required
+            }
+          ]
+        ]
+      }
     ]
 
-    let titleDialog = 'Registrar credenciales de facturación'
+    let titleDialog = 'Registrar credenciales de facturación';
     if (data.id) {
-      titleDialog = 'Editar credenciales de facturación'
+      titleDialog = 'Editar credenciales de facturación';
+      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,

@@ -1,6 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../../catalogos/pais/pais.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -15,6 +19,8 @@ import {NgIf} from '@angular/common';
 import {ConfiguracionCaja} from '../../../shared/models/ConfiguracionCaja';
 import {ConfiguracionCajaService} from '../../../core/services/configuracion-caja.service';
 import {CrudService} from '../../../core/services/crud.service';
+import {hasPermission} from '../../../core/helpers/utilities';
+import {permisosConfiguracionCaja} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-configuracion-caja',
@@ -53,14 +59,33 @@ export class ConfiguracionCajaComponent implements OnInit {
     {clave: 'costoCajaRango', valor: 'Costo', tipo: "moneda"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosConfiguracionCaja.update) || !item.activo
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosConfiguracionCaja.delete) || !item.activo
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        return hasPermission(permisosConfiguracionCaja.reactivar) || item.activo
+      }
     }
   ];
 
@@ -143,24 +168,31 @@ export class ConfiguracionCajaComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'tipoLicencia',
-          label: 'Tipo de licencia',
-          type: 'select',
-          options: this.listaTipoLicencia,
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'costoCajaRango',
-          label: 'Precio',
-          type: 'text',
-          validation: Validators.required
-        }
-      ]
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'configuracionCaja',
+        fields: [
+          [
+            {
+              name: 'tipoLicencia',
+              label: 'Tipo de licencia',
+              type: 'select',
+              options: this.listaTipoLicencia,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'costoCajaRango',
+              label: 'Precio',
+              value: 'costoCajaRango',
+              type: 'text',
+              validation: Validators.required
+            }
+          ]
+        ]
+      }
+
     ]
 
     let titleDialog = 'Registrar configuración caja'
@@ -171,7 +203,7 @@ export class ConfiguracionCajaComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,

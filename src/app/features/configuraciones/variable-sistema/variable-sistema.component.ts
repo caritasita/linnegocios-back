@@ -7,13 +7,19 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {Field, FormDialogGenericoComponent} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {ColumnasTabla} from '../../catalogos/pais/pais.component';
+import {
+  Field,
+  FieldForm,
+  FormDialogGenericoComponent
+} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
+import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {VariableSistema} from '../../../shared/models/VariableSistema';
 import {VariableSistemaService} from '../../../core/services/variable-sistema.service';
+import {hasPermission} from '../../../core/helpers/utilities';
+import {permisosEmpresaCredencial, permisosVariableSistema} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-variable-sistema',
@@ -53,14 +59,33 @@ export class VariableSistemaComponent implements OnInit {
     {clave: 'descripcion', valor: 'Descripción', tipo: "texto"},
     {clave: 'activo', valor: 'Estatus', tipo: "boleano"},
   ];
-  actions = [
-    {name: 'Editar', icon: "edit", tooltipText: 'Editar', callback: (item: any) => this.openFormDialog(item)},
-    {name: 'Eliminar', icon: "delete", tooltipText: 'Eliminar', callback: (item: any) => this.delete(item)},
+  actions: ActionsTabla[] = [
     {
-      name: 'Recuperar eliminado',
+      name: 'Editar',
+      icon: "edit",
+      tooltipText: 'Editar',
+      callback: (item: any) => this.openFormDialog(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosVariableSistema.update) || !item.activo
+      }
+    },
+    {
+      name: 'Eliminar',
+      icon: "delete",
+      tooltipText: 'Eliminar',
+      callback: (item: any) => this.delete(item),
+      hideAction: (item: any) => {
+        return hasPermission(permisosVariableSistema.delete) || !item.activo
+      }
+    },
+    {
+      name: 'recuperarEliminado',
       icon: "restore_from_trash",
       tooltipText: 'Recuperar registro eliminado',
-      callback: (item: any) => this.recoverRegister(item.id)
+      callback: (item: any) => this.recoverRegister(item.id),
+      hideAction: (item: any) => {
+        return hasPermission(permisosVariableSistema.delete) || item.activo
+      }
     }
   ];
 
@@ -131,37 +156,45 @@ export class VariableSistemaComponent implements OnInit {
 
   openFormDialog(data: any = {}) {
 
-    const fields: Field[][] = [
-      [
-        {
-          name: 'nombre',
-          label: 'Nombre',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'valor',
-          label: 'Valor',
-          type: 'text',
-          validation: Validators.required
-        }
-      ],
-      [
-        {
-          name: 'descripcion',
-          label: 'Descripción',
-          type: 'text',
-        }
-      ],
-      [
-        {
-          name: 'encriptado',
-          label: 'Activa la opción si quieres que el valor se encripte en base de datos',
-          type: 'toggle',
-        }
-      ],
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'variableSistema',
+        fields: [
+          [
+            {
+              name: 'nombre',
+              label: 'Nombre',
+              value: 'nombre',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'valor',
+              label: 'Valor',
+              value: 'valor',
+              type: 'text',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'descripcion',
+              label: 'Descripción',
+              value: 'descripcion',
+              type: 'text',
+            }
+          ],
+          [
+            {
+              name: 'encriptado',
+              label: 'Activa la opción si quieres que el valor se encripte en base de datos',
+              type: 'toggle',
+            }
+          ],
+        ]
+      }
     ]
 
     let titleDialog = 'Registrar estado'
@@ -172,7 +205,7 @@ export class VariableSistemaComponent implements OnInit {
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
-        fields,
+        fieldForms,
         data
       },
       disableClose: true,
@@ -181,6 +214,7 @@ export class VariableSistemaComponent implements OnInit {
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
       if (data.id) {
+        result= result.variableSistema
         result = ({...result, id: data.id})
         this.variableSistemaService.update(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
