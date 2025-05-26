@@ -25,6 +25,8 @@ import {GiroComercial} from '../../../shared/models/GiroComercial';
 import {hasPermission} from '../../../core/helpers/utilities';
 import {permisosCredencialElectronico} from '../../../core/helpers/permissions.data';
 import {ValidationMessagesService} from '../../../core/services/validation-messages.service';
+import {ListaGenericaComponent} from '../../../shared/lista-generica/lista-generica.component';
+import {LogMovimientosLicencia} from '../../../shared/models/logMovimientosLicencia';
 
 @Component({
   selector: 'app-negocio',
@@ -50,6 +52,7 @@ export class NegocioComponent implements OnInit {
   dataList: Partial<Negocio>[] = [];
   estadosList: Partial<Estado>[] = [];
   giroComercialList: GiroComercial[] = [];
+  logsList: LogMovimientosLicencia[] = [];
 
   totalRecords = 0;
   fieldsFilters!: Field[];
@@ -72,15 +75,15 @@ export class NegocioComponent implements OnInit {
       name: 'Credenciales electrónicas',
       icon: "key",
       tooltipText: 'Credenciales electrónicas',
+      callback: (item: any) => this.activarCredencialElectrnico(item),
       hideAction: (item: any) => {
         if (item.idLinntae) {
           return item.activo && item.idLinntae
             ? hasPermission(permisosCredencialElectronico.update)
             : hasPermission(permisosCredencialElectronico.save);
         }
-        return false;
+        return true;
       },
-      callback: (item: any) => this.activarCredencialElectrnico(item)
     },
     {
       name: 'Asignar ID TAE',
@@ -90,7 +93,7 @@ export class NegocioComponent implements OnInit {
         if (!item.idLinntae) {
           return hasPermission(permisosCredencialElectronico.save);
         }
-        return false;
+        return true;
       },
       callback: (item: any) => this.asignarIdTae(item)
     },
@@ -119,7 +122,7 @@ export class NegocioComponent implements OnInit {
       hideAction: (item: any) => {
         return false;
       },
-      callback: (item: any) => this.promoteLicence(item)
+      callback: (item: any) => this.increaseLicence(item)
     },
     {
       name: 'Cambiar tipo de licencia',
@@ -432,7 +435,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     ]
 
     let titleDialog = 'Registrar negocio'
-    data.comisionRecargas= 6;
+    data.comisionRecargas = 6;
     if (data.id) {
       titleDialog = 'Editar negocio'
       //Se quitan del json los campos que forman parte del tendero
@@ -512,31 +515,45 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       });
   }
 
-  private asignarIdTae(negocio: Negocio) {
-    const fields: Field[][] = [
-      [
-        {
-          name: 'idTae',
-          label: 'ID de linntae',
-          type: 'text',
-          validation: Validators.compose([Validators.required, this.validationMessagesService.soloNumeros()])
-        }
-      ],
-    ]
+  private async asignarIdTae(negocio: Negocio) {
+
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'asignarIdTae',
+        fields: [
+          [
+            {
+              name: 'idTae',
+              label: 'ID de linntae',
+              type: 'text',
+              validation: Validators.compose([Validators.required, this.validationMessagesService.soloNumeros()])
+            }
+          ],
+        ]
+      }
+    ];
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
-        titleDialog: 'Registrar ID de  Linntae',
-        fields,
+        titleDialog: 'Registrar ID de Linntae',
+        fieldForms,
       },
       disableClose: true,
       minWidth: '30vw',
     });
 
-    dialogRef.componentInstance.submitForm.subscribe(result => {
+    dialogRef.componentInstance.submitForm.subscribe(async result => { // Cambiado a async
+
+      const isConfirmed = await this.genericoService.confirmDialog( // Se agrega await
+        `¿Está seguro de asignar el id ${result.asignarIdTae.idTae} al negocio, ${negocio.nombre}?`
+      );
+      if (!isConfirmed) {
+        return;
+      }
+
       this.crudService
         .update({
-            id: result.idTae,
+            id: result.asignarIdTae.idTae,
             idNegocio: negocio.id,
             opc: 'asignarIdTae'
           },
@@ -577,4 +594,81 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       // this.resetOffset();
     });
   }
+
+  private async increaseLicence(negocio: Negocio) {
+
+    const fieldForms: FieldForm[] = [
+      {
+        form: 'asignarDiasLicenciaDemo',
+        fields: [
+          [
+            {
+              name: 'numeroDias',
+              label: 'Número de días',
+              type: 'text',
+              validation: Validators.compose([Validators.required, this.validationMessagesService.soloNumeros()])
+            }
+          ],
+        ]
+      }
+    ];
+
+    this.listLogMovimientos(negocio)
+
+    const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
+      data: {
+        titleDialog: 'Asignar días licencia demo',
+        twoColumn: true,
+        fieldForms,
+        componente: ListaGenericaComponent,
+        datos: { // estos datos son para el componente ListaGenericaComponente
+          columns: this.columns,
+          data: this.logsList
+        },
+      },
+      disableClose: true,
+      minWidth: '65vw',
+    });
+
+    dialogRef.componentInstance.submitForm.subscribe(async result => { // Cambiado a async
+
+      const isConfirmed = await this.genericoService.confirmDialog( // Se agrega await
+        `¿Está seguro de asignar días al negocio ${negocio.nombre}?`
+      );
+      if (!isConfirmed) {
+        return;
+      }
+      console.log('RESULT');
+      console.table(result);
+
+      result= result.asignarDiasLicenciaDemo;
+      result.id= negocio.id;
+      this.crudService.updateById(result, UrlServer.updateLicenciaDemo).subscribe((response) => {
+        dialogRef.close();
+        if (response) this.genericoService.openSnackBar(
+          response?.mensaje,
+          'Aceptar', 'snack-bar-success',
+          () => {}
+        );
+      });
+    });
+  }
+
+  public listLogMovimientos(negocio: Negocio) {
+    this.crudService
+      .list(
+        {
+          all: true,
+          negocio: negocio.id
+        },
+        UrlServer.logsMovimientosLicencia
+      )
+      .subscribe(async (resp: any) => {
+        this.logsList = resp.data;
+        console.log('this.logsList');
+        console.table(this.logsList);
+      });
+  }
+
+
 }

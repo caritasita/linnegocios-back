@@ -1,11 +1,30 @@
+@import "variables";
+
+.contenedor-formulario {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  &.two-column {
+    grid-template-columns: 1fr minmax(max-content, 400px) !important;
+    column-gap: 1rem;
+  }
+
+  .border-horizontal-right {
+    border-left: solid 1px $color-primario-25;
+    padding-left: 2rem;
+  }
+}
+
 .container {
   max-width: 500px;
   margin: 20px auto;
 }
+
 .image-preview {
   margin-bottom: 15px;
   text-align: center;
 }
+
 .image-preview img {
   max-width: 100px;
   max-height: 100px;
@@ -18,15 +37,16 @@
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   column-gap: 24px; /* Espaciado entre columnas y filas */
   margin-bottom: 12px;
-  .fill-one-column{
+
+  .fill-one-column {
     grid-column: span 1;
   }
 
-  .fill-two-column{
+  .fill-two-column {
     grid-column: span 2;
   }
 
-  .fill-three-column{
+  .fill-three-column {
     grid-column: span 3;
   }
 }

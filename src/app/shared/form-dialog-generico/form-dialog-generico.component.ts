@@ -1,4 +1,14 @@
-import {Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+  ViewContainerRef
+} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -39,6 +49,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   @Input() fieldForms: FieldForm[] = [];
   @Input() data: any = {};
   @Input() titleDialog: string = "Registrar";
+  @Input() twoColumn= false;
   @Output() submitForm = new EventEmitter<any>();
 
   fieldsFlat!: FieldForm[];
@@ -49,6 +60,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   filteredOptions: { [key: string]: any[] } = {};
 
   private subscription!: Subscription;
+
+  @ViewChild('contenedorDinamico', { read: ViewContainerRef, static: true }) contenedorDinamico!: ViewContainerRef;
 
   constructor(
     private fb: FormBuilder,
@@ -63,10 +76,22 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     this.fieldForms = this.dialogData.fieldForms;
     this.titleDialog = this.dialogData.titleDialog;
+    this.twoColumn = this.dialogData.twoColumn || false;
     this.data = this.dialogData.data || {};
+
+
+    if (this.dialogData.componente) {
+      // Crear el componente dinámicamente
+      const componentRef = this.contenedorDinamico.createComponent(this.dialogData.componente);
+      // Pasar los datos al componente proyectado
+      if (this.dialogData.datos) {
+        Object.keys(this.dialogData.datos).forEach(key => {
+          (componentRef.instance as any)[key] = this.dialogData.datos[key];
+        });
+      }
+    }
 
     for (const key of this.fieldForms) {
       // if(this.fieldForms.hasOwnProperty(key.form)){

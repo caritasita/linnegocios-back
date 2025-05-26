@@ -1,0 +1,7 @@
+.text-bolder{
+  font-weight: 700;
+}
+
+.mdc-list-item.mdc-list-item--with-one-line {
+  height: 25px;
+}
