@@ -1,21 +1,26 @@
-<mat-card *ngFor="let item of data" class="mt-2 ">
-  <mat-card-content>
-    <mat-list >
-      <mat-list-item >
-        <span class="text-bolder mr-1">Recha registro:</span> {{item.fechaRegistro}}
-      </mat-list-item>
-      <mat-list-item >
-        <span class="text-bolder mr-1">Usuario registró:</span> {{item.usuarioRegistro.nombre}}
-      </mat-list-item>
-      <mat-list-item >
-        <span class="text-bolder mr-1">Días otorgados:</span> {{item.numeroDias}}
-      </mat-list-item>
-      <mat-list-item >
-        <span class="text-bolder mr-1">Licencia anterior:</span> {{item.tipoLicenciaAnterior}}
-      </mat-list-item>
-      <mat-list-item >
-        <span class="text-bolder mr-1">Licencia nueva:</span> {{item.tipoLicencia}}
-      </mat-list-item>
-    </mat-list>
-  </mat-card-content>
-</mat-card>
+@if (data.length>1) {
+  <mat-card *ngFor="let item of data" class="mt-2 ">
+    <mat-card-content>
+      <mat-list >
+        <mat-list-item >
+          <span class="text-bolder mr-1">Recha registro:</span> {{item.fechaRegistro}}
+        </mat-list-item>
+        <mat-list-item >
+          <span class="text-bolder mr-1">Usuario registró:</span> {{item.usuarioRegistro.nombre}}
+        </mat-list-item>
+        <mat-list-item >
+          <span class="text-bolder mr-1">Días otorgados:</span> {{item.numeroDias}}
+        </mat-list-item>
+        <mat-list-item >
+          <span class="text-bolder mr-1">Licencia anterior:</span> {{item.tipoLicenciaAnterior}}
+        </mat-list-item>
+        <mat-list-item >
+          <span class="text-bolder mr-1">Licencia nueva:</span> {{item.tipoLicencia}}
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+} @else {
+  Sin movimientos
+}
+

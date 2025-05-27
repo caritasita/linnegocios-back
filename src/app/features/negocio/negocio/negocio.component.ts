@@ -27,6 +27,7 @@ import {permisosCredencialElectronico} from '../../../core/helpers/permissions.d
 import {ValidationMessagesService} from '../../../core/services/validation-messages.service';
 import {ListaGenericaComponent} from '../../../shared/lista-generica/lista-generica.component';
 import {LogMovimientosLicencia} from '../../../shared/models/logMovimientosLicencia';
+import {firstValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-negocio',
@@ -178,7 +179,7 @@ export class NegocioComponent implements OnInit {
     private genericoService: GenericoService,
     private crudService: CrudService,
     private dialog: MatDialog,
-    private validationMessagesService: ValidationMessagesService
+    private validationMessagesService: ValidationMessagesService,
   ) {
   }
 
@@ -596,6 +597,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
   }
 
   private async increaseLicence(negocio: Negocio) {
+    // Esperar a que se cargue la lista de movimientos
+    await this.listLogMovimientos(negocio);
 
     const fieldForms: FieldForm[] = [
       {
@@ -613,8 +616,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       }
     ];
 
-    this.listLogMovimientos(negocio)
-
+    const dialogSize = this.genericoService.getDialogSize();
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: 'Asignar días licencia demo',
@@ -623,26 +625,23 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
         componente: ListaGenericaComponent,
         datos: { // estos datos son para el componente ListaGenericaComponente
           columns: this.columns,
-          data: this.logsList
+          data: this.logsList // Ya estará cargado
         },
       },
       disableClose: true,
-      minWidth: '65vw',
+      minWidth: dialogSize.width,
     });
 
-    dialogRef.componentInstance.submitForm.subscribe(async result => { // Cambiado a async
-
-      const isConfirmed = await this.genericoService.confirmDialog( // Se agrega await
+    dialogRef.componentInstance.submitForm.subscribe(async result => {
+      const isConfirmed = await this.genericoService.confirmDialog(
         `¿Está seguro de asignar días al negocio ${negocio.nombre}?`
       );
       if (!isConfirmed) {
         return;
       }
-      console.log('RESULT');
-      console.table(result);
 
-      result= result.asignarDiasLicenciaDemo;
-      result.id= negocio.id;
+      result = result.asignarDiasLicenciaDemo;
+      result.id = negocio.id;
       this.crudService.updateById(result, UrlServer.updateLicenciaDemo).subscribe((response) => {
         dialogRef.close();
         if (response) this.genericoService.openSnackBar(
@@ -654,20 +653,22 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     });
   }
 
-  public listLogMovimientos(negocio: Negocio) {
-    this.crudService
-      .list(
-        {
-          all: true,
-          negocio: negocio.id
-        },
-        UrlServer.logsMovimientosLicencia
-      )
-      .subscribe(async (resp: any) => {
-        this.logsList = resp.data;
-        console.log('this.logsList');
-        console.table(this.logsList);
-      });
+  public async listLogMovimientos(negocio: Negocio): Promise<void> {
+    try {
+      const resp: any = await firstValueFrom(
+        this.crudService.list(
+          {
+            all: true,
+            negocio: negocio.id,
+          },
+          UrlServer.logsMovimientosLicencia
+        )
+      );
+      this.logsList = resp.data;
+    } catch (error) {
+      console.error('Error al cargar logs:', error);
+      throw error; // Manejar errores en caso de que ocurra
+    }
   }
 
 

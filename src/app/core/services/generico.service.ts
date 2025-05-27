@@ -7,6 +7,7 @@ import {SnackbarGenericoComponent} from '../../shared/snackbar-generico/snackbar
 import {DatePipe} from '@angular/common';
 import {ErrorDialogComponent} from '../../shared/error-dialog/error-dialog.component';
 import {FieldForm} from '../../shared/form-dialog-generico/form-dialog-generico.component';
+import {BreakpointObserver} from '@angular/cdk/layout';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class GenericoService {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private datePipe: DatePipe,
+    private breakpointObserver: BreakpointObserver
   ) {}
 
   confirmDialog(message: string): Promise<boolean> {
@@ -71,6 +73,22 @@ export class GenericoService {
     const currentState = this.fieldVisibility.getValue();
     currentState[fieldName] = value;
     this.fieldVisibility.next(currentState);
+  }
+
+  getDialogSize(): { width: string; height: string } {
+    let dialogWidth = '60vw'; // Tamaño por defecto
+    let dialogHeight = 'auto';
+
+    // Detectar el tamaño de la pantalla y ajustar el tamaño del diálogo
+    if (this.breakpointObserver.isMatched('(max-width: 959px)')) {
+      dialogWidth = '95vw'; // Pantallas SM
+    } else if (this.breakpointObserver.isMatched('(min-width: 960px) and (max-width: 1365px)')) {
+      dialogWidth = '65vw'; // Pantallas MD
+    } else if (this.breakpointObserver.isMatched('(min-width: 1366px)')) {
+      dialogWidth = '50vw'; // Pantallas LG
+    }
+
+    return { width: dialogWidth, height: dialogHeight };
   }
 
 
