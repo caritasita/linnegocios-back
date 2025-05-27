@@ -25,7 +25,7 @@ import {GenericoService} from '../../core/services/generico.service';
 import {Subscription} from 'rxjs';
 
 @Component({
-  selector: 'app-form-generico',
+  selector: 'app-form-dialog-generico',
   standalone: true,
   imports: [
     ReactiveFormsModule,

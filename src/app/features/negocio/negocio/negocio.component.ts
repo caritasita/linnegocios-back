@@ -45,6 +45,7 @@ import {firstValueFrom} from 'rxjs';
     MatToolbar,
     NgIf,
     TablaGenericaComponent,
+    FormDialogGenericoComponent,
   ],
   templateUrl: './negocio.component.html',
   styleUrl: './negocio.component.scss',
@@ -105,7 +106,7 @@ export class NegocioComponent implements OnInit {
       hideAction: (item: any) => {
         return false;
       },
-      callback: (item: any) => this.openFormDialog(item)
+      callback: (item: any) => this.openSeguimientoNegocio(item)
     },
     {
       name: 'Reiniciar negocio',
@@ -172,7 +173,10 @@ export class NegocioComponent implements OnInit {
     },
   ];
 
+  fieldFormSeguimiento!: FieldForm[];
+
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
+  @ViewChild('drawerSeguimientoNegocio') drawerSeguimientoNegocio!: MatDrawer;
 
   constructor(
     private negocioService: NegocioService,
@@ -485,6 +489,49 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
         });
       }
     });
+  }
+
+  openSeguimientoNegocio(data: Negocio) {
+    this.drawerSeguimientoNegocio.open()
+
+    this.fieldFormSeguimiento = [
+      {
+        form: 'negocio',
+        fields: [
+          [
+            {
+              name: 'tipoSeguimiento',
+              label: 'Tipo de seguimiento',
+              value: 'tipoSeguimiento',
+              type: 'select',
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'estatusSeguimiento',
+              label: 'Estatus de seguimiento',
+              value: 'estatusSeguimiento',
+              type: 'select',
+              options: this.transformedGiroComercialList,
+              validation: Validators.required
+            }
+          ],
+          [
+            {
+              name: 'mensaje',
+              label: 'Mensaje',
+              value: 'mensaje',
+              type: 'text',
+              maxLenght: 10,
+              validation: Validators.compose([Validators.required, this.validationMessagesService.telefonoValido()]),
+
+            }
+          ],
+        ]
+      },
+    ]
+
   }
 
   private async delete(objeto: any) {

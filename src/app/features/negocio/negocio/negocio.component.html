@@ -53,6 +53,27 @@
       ></app-form-generico>
     </div>
   </mat-drawer>
+
+  <mat-drawer #drawerSeguimientoNegocio class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end" >
+    <mat-toolbar  class="border-bottom">
+      <mat-icon class="mr-1">directions_walk</mat-icon>
+      <span>
+        Seguimiento negocio
+      </span>
+      <div class="spacer"></div>
+      <button mat-icon-button class="bordered-icon-button" (click)="drawerSeguimientoNegocio.toggle()">
+        <mat-icon>close_round</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <div class="container p-3">
+
+      <app-form-dialog-generico
+        [fieldForms]= "fieldFormSeguimiento"
+      ></app-form-dialog-generico>
+    </div>
+  </mat-drawer>
+
 </mat-drawer-container>
 
 
