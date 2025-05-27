@@ -27,6 +27,7 @@ import {permisosCredencialElectronico} from '../../../core/helpers/permissions.d
 import {ValidationMessagesService} from '../../../core/services/validation-messages.service';
 import {ListaGenericaComponent} from '../../../shared/lista-generica/lista-generica.component';
 import {LogMovimientosLicencia} from '../../../shared/models/logMovimientosLicencia';
+import {lastValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-negocio',
@@ -596,6 +597,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
   }
 
   private async increaseLicence(negocio: Negocio) {
+    this.logsList= []
+    this.listLogMovimientos(negocio)
 
     const fieldForms: FieldForm[] = [
       {
@@ -612,9 +615,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
         ]
       }
     ];
-
-    this.listLogMovimientos(negocio)
-
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: 'Asignar días licencia demo',
@@ -654,20 +654,20 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     });
   }
 
-  public listLogMovimientos(negocio: Negocio) {
-    this.crudService
-      .list(
+  public async listLogMovimientos(negocio: Negocio): Promise<void> {
+    const response: any = await lastValueFrom(
+      this.crudService.list(
         {
           all: true,
           negocio: negocio.id
         },
         UrlServer.logsMovimientosLicencia
       )
-      .subscribe(async (resp: any) => {
-        this.logsList = resp.data;
-        console.log('this.logsList');
-        console.table(this.logsList);
-      });
+    );
+
+    this.logsList = response?.data || [];
+    console.log('this.logsList');
+    console.table(this.logsList);
   }
 
 
