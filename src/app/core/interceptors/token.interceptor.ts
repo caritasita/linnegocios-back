@@ -135,7 +135,7 @@ export class TokenInterceptor implements HttpInterceptor {
                   'snack-bar-error',
                   () => {}
                 );
-                // this.cerrarSesion();
+                this.cerrarSesion();
                 break;
               case 'LockedException':
                 this.genericoService.openSnackBar(
