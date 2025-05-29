@@ -28,6 +28,10 @@ import {ValidationMessagesService} from '../../../core/services/validation-messa
 import {ListaGenericaComponent} from '../../../shared/lista-generica/lista-generica.component';
 import {LogMovimientosLicencia} from '../../../shared/models/logMovimientosLicencia';
 import {firstValueFrom} from 'rxjs';
+import {EstatusSeguimientoNegocioService} from '../../../core/services/estatus-seguimiento-negocio.service';
+import {TipoSeguimientoService} from '../../../core/services/tipo-seguimiento.service';
+import {TipoSeguimientoNegocio} from '../../../shared/models/tipoSeguimientoNegocio';
+import {EstatusSeguimientoNegocio} from '../../../shared/models/estatusSeguimientoNegocio';
 
 @Component({
   selector: 'app-negocio',
@@ -55,6 +59,9 @@ export class NegocioComponent implements OnInit {
   estadosList: Partial<Estado>[] = [];
   giroComercialList: GiroComercial[] = [];
   logsList: LogMovimientosLicencia[] = [];
+
+  tipoSeguimientoList: TipoSeguimientoNegocio[] = [];
+  estatusSeguimientoList: EstatusSeguimientoNegocio[] = [];
 
   totalRecords = 0;
   fieldsFilters!: Field[];
@@ -184,6 +191,8 @@ export class NegocioComponent implements OnInit {
     private crudService: CrudService,
     private dialog: MatDialog,
     private validationMessagesService: ValidationMessagesService,
+    private tipoSeguimientoService: TipoSeguimientoService,
+    private estatusSeguimientoNegocioService: EstatusSeguimientoNegocioService,
   ) {
   }
 
@@ -191,6 +200,9 @@ export class NegocioComponent implements OnInit {
     this.lista();
     this.getEstados(null);
     this.getGiroComercial();
+
+    this.getTipoSeguimiento();
+    this.getEstatusSeguimiento();
   }
 
   lista(resetOffset = false) {
@@ -494,27 +506,34 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
   openSeguimientoNegocio(data: Negocio) {
     this.drawerSeguimientoNegocio.open()
 
+    const listaTipoSeguimiento: any= this.tipoSeguimientoList?.map(ts => ({
+      label: ts?.nombre,
+      value: ts?.id
+    }));
+
+    const listaEstatusSeguimiento: any= this.estatusSeguimientoList?.map(ts => ({
+      label: ts?.nombre,
+      value: ts?.id
+    }));
+
     this.fieldFormSeguimiento = [
       {
-        form: 'negocio',
+        form: 'seguimientoNegocio',
         fields: [
           [
             {
               name: 'tipoSeguimiento',
               label: 'Tipo de seguimiento',
-              value: 'tipoSeguimiento',
               type: 'select',
-              validation: Validators.required
+              options: listaTipoSeguimiento
             }
           ],
           [
             {
               name: 'estatusSeguimiento',
               label: 'Estatus de seguimiento',
-              value: 'estatusSeguimiento',
               type: 'select',
-              options: this.transformedGiroComercialList,
-              validation: Validators.required
+              options: listaEstatusSeguimiento,
             }
           ],
           [
@@ -528,10 +547,72 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
             }
           ],
+          [
+            {
+              name: 'programado',
+              label: '¿Programar seguimiento?',
+              value: 'programado',
+              type: 'toggle',
+            }
+          ],
+          [
+            {
+              name: 'tipoSeguimientoProgramado',
+              label: 'Tipo de comunicación',
+              options: listaTipoSeguimiento,
+              type: 'select',
+              dependsOn: 'seguimientoNegocio.programado',
+            }
+          ],
+          [
+            {
+              name: 'fechaProgramada',
+              label: 'Fecha programada',
+              value: 'fechaProgramada',
+              type: 'text',
+              dependsOn: 'seguimientoNegocio.programado',
+            }
+          ],
+          [
+            {
+              name: 'hora',
+              label: 'Hora de la cita',
+              value: 'hora',
+              type: 'text',
+              dependsOn: 'seguimientoNegocio.programado',
+            }
+          ],
+          [
+            {
+              name: 'enlace',
+              label: 'Enalce',
+              value: 'enlace',
+              type: 'text',
+              dependsOn: 'seguimientoNegocio.programado',
+            }
+          ],
         ]
       },
     ]
 
+  }
+
+  getTipoSeguimiento(): void {
+    this.tipoSeguimientoService
+      .list({ all: true })
+      .subscribe((response: any) => {
+        this.tipoSeguimientoList = response.data;
+        console.log('tipoSeguimientoList');
+        console.table(this.tipoSeguimientoList);
+      });
+  }
+
+  getEstatusSeguimiento(): void {
+    this.estatusSeguimientoNegocioService
+      .list({ all: true })
+      .subscribe((response: any) => {
+        this.estatusSeguimientoList = response.data;
+      });
   }
 
   private async delete(objeto: any) {
@@ -717,6 +798,5 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       throw error; // Manejar errores en caso de que ocurra
     }
   }
-
 
 }

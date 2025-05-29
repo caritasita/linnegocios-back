@@ -4,7 +4,7 @@ import {
   Inject,
   Input,
   OnDestroy,
-  OnInit,
+  OnInit, Optional,
   Output,
   ViewChild,
   ViewContainerRef
@@ -65,8 +65,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    public dialogRef: MatDialogRef<FormDialogGenericoComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any,
+    @Optional() public dialogRef: MatDialogRef<FormDialogGenericoComponent>,
     private genericoService: GenericoService
   ) {
   }
@@ -76,13 +76,13 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.fieldForms = this.dialogData.fieldForms;
-    this.titleDialog = this.dialogData.titleDialog;
-    this.twoColumn = this.dialogData.twoColumn || false;
-    this.data = this.dialogData.data || {};
+    this.fieldForms = this.fieldForms.length > 0 ? this.fieldForms : this.dialogData?.fieldForms;
+    this.titleDialog = this.titleDialog ? this.titleDialog : this.dialogData?.titleDialog;
+    this.twoColumn = (this.twoColumn ? this.twoColumn :  this.dialogData?.twoColumn) || false;
+    this.data = this.dialogData?.data || {};
 
 
-    if (this.dialogData.componente) {
+    if (this?.dialogData?.componente) {
       // Crear el componente dinámicamente
       const componentRef = this.contenedorDinamico.createComponent(this.dialogData.componente);
       // Pasar los datos al componente proyectado
