@@ -14,7 +14,7 @@ import {
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {GenericoService} from '../../../core/services/generico.service';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {Negocio} from '../../../shared/models/negocio';
 import {NegocioService} from '../../../core/services/negocio.service';
@@ -525,7 +525,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               name: 'tipoSeguimiento',
               label: 'Tipo de seguimiento',
               type: 'select',
-              options: listaTipoSeguimiento
+              options: listaTipoSeguimiento,
+              validation: Validators.required
             }
           ],
           [
@@ -534,6 +535,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               label: 'Estatus de seguimiento',
               type: 'select',
               options: listaEstatusSeguimiento,
+              validation: Validators.required
             }
           ],
           [
@@ -543,7 +545,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               value: 'mensaje',
               type: 'text',
               maxLenght: 10,
-              validation: Validators.compose([Validators.required, this.validationMessagesService.telefonoValido()]),
+              validation: Validators.compose([Validators.required]),
 
             }
           ],
@@ -569,7 +571,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               name: 'fechaProgramada',
               label: 'Fecha programada',
               value: 'fechaProgramada',
-              type: 'text',
+              type: 'datepicker',
               dependsOn: 'seguimientoNegocio.programado',
             }
           ],
@@ -578,7 +580,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               name: 'hora',
               label: 'Hora de la cita',
               value: 'hora',
-              type: 'text',
+              type: 'timepicker',
               dependsOn: 'seguimientoNegocio.programado',
             }
           ],

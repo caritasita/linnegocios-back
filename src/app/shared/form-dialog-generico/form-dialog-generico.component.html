@@ -1,5 +1,5 @@
 <ng-container>
-  <h4 mat-dialog-title>{{ titleDialog }}</h4>
+  <h4 mat-dialog-title *ngIf="showHeader">{{ titleDialog }}</h4>
 
   <mat-dialog-content class="pt-4">
     <div [ngClass]="{'contenedor-formulario': true, 'two-column': twoColumn}">
@@ -122,6 +122,24 @@
                   </mat-error>
                 </mat-form-field>
 
+                <mat-form-field *ngIf="field.type === 'datepicker' && !field.visibility" class="width-content" appearance="outline">
+                  <mat-label>{{ field.label | uppercase }}</mat-label>
+                  <input matInput [matDatepicker]="picker" (focus)="picker.open()" [placeholder]="'DD/MM/YYYY'">
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content" appearance="outline">
+                  <mat-label>{{ field.label | uppercase }}</mat-label>
+                  <input
+                    matInput
+                    [ngxTimepicker]="picker"
+                    readonly
+                    placeholder="Selecciona una hora"
+                  />
+                  <ngx-material-timepicker #picker></ngx-material-timepicker>
+                </mat-form-field>
+
                 <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.visibility"
                                   (change)="onCheckboxChange(field.name, $event)"
                                   [formControlName]="field.name">{{ field.label }}
@@ -134,7 +152,8 @@
       </div>
     </div>
   </mat-dialog-content>
-  <mat-dialog-actions>
+  <mat-dialog-actions class="actions">
+    <div class="spacer"></div>
     <button class="boton-bg-primario" mat-stroked-button (click)="onClose()">Cancelar</button>
     <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="!isFormsValid"
             (click)="onSubmit()">{{ data.id ? 'Actualizar' : 'Guardar' }}

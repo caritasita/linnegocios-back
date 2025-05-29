@@ -57,3 +57,12 @@
   line-height: 1;
 }
 
+.actions {
+  display: flex;
+  justify-content: flex-end; /* Alinea los elementos al lado derecho */
+  gap: 8px; /* Espacio entre botones */
+}
+
+.spacer {
+  flex: 1; /* Empuja los botones hacia la derecha */
+}

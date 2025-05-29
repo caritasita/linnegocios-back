@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Inject,
@@ -16,13 +17,18 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
-import {MatSelect, MatSelectModule} from '@angular/material/select';
+import {MatSelectModule} from '@angular/material/select';
 import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
 import {MatCardModule} from '@angular/material/card';
 import {FormErrorsComponent} from '../form-errors/form-errors.component';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {GenericoService} from '../../core/services/generico.service';
 import {Subscription} from 'rxjs';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {DateAdapter, MAT_DATE_FORMATS, MatNativeDateModule, NativeDateAdapter} from '@angular/material/core';
+import {CUSTOM_DATE_FORMATS} from '../../core/config/custom-date-formats';
+import {CustomDateAdapter} from '../../core/config/CustomDateAdapter';
+import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 
 @Component({
   selector: 'app-form-dialog-generico',
@@ -40,16 +46,25 @@ import {Subscription} from 'rxjs';
     FormsModule,
     MatCardModule,
     FormErrorsComponent,
-    MatSlideToggle
+    MatSlideToggle,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    NgxMaterialTimepickerModule,
   ],
+  providers: [
+    {provide: DateAdapter, useClass: CustomDateAdapter},
+    {provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS},
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './form-dialog-generico.component.html',
   styleUrl: './form-dialog-generico.component.scss',
 })
 export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   @Input() fieldForms: FieldForm[] = [];
   @Input() data: any = {};
+  @Input() showHeader: boolean = true;
   @Input() titleDialog: string = "Registrar";
-  @Input() twoColumn= false;
+  @Input() twoColumn = false;
   @Output() submitForm = new EventEmitter<any>();
 
   fieldsFlat!: FieldForm[];
@@ -61,7 +76,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
 
   private subscription!: Subscription;
 
-  @ViewChild('contenedorDinamico', { read: ViewContainerRef, static: true }) contenedorDinamico!: ViewContainerRef;
+  @ViewChild('contenedorDinamico', {read: ViewContainerRef, static: true}) contenedorDinamico!: ViewContainerRef;
 
   constructor(
     private fb: FormBuilder,
@@ -78,7 +93,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.fieldForms = this.fieldForms.length > 0 ? this.fieldForms : this.dialogData?.fieldForms;
     this.titleDialog = this.titleDialog ? this.titleDialog : this.dialogData?.titleDialog;
-    this.twoColumn = (this.twoColumn ? this.twoColumn :  this.dialogData?.twoColumn) || false;
+    this.twoColumn = (this.twoColumn ? this.twoColumn : this.dialogData?.twoColumn) || false;
     this.data = this.dialogData?.data || {};
 
 
@@ -116,8 +131,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
               if (f.dependsOn) {
                 const partes = f.dependsOn.split('.');
                 // if (partes[0] === ff.form) {
-                  const valorActual= visibility[partes[1]];
-                  f.visibility = !valorActual;
+                const valorActual = visibility[partes[1]];
+                f.visibility = !valorActual;
                 // }
               }
             });
@@ -127,7 +142,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
     });
   }
 
-  obtenerEstatusActualCheckbox(){
+  obtenerEstatusActualCheckbox() {
     this.fieldForms.forEach(ff => {
       if (ff.fields) {
         ff.fields.forEach((field: any) => {
@@ -135,9 +150,9 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
             if (f.dependsOn) {
               const partes = f.dependsOn.split('.');
               // if (partes[0] === ff.form) {
-                let valorActual = this.getValueByPath(this.data, f.dependsOn || '');
-                valorActual = (valorActual === null || valorActual === false) ? false : valorActual;
-                f.visibility = !valorActual;
+              let valorActual = this.getValueByPath(this.data, f.dependsOn || '');
+              valorActual = (valorActual === null || valorActual === false) ? false : valorActual;
+              f.visibility = !valorActual;
               // }
             }
           });
@@ -162,12 +177,12 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
           size: [this.data.imagen?.size || null],
           encodeImage: [this.data.imagen?.encodeImage || null]
         });
-      }else if(field.type === 'toggle'){
+      } else if (field.type === 'toggle') {
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || false,
           field.validation
         );
-      }else {
+      } else {
         // Crear un FormControl para los demás campos
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || '',
