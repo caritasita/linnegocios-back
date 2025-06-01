@@ -66,11 +66,16 @@
       </button>
     </mat-toolbar>
 
-    <div class="container p-3" *ngIf="fieldFormSeguimiento">
+    <div class="container p-3" *ngIf="fieldFormSeguimiento && datosComponenteExtra">
 
       <app-form-dialog-generico
         [showHeader]="false"
         [fieldForms]= "fieldFormSeguimiento"
+        [componente]="LogSeguimientoNegocioComponent"
+        [datos]="datosComponenteExtra"
+        [twoColumn]="true"
+        (submitForm)="registrarSeguimiento($event)"
+
       ></app-form-dialog-generico>
     </div>
   </mat-drawer>

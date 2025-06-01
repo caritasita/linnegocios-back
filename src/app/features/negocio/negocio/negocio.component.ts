@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
@@ -27,11 +27,16 @@ import {permisosCredencialElectronico} from '../../../core/helpers/permissions.d
 import {ValidationMessagesService} from '../../../core/services/validation-messages.service';
 import {ListaGenericaComponent} from '../../../shared/lista-generica/lista-generica.component';
 import {LogMovimientosLicencia} from '../../../shared/models/logMovimientosLicencia';
-import {firstValueFrom} from 'rxjs';
+import {firstValueFrom, lastValueFrom, Subscription} from 'rxjs';
 import {EstatusSeguimientoNegocioService} from '../../../core/services/estatus-seguimiento-negocio.service';
 import {TipoSeguimientoService} from '../../../core/services/tipo-seguimiento.service';
 import {TipoSeguimientoNegocio} from '../../../shared/models/tipoSeguimientoNegocio';
 import {EstatusSeguimientoNegocio} from '../../../shared/models/estatusSeguimientoNegocio';
+import {SeguimientoNegocioService} from '../../../core/services/seguimiento-negocio.service';
+import {SeguimientoProgramadoNegocioService} from '../../../core/services/seguimiento-programado-negocio.service';
+import {SeguimientoNegocio} from '../../../shared/models/seguimientoNegocio';
+import {SeguimientoProgramadoNegocio} from '../../../shared/models/seguimientoProgramadoNegocio';
+import {LogSeguimientoNegocioComponent} from './log-seguimiento-negocio/log-seguimiento-negocio.component';
 
 @Component({
   selector: 'app-negocio',
@@ -54,7 +59,9 @@ import {EstatusSeguimientoNegocio} from '../../../shared/models/estatusSeguimien
   templateUrl: './negocio.component.html',
   styleUrl: './negocio.component.scss',
 })
-export class NegocioComponent implements OnInit {
+export class NegocioComponent implements OnInit, OnDestroy {
+  LogSeguimientoNegocioComponent = LogSeguimientoNegocioComponent;
+
   dataList: Partial<Negocio>[] = [];
   estadosList: Partial<Estado>[] = [];
   giroComercialList: GiroComercial[] = [];
@@ -185,6 +192,22 @@ export class NegocioComponent implements OnInit {
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
   @ViewChild('drawerSeguimientoNegocio') drawerSeguimientoNegocio!: MatDrawer;
 
+  private listSeguimientosRequest: Subscription | null = null;
+  private listSeguimientosProgramadosRequest: Subscription | null = null;
+  private saveRequest: Subscription | null = null;
+
+  datosComponenteExtra!: any;
+  seguimientoList: SeguimientoNegocio[] = [];
+  countSeguimientos = 0;
+  offsetSeguimiento = 0;
+  maxSeguimiento = 10;
+  seguimientoProgramadoList: SeguimientoProgramadoNegocio[] = [];
+  countSeguimientosProgramados = 0;
+  offsetSeguimientoProgramado = 0;
+  maxSeguimientoProgramado = 10;
+
+  negocio!: number;
+
   constructor(
     private negocioService: NegocioService,
     private genericoService: GenericoService,
@@ -193,16 +216,19 @@ export class NegocioComponent implements OnInit {
     private validationMessagesService: ValidationMessagesService,
     private tipoSeguimientoService: TipoSeguimientoService,
     private estatusSeguimientoNegocioService: EstatusSeguimientoNegocioService,
+    private seguimientoNegocioService: SeguimientoNegocioService,
+    private seguimientoProgramadoNegocioService: SeguimientoProgramadoNegocioService
   ) {
+  }
+
+  ngOnDestroy(): void {
+    this.saveRequest?.unsubscribe()
   }
 
   ngOnInit() {
     this.lista();
     this.getEstados(null);
     this.getGiroComercial();
-
-    this.getTipoSeguimiento();
-    this.getEstatusSeguimiento();
   }
 
   lista(resetOffset = false) {
@@ -503,8 +529,16 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     });
   }
 
-  openSeguimientoNegocio(data: Negocio) {
+  async openSeguimientoNegocio(negocio: Negocio) {
+
+    this.negocio = negocio.id
     this.drawerSeguimientoNegocio.open()
+
+    await this.getTipoSeguimiento();
+    await this.getEstatusSeguimiento();
+
+    await this.getSeguimiento(negocio.id);
+    await this.getSeguimientoProgramado(negocio.id);
 
     const listaTipoSeguimiento: any= this.tipoSeguimientoList?.map(ts => ({
       label: ts?.nombre,
@@ -543,10 +577,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               name: 'mensaje',
               label: 'Mensaje',
               value: 'mensaje',
-              type: 'text',
-              maxLenght: 10,
-              validation: Validators.compose([Validators.required]),
-
+              type: 'textarea',
+              validation: [Validators.required],
             }
           ],
           [
@@ -587,7 +619,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
           [
             {
               name: 'enlace',
-              label: 'Enalce',
+              label: 'Link de capacitación',
               value: 'enlace',
               type: 'text',
               dependsOn: 'seguimientoNegocio.programado',
@@ -597,24 +629,56 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       },
     ]
 
+    this.datosComponenteExtra= {
+      seguimientoList : this.seguimientoList,
+      seguimientoProgramadoList: this.seguimientoProgramadoList
+    }
+
   }
 
-  getTipoSeguimiento(): void {
-    this.tipoSeguimientoService
-      .list({ all: true })
-      .subscribe((response: any) => {
-        this.tipoSeguimientoList = response.data;
-        console.log('tipoSeguimientoList');
-        console.table(this.tipoSeguimientoList);
-      });
+  async getTipoSeguimiento(): Promise<void> {
+    const response: any = await lastValueFrom(this.tipoSeguimientoService.list({ all: true }));
+    this.tipoSeguimientoList = response.data;
   }
 
-  getEstatusSeguimiento(): void {
-    this.estatusSeguimientoNegocioService
-      .list({ all: true })
-      .subscribe((response: any) => {
-        this.estatusSeguimientoList = response.data;
-      });
+  async getEstatusSeguimiento(): Promise<void> {
+    const response: any = await lastValueFrom(this.estatusSeguimientoNegocioService.list({ all: true }));
+    this.estatusSeguimientoList = response.data;
+  }
+
+  async getSeguimiento(negocio: number): Promise<void> {
+    const response: any = await lastValueFrom(
+      this.seguimientoNegocioService.list({
+        max: this.maxSeguimiento,
+        offset: this.maxSeguimiento * this.offsetSeguimiento,
+        negocio: negocio,
+      })
+    );
+    this.seguimientoList = response.data;
+    this.countSeguimientos = response.count;
+  }
+
+  async getSeguimientoProgramado(negocio: number): Promise<void> {
+    const response = await lastValueFrom(
+      this.seguimientoProgramadoNegocioService.list({
+        max: this.maxSeguimientoProgramado,
+        offset: this.maxSeguimientoProgramado * this.offsetSeguimientoProgramado,
+        negocio: negocio,
+      })
+    );
+    this.seguimientoProgramadoList = response.data;
+    this.countSeguimientosProgramados = response.count;
+  }
+
+  registrarSeguimiento(seguimiento: any){
+
+    const data = {...seguimiento.seguimientoNegocio, negocio: this.negocio}
+    this.saveRequest = this.seguimientoNegocioService.create(data).subscribe(() => {
+      if (seguimiento) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {});
+      this.getSeguimiento(this.negocio);
+      this.getSeguimientoProgramado(this.negocio);
+      // this.totalSeguimientoProspectoService.getSeguimientoProgramadoNegocio();
+    });
   }
 
   private async delete(objeto: any) {
@@ -800,5 +864,4 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       throw error; // Manejar errores en caso de que ocurra
     }
   }
-
 }

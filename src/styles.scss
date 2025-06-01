@@ -222,7 +222,8 @@ tr:hover {
 
   .content-sidenav {
     position: fixed;
-    width: 400px;
+    min-width: 70vw;
+    max-width: 800px !important;
     border-radius: 0.75rem !important;
     @media (max-width: 768px) {
       width: 100vw;
@@ -377,5 +378,24 @@ mat-form-field input[readonly] {
 .mat-mdc-text-field-wrapper:has(input[readonly]) {
   background-color: $color-primario-5; /* Cambia este color según tus necesidades */
   cursor: not-allowed;
+}
+
+mat-list{
+  .mdc-list-item__primary-text {
+    font-size: 14px !important;
+  }
+}
+.mat-mdc-tab-body {
+  padding: 0.25rem 0 !important;
+}
+
+.acortar-texto-max-300px{
+  width: 300px !important;
+  white-space: break-spaces;
+  overflow: hidden;
+}
+
+.mdc-list-item.mdc-list-item--with-one-line {
+   height: max-content !important;
 }
 

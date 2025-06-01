@@ -67,6 +67,9 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   @Input() twoColumn = false;
   @Output() submitForm = new EventEmitter<any>();
 
+  @Input() componente: any; // Componente a recibir
+  @Input() datos: any;
+
   fieldsFlat!: FieldForm[];
 
   form!: FormGroup;
@@ -96,14 +99,21 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
     this.twoColumn = (this.twoColumn ? this.twoColumn : this.dialogData?.twoColumn) || false;
     this.data = this.dialogData?.data || {};
 
+    this.componente = this.componente || this?.dialogData?.componente;
+    this.datos = this.datos || this?.dialogData?.datos;
+    console.log('*this.datos*');
+    console.table(this.datos);
 
-    if (this?.dialogData?.componente) {
+
+    if (this.componente) {
       // Crear el componente dinámicamente
-      const componentRef = this.contenedorDinamico.createComponent(this.dialogData.componente);
+      const componentRef = this.contenedorDinamico.createComponent(this.componente);
       // Pasar los datos al componente proyectado
-      if (this.dialogData.datos) {
-        Object.keys(this.dialogData.datos).forEach(key => {
-          (componentRef.instance as any)[key] = this.dialogData.datos[key];
+      if (this.datos) {
+        Object.keys(this.datos).forEach(key => {
+          console.log('DATOS ENTRA');
+          console.table(key);
+          (componentRef.instance as any)[key] = this.datos[key];
         });
       }
     }
@@ -183,6 +193,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
           field.validation
         );
       } else {
+        // console.log(`field.name ${field.name}`);
         // Crear un FormControl para los demás campos
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || '',

@@ -4,7 +4,7 @@
   <mat-dialog-content class="pt-4">
     <div [ngClass]="{'contenedor-formulario': true, 'two-column': twoColumn}">
       <ng-container #contenedorDinamico></ng-container>
-      <div [ngClass]="{'border-horizontal-right': twoColumn}" >
+      <div class="formulario-generico" [ngClass]="{'border-horizontal-right': twoColumn}">
         <ng-container *ngFor="let key of getKeys(forms)">
           <form [formGroup]="forms[key]">
             <div *ngFor="let grupo  of getFields(key)" class="form-container">
@@ -82,6 +82,16 @@
                   </mat-error>
                 </mat-form-field>
 
+                <mat-form-field *ngIf="field.type === 'textarea' && !field.visibility" class="width-content"
+                                appearance="outline">
+                  <mat-label>{{ field.label | uppercase }}</mat-label>
+                  <textarea matInput formControlName="mensaje" placeholder="Escribe aquí"></textarea>
+                  <mat-error
+                    *ngIf="forms[key].get(field.name)?.invalid && (forms[key].get(field.name)?.dirty || forms[key].get(field.name)?.touched)">
+                    <app-form-errors [control]="forms[key].get(field.name)"></app-form-errors>
+                  </mat-error>
+                </mat-form-field>
+
                 <mat-form-field *ngIf="field.type === 'multiselect' && !field.visibility" class="width-content"
                                 appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
@@ -122,14 +132,16 @@
                   </mat-error>
                 </mat-form-field>
 
-                <mat-form-field *ngIf="field.type === 'datepicker' && !field.visibility" class="width-content" appearance="outline">
+                <mat-form-field *ngIf="field.type === 'datepicker' && !field.visibility" class="width-content"
+                                appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
                   <input matInput [matDatepicker]="picker" (focus)="picker.open()" [placeholder]="'DD/MM/YYYY'">
                   <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
 
-                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content" appearance="outline">
+                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content"
+                                appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
                   <input
                     matInput

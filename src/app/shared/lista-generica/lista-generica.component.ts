@@ -10,7 +10,6 @@ import {CommonModule, JsonPipe} from '@angular/common';
     CommonModule,
     MatCardModule,
     MatListModule,
-    JsonPipe
   ],
   templateUrl: './lista-generica.component.html',
   styleUrl: './lista-generica.component.css'
