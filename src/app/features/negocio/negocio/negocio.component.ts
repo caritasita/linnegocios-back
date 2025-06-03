@@ -645,7 +645,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
   }
 
   async getSeguimiento(negocio: number): Promise<void> {
-    console.log(`++++ negocio ${negocio}`);
     try {
       const response: any = await lastValueFrom(
         this.seguimientoNegocioService.list({
@@ -656,9 +655,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       );
       this.seguimientoList = response.data;
       this.countSeguimientos = response.count;
-      console.log('ENTRANDOOOO');
-      console.table(response.data);
-      console.log('------');
     } catch (error) {
       console.error('Error en getSeguimiento:', error);
     }
@@ -678,16 +674,29 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
   registrarSeguimiento(seguimiento: any){
 
-    console.table(seguimiento);
-    console.table(seguimiento.seguimientoNegocio.hora);
-    const hour: string = seguimiento.seguimientoNegocio.hora;
-    const [hours, minutes] = hour.split(':'); // 12:24
-    console.log(`hours ${Number(hours)}`);
-    console.log(`minutes ${Number(minutes.split(' ')[0])}`);
-    seguimiento.fechaProgramada.setHours(Number(hours), Number(minutes.split(' ')[0]));
-    seguimiento.fechaProgramada = seguimiento.fechaProgramada.toGMTString();
-    seguimiento.hora= hours
+// Obtener la hora como string
+    const hour: string = seguimiento.seguimientoNegocio.hora; // Ejemplo: "12:24"
 
+// Dividir la hora en horas y minutos
+    const [hours, minutes] = hour.split(':'); // hours = "12", minutes = "24"
+
+// Convertir a números
+    const numericHours = Number(hours);
+    const numericMinutes = Number(minutes.split(' ')[0]);
+
+// Asegúrate de que fechaProgramada sea un objeto Date
+    if (!(seguimiento.seguimientoNegocio.fechaProgramada instanceof Date)) {
+      seguimiento.fechaProgramada = new Date(seguimiento.seguimientoNegocio.fechaProgramada); // Convertir si es necesario
+    }
+
+    // Establecer la hora y minutos en fechaProgramada
+    seguimiento.seguimientoNegocio.fechaProgramada.setHours(numericHours, numericMinutes);
+
+// Convertir a GMT string (opcional)
+    seguimiento.seguimientoNegocio.fechaProgramada = seguimiento.seguimientoNegocio.fechaProgramada.toGMTString();
+
+// Guardar solo la hora en el objeto seguimiento
+    seguimiento.hora = hours;
 
     const data = {...seguimiento.seguimientoNegocio, negocio: this.negocio}
     this.saveRequest = this.seguimientoNegocioService.create(data).subscribe(() => {

@@ -146,8 +146,7 @@
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
 
-                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content"
-                                appearance="outline">
+                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content" appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
                   <input
                     matInput
@@ -156,7 +155,7 @@
                     placeholder="Selecciona una hora"
                     [formControlName]="field.name"
                   />
-                  <ngx-material-timepicker #picker></ngx-material-timepicker>
+                  <ngx-material-timepicker #picker [format]="24"></ngx-material-timepicker>
                 </mat-form-field>
 
                 <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.visibility"
