@@ -3,10 +3,10 @@ import {
   Component,
   EventEmitter,
   Inject,
-  Input,
+  Input, OnChanges,
   OnDestroy,
   OnInit, Optional,
-  Output,
+  Output, SimpleChanges,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
@@ -59,12 +59,15 @@ import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
   templateUrl: './form-dialog-generico.component.html',
   styleUrl: './form-dialog-generico.component.scss',
 })
-export class FormDialogGenericoComponent implements OnInit, OnDestroy {
+export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges {
   @Input() fieldForms: FieldForm[] = [];
   @Input() data: any = {};
   @Input() showHeader: boolean = true;
   @Input() titleDialog: string = "Registrar";
   @Input() twoColumn = false;
+  @Input() nombreButtonGuardar: string = 'Guardar';
+  @Input() nombreBotonCancelar: string = 'Cancelar'
+  @Input() mostrarBotonCancelar: Boolean = true;
   @Output() submitForm = new EventEmitter<any>();
 
   @Input() componente: any; // Componente a recibir
@@ -78,6 +81,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
   filteredOptions: { [key: string]: any[] } = {};
 
   private subscription!: Subscription;
+  componentRef!: any;
 
   @ViewChild('contenedorDinamico', {read: ViewContainerRef, static: true}) contenedorDinamico!: ViewContainerRef;
 
@@ -101,21 +105,10 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
 
     this.componente = this.componente || this?.dialogData?.componente;
     this.datos = this.datos || this?.dialogData?.datos;
-    console.log('*this.datos*');
-    console.table(this.datos);
-
 
     if (this.componente) {
-      // Crear el componente dinámicamente
-      const componentRef = this.contenedorDinamico.createComponent(this.componente);
-      // Pasar los datos al componente proyectado
-      if (this.datos) {
-        Object.keys(this.datos).forEach(key => {
-          console.log('DATOS ENTRA');
-          console.table(key);
-          (componentRef.instance as any)[key] = this.datos[key];
-        });
-      }
+      this.componentRef = this.contenedorDinamico.createComponent(this.componente);
+      this.updateComponentWithDatos();
     }
 
     for (const key of this.fieldForms) {
@@ -127,10 +120,23 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy {
     this.listenCheckbox();
     this.obtenerEstatusActualCheckbox();
 
-    console.log('DATA EN GENERICO');
-    console.table(this.data);
-
   }
+
+  private updateComponentWithDatos() {
+    // Pasar los nuevos datos al componente proyectado
+    if (this.datos) {
+      Object.keys(this.datos).forEach(key => {
+        (this.componentRef.instance as any)[key] = this.datos[key];
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['datos'] && this.componentRef) {
+      this.updateComponentWithDatos();
+    }
+  }
+
 
   listenCheckbox() {
     this.subscription = this.genericoService.fieldVisibility$.subscribe((visibility) => {

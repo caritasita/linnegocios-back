@@ -11,10 +11,8 @@
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
-  height: calc(100vh - 280px);
+  height: calc(100vh - 270px);
   overflow-y: scroll;
   padding-bottom: 1rem;
   padding-right: 0.5rem;
-
-
 }

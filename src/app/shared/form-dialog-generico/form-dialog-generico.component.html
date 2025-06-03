@@ -135,7 +135,13 @@
                 <mat-form-field *ngIf="field.type === 'datepicker' && !field.visibility" class="width-content"
                                 appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
-                  <input matInput [matDatepicker]="picker" (focus)="picker.open()" [placeholder]="'DD/MM/YYYY'">
+                  <input
+                    matInput
+                    [matDatepicker]="picker"
+                    (focus)="picker.open()"
+                    [placeholder]="'DD/MM/YYYY'"
+                    [formControlName]="field.name"
+                  >
                   <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
@@ -148,6 +154,7 @@
                     [ngxTimepicker]="picker"
                     readonly
                     placeholder="Selecciona una hora"
+                    [formControlName]="field.name"
                   />
                   <ngx-material-timepicker #picker></ngx-material-timepicker>
                 </mat-form-field>
@@ -166,9 +173,11 @@
   </mat-dialog-content>
   <mat-dialog-actions class="actions">
     <div class="spacer"></div>
-    <button class="boton-bg-primario" mat-stroked-button (click)="onClose()">Cancelar</button>
-    <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="!isFormsValid"
-            (click)="onSubmit()">{{ data.id ? 'Actualizar' : 'Guardar' }}
+    <button *ngIf="mostrarBotonCancelar" class="boton-bg-primario" mat-stroked-button
+            (click)="onClose()"> {{ nombreBotonCancelar }}
+    </button>
+    <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="!isFormsValid" (click)="onSubmit()">
+      {{ data.id ? 'Actualizar' : nombreButtonGuardar }}
     </button>
   </mat-dialog-actions>
 </ng-container>

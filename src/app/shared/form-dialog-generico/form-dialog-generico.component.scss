@@ -1,14 +1,21 @@
 @import "variables";
 
 .contenedor-formulario {
+  height: calc(100vh - 202px);
   display: grid;
   grid-template-columns: 1fr;
+  overflow: hidden;
 
   &.two-column {
     grid-template-columns: 1fr minmax(max-content, 400px) !important;
     grid-template-rows: 1fr;
     column-gap: 1rem;
+  }
 
+  .formulario-generico{
+    height: 100%;
+    overflow-y: scroll;
+    padding-bottom: 0.5rem;
   }
 
   .border-horizontal-right {

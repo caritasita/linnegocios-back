@@ -29,8 +29,8 @@
 
 
   <!--FILTROS-->
-  <mat-drawer #drawer class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end" >
-    <mat-toolbar  class="border-bottom">
+  <mat-drawer #drawer class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end">
+    <mat-toolbar class="border-bottom">
       <mat-icon class="mr-1">filter_alt</mat-icon>
       <span>
         Filtros
@@ -54,8 +54,8 @@
     </div>
   </mat-drawer>
 
-  <mat-drawer #drawerSeguimientoNegocio class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end" >
-    <mat-toolbar  class="border-bottom">
+  <mat-drawer #drawerSeguimientoNegocio class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end">
+    <mat-toolbar class="border-bottom">
       <mat-icon class="mr-1">directions_walk</mat-icon>
       <span>
         Seguimiento negocio
@@ -70,12 +70,13 @@
 
       <app-form-dialog-generico
         [showHeader]="false"
-        [fieldForms]= "fieldFormSeguimiento"
+        [fieldForms]="fieldFormSeguimiento"
         [componente]="LogSeguimientoNegocioComponent"
         [datos]="datosComponenteExtra"
         [twoColumn]="true"
+        nombreButtonGuardar="Registrar seguimiento"
+        [mostrarBotonCancelar]="false"
         (submitForm)="registrarSeguimiento($event)"
-
       ></app-form-dialog-generico>
     </div>
   </mat-drawer>

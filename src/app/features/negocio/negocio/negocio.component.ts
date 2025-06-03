@@ -531,14 +531,16 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
   async openSeguimientoNegocio(negocio: Negocio) {
 
+    this.negocio= 0
     this.negocio = negocio.id
-    this.drawerSeguimientoNegocio.open()
+    console.log(`negocio.id ${negocio.id}`);
 
     await this.getTipoSeguimiento();
     await this.getEstatusSeguimiento();
 
     await this.getSeguimiento(negocio.id);
     await this.getSeguimientoProgramado(negocio.id);
+    this.getListaSeguimientos();
 
     const listaTipoSeguimiento: any= this.tipoSeguimientoList?.map(ts => ({
       label: ts?.nombre,
@@ -629,11 +631,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       },
     ]
 
-    this.datosComponenteExtra= {
-      seguimientoList : this.seguimientoList,
-      seguimientoProgramadoList: this.seguimientoProgramadoList
-    }
-
+    this.drawerSeguimientoNegocio.open()
   }
 
   async getTipoSeguimiento(): Promise<void> {
@@ -647,15 +645,23 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
   }
 
   async getSeguimiento(negocio: number): Promise<void> {
-    const response: any = await lastValueFrom(
-      this.seguimientoNegocioService.list({
-        max: this.maxSeguimiento,
-        offset: this.maxSeguimiento * this.offsetSeguimiento,
-        negocio: negocio,
-      })
-    );
-    this.seguimientoList = response.data;
-    this.countSeguimientos = response.count;
+    console.log(`++++ negocio ${negocio}`);
+    try {
+      const response: any = await lastValueFrom(
+        this.seguimientoNegocioService.list({
+          max: this.maxSeguimiento,
+          offset: this.maxSeguimiento * this.offsetSeguimiento,
+          negocio: negocio,
+        })
+      );
+      this.seguimientoList = response.data;
+      this.countSeguimientos = response.count;
+      console.log('ENTRANDOOOO');
+      console.table(response.data);
+      console.log('------');
+    } catch (error) {
+      console.error('Error en getSeguimiento:', error);
+    }
   }
 
   async getSeguimientoProgramado(negocio: number): Promise<void> {
@@ -672,13 +678,32 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
   registrarSeguimiento(seguimiento: any){
 
+    console.table(seguimiento);
+    console.table(seguimiento.seguimientoNegocio.hora);
+    const hour: string = seguimiento.seguimientoNegocio.hora;
+    const [hours, minutes] = hour.split(':'); // 12:24
+    console.log(`hours ${Number(hours)}`);
+    console.log(`minutes ${Number(minutes.split(' ')[0])}`);
+    seguimiento.fechaProgramada.setHours(Number(hours), Number(minutes.split(' ')[0]));
+    seguimiento.fechaProgramada = seguimiento.fechaProgramada.toGMTString();
+    seguimiento.hora= hours
+
+
     const data = {...seguimiento.seguimientoNegocio, negocio: this.negocio}
     this.saveRequest = this.seguimientoNegocioService.create(data).subscribe(() => {
       if (seguimiento) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {});
       this.getSeguimiento(this.negocio);
       this.getSeguimientoProgramado(this.negocio);
+      this.getListaSeguimientos();
       // this.totalSeguimientoProspectoService.getSeguimientoProgramadoNegocio();
     });
+  }
+
+  getListaSeguimientos(){
+    this.datosComponenteExtra= {
+      seguimientoList : this.seguimientoList,
+      seguimientoProgramadoList: this.seguimientoProgramadoList
+    }
   }
 
   private async delete(objeto: any) {
