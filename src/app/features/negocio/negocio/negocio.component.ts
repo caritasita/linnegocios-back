@@ -197,14 +197,7 @@ export class NegocioComponent implements OnInit, OnDestroy {
   private saveRequest: Subscription | null = null;
 
   datosComponenteExtra!: any;
-  seguimientoList: SeguimientoNegocio[] = [];
-  countSeguimientos = 0;
-  offsetSeguimiento = 0;
-  maxSeguimiento = 10;
-  seguimientoProgramadoList: SeguimientoProgramadoNegocio[] = [];
-  countSeguimientosProgramados = 0;
-  offsetSeguimientoProgramado = 0;
-  maxSeguimientoProgramado = 10;
+
 
   negocio!: number;
 
@@ -217,7 +210,6 @@ export class NegocioComponent implements OnInit, OnDestroy {
     private tipoSeguimientoService: TipoSeguimientoService,
     private estatusSeguimientoNegocioService: EstatusSeguimientoNegocioService,
     private seguimientoNegocioService: SeguimientoNegocioService,
-    private seguimientoProgramadoNegocioService: SeguimientoProgramadoNegocioService
   ) {
   }
 
@@ -485,9 +477,6 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       fieldForms = fieldForms.filter(ff => ff.form !== 'tendero')
     }
 
-    // console.log('data');
-    // console.table(data);
-
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
@@ -533,21 +522,16 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
     this.negocio= 0
     this.negocio = negocio.id
-    console.log(`negocio.id ${negocio.id}`);
 
     await this.getTipoSeguimiento();
     await this.getEstatusSeguimiento();
 
-    await this.getSeguimiento(negocio.id);
-    await this.getSeguimientoProgramado(negocio.id);
-    this.getListaSeguimientos();
-
-    const listaTipoSeguimiento: any= this.tipoSeguimientoList?.map(ts => ({
+    const listaTipoSeguimiento: any = this.tipoSeguimientoList?.map(ts => ({
       label: ts?.nombre,
       value: ts?.id
     }));
 
-    const listaEstatusSeguimiento: any= this.estatusSeguimientoList?.map(ts => ({
+    const listaEstatusSeguimiento: any = this.estatusSeguimientoList?.map(ts => ({
       label: ts?.nombre,
       value: ts?.id
     }));
@@ -631,88 +615,46 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
       },
     ]
 
+    this.datosComponenteExtra = {
+      negocioId: this.negocio
+    }
+
     this.drawerSeguimientoNegocio.open()
   }
 
   async getTipoSeguimiento(): Promise<void> {
-    const response: any = await lastValueFrom(this.tipoSeguimientoService.list({ all: true }));
+    const response: any = await lastValueFrom(this.tipoSeguimientoService.list({all: true}));
     this.tipoSeguimientoList = response.data;
   }
 
   async getEstatusSeguimiento(): Promise<void> {
-    const response: any = await lastValueFrom(this.estatusSeguimientoNegocioService.list({ all: true }));
+    const response: any = await lastValueFrom(this.estatusSeguimientoNegocioService.list({all: true}));
     this.estatusSeguimientoList = response.data;
   }
 
-  async getSeguimiento(negocio: number): Promise<void> {
-    try {
-      const response: any = await lastValueFrom(
-        this.seguimientoNegocioService.list({
-          max: this.maxSeguimiento,
-          offset: this.maxSeguimiento * this.offsetSeguimiento,
-          negocio: negocio,
-        })
-      );
-      this.seguimientoList = response.data;
-      this.countSeguimientos = response.count;
-    } catch (error) {
-      console.error('Error en getSeguimiento:', error);
-    }
-  }
+  registrarSeguimiento(seguimiento: any) {
 
-  async getSeguimientoProgramado(negocio: number): Promise<void> {
-    const response = await lastValueFrom(
-      this.seguimientoProgramadoNegocioService.list({
-        max: this.maxSeguimientoProgramado,
-        offset: this.maxSeguimientoProgramado * this.offsetSeguimientoProgramado,
-        negocio: negocio,
-      })
-    );
-    this.seguimientoProgramadoList = response.data;
-    this.countSeguimientosProgramados = response.count;
-  }
-
-  registrarSeguimiento(seguimiento: any){
-
-// Obtener la hora como string
     const hour: string = seguimiento.seguimientoNegocio.hora; // Ejemplo: "12:24"
-
-// Dividir la hora en horas y minutos
     const [hours, minutes] = hour.split(':'); // hours = "12", minutes = "24"
-
-// Convertir a números
     const numericHours = Number(hours);
     const numericMinutes = Number(minutes.split(' ')[0]);
-
-// Asegúrate de que fechaProgramada sea un objeto Date
     if (!(seguimiento.seguimientoNegocio.fechaProgramada instanceof Date)) {
       seguimiento.fechaProgramada = new Date(seguimiento.seguimientoNegocio.fechaProgramada); // Convertir si es necesario
     }
 
-    // Establecer la hora y minutos en fechaProgramada
     seguimiento.seguimientoNegocio.fechaProgramada.setHours(numericHours, numericMinutes);
-
-// Convertir a GMT string (opcional)
     seguimiento.seguimientoNegocio.fechaProgramada = seguimiento.seguimientoNegocio.fechaProgramada.toGMTString();
-
-// Guardar solo la hora en el objeto seguimiento
     seguimiento.hora = hours;
 
     const data = {...seguimiento.seguimientoNegocio, negocio: this.negocio}
     this.saveRequest = this.seguimientoNegocioService.create(data).subscribe(() => {
-      if (seguimiento) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {});
-      this.getSeguimiento(this.negocio);
-      this.getSeguimientoProgramado(this.negocio);
-      this.getListaSeguimientos();
+      if (seguimiento) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
+      });
+      // this.getSeguimiento(this.negocio);
+      // this.getSeguimientoProgramado(this.negocio);
+      // this.getListaSeguimientos();
       // this.totalSeguimientoProspectoService.getSeguimientoProgramadoNegocio();
     });
-  }
-
-  getListaSeguimientos(){
-    this.datosComponenteExtra= {
-      seguimientoList : this.seguimientoList,
-      seguimientoProgramadoList: this.seguimientoProgramadoList
-    }
   }
 
   private async delete(objeto: any) {
@@ -875,7 +817,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
         if (response) this.genericoService.openSnackBar(
           response?.mensaje,
           'Aceptar', 'snack-bar-success',
-          () => {}
+          () => {
+          }
         );
       });
     });

@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Inject,
@@ -55,7 +54,6 @@ import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
     {provide: DateAdapter, useClass: CustomDateAdapter},
     {provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS},
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './form-dialog-generico.component.html',
   styleUrl: './form-dialog-generico.component.scss',
 })
@@ -103,13 +101,6 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
     this.twoColumn = (this.twoColumn ? this.twoColumn : this.dialogData?.twoColumn) || false;
     this.data = this.dialogData?.data || {};
 
-    this.componente = this.componente || this?.dialogData?.componente;
-    this.datos = this.datos || this?.dialogData?.datos;
-
-    if (this.componente) {
-      this.componentRef = this.contenedorDinamico.createComponent(this.componente);
-      this.updateComponentWithDatos();
-    }
 
     for (const key of this.fieldForms) {
       // if(this.fieldForms.hasOwnProperty(key.form)){
@@ -117,23 +108,43 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
       // }
     }
 
+    this.componente = this.componente || this?.dialogData?.componente;
+    this.datos = this.datos || this?.dialogData?.datos;
+
+    this.crearComponenteAux();
     this.listenCheckbox();
     this.obtenerEstatusActualCheckbox();
 
   }
 
-  private updateComponentWithDatos() {
-    // Pasar los nuevos datos al componente proyectado
-    if (this.datos) {
-      Object.keys(this.datos).forEach(key => {
-        (this.componentRef.instance as any)[key] = this.datos[key];
-      });
+  private crearComponenteAux() {
+    if (this.componentRef) {
+      this.componentRef.destroy(); // Destruir el componente anterior
+    }
+
+    if (this.componente) {
+      this.componentRef = this.contenedorDinamico.createComponent(this.componente);
+      if (this.datos) {
+        Object.keys(this.datos).forEach(key => {
+          (this.componentRef.instance as any)[key] = this.datos[key];
+        });
+      }
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges) {
     if (changes['datos'] && this.componentRef) {
-      this.updateComponentWithDatos();
+      this.crearComponenteAux();
+    }
+
+    if (changes['fieldForms']) {
+      for (const key of this.fieldForms) {
+        // if(this.fieldForms.hasOwnProperty(key.form)){
+        this.forms[key.form] = this.createForm(key.fields);
+        // }
+      }
+      this.listenCheckbox();
+      this.obtenerEstatusActualCheckbox();
     }
   }
 
@@ -178,6 +189,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   }
 
   onCheckboxChange(fieldName: string, event: any) {
+    console.log(`fieldName ${fieldName}`);
+    console.log(`checkd ${event.checked}`)
     this.genericoService.updateFieldVisibility(fieldName, event?.checked);
   }
 
@@ -199,8 +212,6 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
           field.validation
         );
       } else {
-        // console.log(`field.name ${field.name}`);
-        // Crear un FormControl para los demás campos
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || '',
           field.validation

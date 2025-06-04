@@ -15,4 +15,8 @@
   overflow-y: scroll;
   padding-bottom: 1rem;
   padding-right: 0.5rem;
+
+  mat-card{
+    height: max-content;
+  }
 }

@@ -1,7 +1,6 @@
 @import "variables";
 
 .contenedor-formulario {
-  height: calc(100vh - 202px);
   display: grid;
   grid-template-columns: 1fr;
   overflow: hidden;
@@ -13,9 +12,11 @@
   }
 
   .formulario-generico{
-    height: 100%;
+    height: calc(100vh - 202px);
+    //height: 100%;
     overflow-y: scroll;
     padding-bottom: 0.5rem;
+    padding-top: 1rem !important;
   }
 
   .border-horizontal-right {
