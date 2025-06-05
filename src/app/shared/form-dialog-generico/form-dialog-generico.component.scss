@@ -4,19 +4,20 @@
   display: grid;
   grid-template-columns: 1fr;
   overflow: hidden;
+  padding-top: 1rem;
 
   &.two-column {
     grid-template-columns: 1fr minmax(max-content, 400px) !important;
     grid-template-rows: 1fr;
     column-gap: 1rem;
-  }
 
-  .formulario-generico{
-    height: calc(100vh - 202px);
-    //height: 100%;
-    overflow-y: scroll;
-    padding-bottom: 0.5rem;
-    padding-top: 1rem !important;
+    .formulario-generico{
+      height: max-content;
+      max-height: calc(100vh - 202px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-bottom: 1rem;
+    }
   }
 
   .border-horizontal-right {

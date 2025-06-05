@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {CrudService} from './crud.service';
 import {UrlServer} from '../helpers/UrlServer';
 
@@ -7,6 +7,8 @@ import {UrlServer} from '../helpers/UrlServer';
   providedIn: 'root'
 })
 export class SeguimientoNegocioService {
+  private datosSubject = new Subject();
+  datos$ = this.datosSubject.asObservable();
 
   constructor(private crudService: CrudService) {
   }
@@ -24,5 +26,9 @@ export class SeguimientoNegocioService {
       seguimientoNegocio,
       UrlServer.seguimientoNegocio
     );
+  }
+
+  updateListSeguimiento() {
+    this.datosSubject.next(null);
   }
 }

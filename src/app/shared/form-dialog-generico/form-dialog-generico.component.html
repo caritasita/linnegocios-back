@@ -1,7 +1,7 @@
 <ng-container>
   <h4 mat-dialog-title *ngIf="showHeader">{{ titleDialog }}</h4>
 
-  <mat-dialog-content class="pt-4">
+  <mat-dialog-content>
     <div [ngClass]="{'contenedor-formulario': true, 'two-column': twoColumn}">
       <ng-container #contenedorDinamico></ng-container>
       <div class="formulario-generico" [ngClass]="{'border-horizontal-right': twoColumn}">

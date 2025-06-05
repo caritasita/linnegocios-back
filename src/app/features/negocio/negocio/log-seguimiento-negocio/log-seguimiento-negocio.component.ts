@@ -46,6 +46,11 @@ export class LogSeguimientoNegocioComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.getSeguimiento();
     this.getSeguimientoProgramado();
+
+    this.seguimientoNegocioService.datos$.subscribe((datos) => {
+      console.log('ENTRANDO POR EL ESCUCHADOR');
+      this.getSeguimiento();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -80,6 +85,8 @@ export class LogSeguimientoNegocioComponent implements OnInit, OnChanges {
       })
     );
     this.seguimientoProgramadoList = response.data;
+    console.log('seguimientoProgramadoList');
+    console.table(this.seguimientoProgramadoList);
     this.countSeguimientosProgramados = response.count;
   }
 }

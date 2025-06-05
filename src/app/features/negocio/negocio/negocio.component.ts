@@ -634,26 +634,25 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
 
   registrarSeguimiento(seguimiento: any) {
 
-    const hour: string = seguimiento.seguimientoNegocio.hora; // Ejemplo: "12:24"
-    const [hours, minutes] = hour.split(':'); // hours = "12", minutes = "24"
-    const numericHours = Number(hours);
-    const numericMinutes = Number(minutes.split(' ')[0]);
-    if (!(seguimiento.seguimientoNegocio.fechaProgramada instanceof Date)) {
-      seguimiento.fechaProgramada = new Date(seguimiento.seguimientoNegocio.fechaProgramada); // Convertir si es necesario
-    }
+    if(seguimiento.seguimientoNegocio.programado){
+      const hour: string = seguimiento.seguimientoNegocio.hora; // Ejemplo: "12:24"
+      const [hours, minutes] = hour.split(':'); // hours = "12", minutes = "24"
+      const numericHours = Number(hours);
+      const numericMinutes = Number(minutes.split(' ')[0]);
+      if (!(seguimiento.seguimientoNegocio.fechaProgramada instanceof Date)) {
+        seguimiento.fechaProgramada = new Date(seguimiento.seguimientoNegocio.fechaProgramada); // Convertir si es necesario
+      }
 
-    seguimiento.seguimientoNegocio.fechaProgramada.setHours(numericHours, numericMinutes);
-    seguimiento.seguimientoNegocio.fechaProgramada = seguimiento.seguimientoNegocio.fechaProgramada.toGMTString();
-    seguimiento.hora = hours;
+      seguimiento.seguimientoNegocio.fechaProgramada.setHours(numericHours, numericMinutes);
+      seguimiento.seguimientoNegocio.fechaProgramada = seguimiento.seguimientoNegocio.fechaProgramada.toGMTString();
+      seguimiento.hora = hours;
+    }
 
     const data = {...seguimiento.seguimientoNegocio, negocio: this.negocio}
     this.saveRequest = this.seguimientoNegocioService.create(data).subscribe(() => {
       if (seguimiento) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
       });
-      // this.getSeguimiento(this.negocio);
-      // this.getSeguimientoProgramado(this.negocio);
-      // this.getListaSeguimientos();
-      // this.totalSeguimientoProspectoService.getSeguimientoProgramadoNegocio();
+      this.seguimientoNegocioService.updateListSeguimiento();
     });
   }
 
