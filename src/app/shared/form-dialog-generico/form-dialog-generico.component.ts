@@ -66,7 +66,10 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   @Input() nombreButtonGuardar: string = 'Guardar';
   @Input() nombreBotonCancelar: string = 'Cancelar'
   @Input() mostrarBotonCancelar: Boolean = true;
+  @Input() esFiltro: Boolean = false;
   @Output() submitForm = new EventEmitter<any>();
+  @Output() resetFormFiltros = new EventEmitter<any>();
+
 
   @Input() componente: any; // Componente a recibir
   @Input() datos: any;
@@ -321,6 +324,14 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
       values[key] = this.forms[key].value; // Obtiene los valores de cada FormGroup
     });
     return values;
+  }
+
+  onResetFiltros() {
+    this.resetFormFiltros.emit()
+    for (let formsKey in this.forms) {
+      this.forms[formsKey].reset();
+
+    }
   }
 }
 

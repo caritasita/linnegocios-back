@@ -146,7 +146,8 @@
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
 
-                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content" appearance="outline">
+                <mat-form-field *ngIf="field.type === 'timepicker' && !field.visibility" class="width-content"
+                                appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
                   <input
                     matInput
@@ -173,7 +174,8 @@
   <mat-dialog-actions class="actions">
     <div class="spacer"></div>
     <button *ngIf="mostrarBotonCancelar" class="boton-bg-primario" mat-stroked-button
-            (click)="onClose()"> {{ nombreBotonCancelar }}
+            (click)="esFiltro ? onResetFiltros() : onClose()">
+      {{ nombreBotonCancelar }}
     </button>
     <button mat-flat-button class="boton-bg-primario" type="submit" [disabled]="!isFormsValid" (click)="onSubmit()">
       {{ data.id ? 'Actualizar' : nombreButtonGuardar }}
