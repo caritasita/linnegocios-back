@@ -119,6 +119,11 @@
       box-sizing: border-box;
       padding: 0.25rem;
       border: 2px dashed $color-primario-25;
+      .mat-icon{
+        width: 60px;
+        height: 60px;
+        font-size: 4rem;
+      }
     }
 
     &:hover{

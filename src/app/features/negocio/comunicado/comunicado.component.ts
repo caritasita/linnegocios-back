@@ -44,11 +44,10 @@ import {ComunicadoService} from '../../../core/services/comunicado.service';
   styleUrl: './comunicado.component.css'
 })
 export class ComunicadoComponent implements OnInit {
-  paisList: Pais[] = [];
   dataList: Partial<Estado>[] = [];
   totalRecords = 0;
   fieldsFilters!: FieldForm[];
-  transformedPaisList!: any;
+  transformedComunicadoList!: any;
   queryParams = {
     max: 10,
     offset: 0,
@@ -111,7 +110,6 @@ export class ComunicadoComponent implements OnInit {
 
   ngOnInit() {
     this.lista();
-    // this.getPaises();
   }
 
   lista(resetOffset = false) {
@@ -125,20 +123,21 @@ export class ComunicadoComponent implements OnInit {
       })
       .subscribe((response: any) => {
 
-        this.dataList = response.data;
+        this.dataList = this.generarTablaPersonalizada(response.data);
         this.totalRecords = response.count;
       });
   }
 
-  // getPaises(): void {
-  //   this.paisService.list({all: true}).subscribe((paises: any) => {
-  //     this.paisList = paises.data;
-  //     this.transformedPaisList = this.paisList.map(pais => ({
-  //       label: pais.nombre,
-  //       value: pais.id
-  //     }));
-  //   });
-  // }
+  generarTablaPersonalizada(data: any): any {
+    return data.map((item: any, index: number) => ({
+      comunicado: item?.comunicado,
+      fechaInicio: item.fechaInicio,
+      fechaFin: item.fechaFin,
+      activo: item.activo,
+      ...data[index],
+    }));
+  }
+
 
   formFiltros(): void {
     this.fieldsFilters = [
@@ -289,6 +288,7 @@ export class ComunicadoComponent implements OnInit {
       result.imagen = result?.imagen?.nombre ? result?.imagen : null;
 
       if (data.id) {
+        console.table(data.imagen);
         result = ({...result, id: data.id})
         this.comunicadoService.update(result).subscribe((respueta) => {
           if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {

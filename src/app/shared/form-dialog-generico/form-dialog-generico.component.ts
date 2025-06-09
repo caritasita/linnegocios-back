@@ -83,6 +83,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
 
   private subscription!: Subscription;
   componentRef!: any;
+  imagePreview: string | null = null;
 
   @ViewChild('contenedorDinamico', {read: ViewContainerRef, static: true}) contenedorDinamico!: ViewContainerRef;
 
@@ -99,10 +100,12 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   }
 
   ngOnInit() {
+    console.log(`this.dialogData?.titleDialog ${this.dialogData?.titleDialog}`);
     this.fieldForms = this.fieldForms.length > 0 ? this.fieldForms : this.dialogData?.fieldForms;
-    this.titleDialog = this.titleDialog ? this.titleDialog : this.dialogData?.titleDialog;
+    this.titleDialog = this.dialogData?.titleDialog ? this.dialogData?.titleDialog : this.titleDialog ;
     this.twoColumn = (this.twoColumn ? this.twoColumn : this.dialogData?.twoColumn) || false;
     this.data = this.dialogData?.data || {};
+    console.log(`this.titleDialog ${this.titleDialog}`);
 
 
     for (const key of this.fieldForms) {
@@ -207,6 +210,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
           size: [this.data.imagen?.size || null],
           encodeImage: [this.data.imagen?.encodeImage || null]
         });
+
+        this.imagePreview= this.data.imagen?.url
       } else if (field.type === 'toggle') {
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || false,
@@ -291,16 +296,23 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
     this.form.get(fieldName)?.setValue('');
   }
 
-  imagePreview: string | null = null;
-
-  onImagePicked(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
+  onImagePicked(event: Event, nameForm: FormGroup, nameInput: string) {
+    console.log(`nameInput ${nameInput}`);
+    const fileInput = event.target as HTMLInputElement;
+    if (fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
       const reader = new FileReader();
+
       reader.onload = () => {
-        this.imagePreview = reader.result as string;
+        this.imagePreview = reader.result as string; // Esto mostrará la vista previa de la imagen
+        nameForm.get(nameInput)?.setValue({
+          contentType: file.type,
+          nombre: file.name,
+          size: file.size,
+          encodeImage: reader.result // O puedes usar otra forma de codificación si es necesario
+        });
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Cambia esto si necesitas otro formato
     }
   }
 

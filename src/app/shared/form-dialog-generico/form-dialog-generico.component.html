@@ -52,7 +52,7 @@
                       (click)="fileInput.click()"
                     >
                       <div class="content-interno-image">
-                        Subir imagen
+                        <mat-icon>add_photo_alternate</mat-icon>
                       </div>
                     </div>
                     <div>
@@ -65,10 +65,11 @@
                         Seleccionar imagen
                       </button>
                       <input
-                        #fileInput type="file"
+                        #fileInput
+                        type="file"
                         accept="image/*"
                         style="display: none"
-                        (change)="onImagePicked($event)"
+                        (change)="onImagePicked($event, forms[key],  field.name)"
                       />
                     </div>
                   </mat-card>
