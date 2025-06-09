@@ -140,11 +140,9 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
       this.crearComponenteAux();
     }
 
-    if (changes['fieldForms']) {
+    if (changes['fieldForms'] && !this.esFiltro) {
       for (const key of this.fieldForms) {
-        // if(this.fieldForms.hasOwnProperty(key.form)){
         this.forms[key.form] = this.createForm(key.fields);
-        // }
       }
       this.listenCheckbox();
       this.obtenerEstatusActualCheckbox();
@@ -216,7 +214,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
         );
       } else {
         formGroup[field.name] = new FormControl(
-          this.getValueByPath(this.data, field.value || '') || '',
+          this.data[field.name] || '',
           field.validation
         );
 
@@ -256,10 +254,6 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
 
   getKeys(obj: any): string[] {
     return Object.keys(obj);
-  }
-
-  getControlNames(formGroup: FormGroup): string[] {
-    return Object.keys(formGroup.controls);
   }
 
   getLabelForValue(field: Field, value: any): string {

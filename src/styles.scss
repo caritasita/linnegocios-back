@@ -431,3 +431,11 @@ mat-list{
    height: max-content !important;
 }
 
+.ngx-material-timepicker-container {
+  z-index: 10000 !important; /* Asegúrate de que esté por encima del diálogo */
+}
+
+.cdk-overlay-container {
+  z-index: 10 !important;
+}
+

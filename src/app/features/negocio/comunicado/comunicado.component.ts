@@ -186,29 +186,8 @@ export class ComunicadoComponent implements OnInit {
   }
 
   procesarfiltros(form: any) {
-
-
-    const fechaInicioFormateada= form.comunicado.rangoFechaInicio ? this.getFormatFecha(form.comunicado.rangoFechaInicio) : '';
-    const fechaFinFormateada= form.comunicado.rangoFechaFin ? this.getFormatFecha(form.comunicado.rangoFechaFin) : '';
-    // console.log(`fechaInicioFormateada ${fechaInicioFormateada}`);
-    // console.log(`fechaInicioFormateada ${fechaInicioFormateada}`);
-    console.log(`fechaInicioFormateada ${fechaInicioFormateada}`);
-
-    this.queryParams = ({...this.queryParams, ...form.comunicado, rangoFechaInicio: fechaInicioFormateada, rangoFechaFin: fechaFinFormateada});
+    this.queryParams = ({...this.queryParams, ...form.comunicado});
     this.lista();
-  }
-
-  getFormatFecha(fecha: Date): string{
-    // console.log(`fecha ${fecha}`);
-    // Obtener los componentes de la fecha
-    const dia = String(fecha.getDate()).padStart(2, '0'); // Día (1-31)
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Mes (1-12)
-    const anio = fecha.getFullYear(); // Año (4 dígitos)
-
-// Formato DDMMYYYY
-    const formatoFinal = `${dia}/${mes}/${anio}`;
-    console.log(`formatoFinal ${formatoFinal}`);
-    return formatoFinal;
   }
 
   resetFormFiltros() {
@@ -231,52 +210,64 @@ export class ComunicadoComponent implements OnInit {
 
     const fieldForms: FieldForm[] = [
       {
-        form: 'estado',
+        form: 'comunicado',
         fields: [
           [
             {
-              name: 'pais',
-              label: 'País',
-              value: 'pais',
-              type: 'select',
-              options: this.transformedPaisList,
-              validation: Validators.required
+              name: 'imagen',
+              label: 'Imágen',
+              value: 'imagen',
+              type: 'file',
             }
           ],
           [
             {
-              name: 'clave',
-              label: 'Clave',
-              value: 'clave',
-              type: 'text',
-              validation: Validators.required
+              name: 'comunicado',
+              label: 'Comunicado',
+              value: 'comunicado',
+              type: 'textarea',
+              validation: [Validators.required]
             }
           ],
           [
             {
-              name: 'nombre',
-              label: 'Nombre',
-              value: 'nombre',
-              type: 'text',
+              name: 'fechaInicio',
+              label: 'Fecha inicio',
+              value: 'fechaInicio',
+              type: 'datepicker',
               validation: Validators.required
+            },
+            {
+              name: 'horaInicio',
+              label: 'hora inicio',
+              value: 'horaInicio',
+              type: 'timepicker',
+              // validation: Validators.required
             }
           ],
           [
             {
-              name: 'descripcion',
-              label: 'Descripción',
-              value: 'descripcion',
-              type: 'text',
+              name: 'fechaFin',
+              label: 'Fecha fin',
+              value: 'fechaFin',
+              type: 'datepicker',
+              validation: Validators.required
+            },
+            {
+              name: 'horaFin',
+              label: 'Hora fin',
+              value: 'horaFin',
+              type: 'timepicker',
+              // validation: Validators.required
             }
           ],
         ]
       }
     ]
 
-    let titleDialog = 'Registrar estado'
+    let titleDialog = 'Registrar comunicado'
     if (data.id) {
-      titleDialog = 'Editar estado'
-      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
+      titleDialog = 'Editar comunicado'
     }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
@@ -290,6 +281,13 @@ export class ComunicadoComponent implements OnInit {
     });
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
+      result= result.comunicado
+
+      result.fechaInicio= result.horaInicio ? this.setHour(result.fechaInicio, result.horaInicio) : new Date(result.fechaInicio).toISOString();
+      result.fechaFin= result.horaFin ? this.setHour(result.fechaFin, result.horaFin) : new Date(result.fechaFin).toISOString();
+      result.conHoras= (result.horaInicio || result.horaFin) || false;
+      result.imagen = result?.imagen?.nombre ? result?.imagen : null;
+
       if (data.id) {
         result = ({...result, id: data.id})
         this.comunicadoService.update(result).subscribe((respueta) => {
@@ -306,6 +304,14 @@ export class ComunicadoComponent implements OnInit {
       }
       dialogRef.close();
     });
+  }
+
+  setHour(date: string, hour: string): string {
+    const currentDate = new Date(date);
+    const hoursSplit = hour.split(':');
+    currentDate.setHours(Number(hoursSplit[0]));
+    currentDate.setMinutes(Number(hoursSplit[1].split(' ')[0]));
+    return currentDate.toISOString();
   }
 
   private async delete(objeto: any) {

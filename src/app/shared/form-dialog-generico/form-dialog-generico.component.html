@@ -38,15 +38,30 @@
                 }
 
                 @if (field.type === 'file' && !field.visibility) {
-                  <mat-card class="container quitar-estilo-default-card">
-                    <div class="image-preview" *ngIf="imagePreview">
+                  <mat-card class="container-image">
+                    <div
+                      class="image-preview"
+                      *ngIf="imagePreview"
+                      (click)="fileInput.click()"
+                    >
                       <img [src]="imagePreview" alt="Vista previa de la imagen"/>
+                    </div>
+                    <div
+                      class="content-not-image"
+                      *ngIf="!imagePreview"
+                      (click)="fileInput.click()"
+                    >
+                      <div class="content-interno-image">
+                        Subir imagen
+                      </div>
                     </div>
                     <div>
                       <button
-                        mat-raised-button
-                        color="primary"
-                        (click)="fileInput.click()">
+                        mat-button
+                        mat-flat-button
+                        (click)="fileInput.click()"
+                        class="boton-bg-primario mt-2"
+                      >
                         Seleccionar imagen
                       </button>
                       <input
@@ -85,7 +100,7 @@
                 <mat-form-field *ngIf="field.type === 'textarea' && !field.visibility" class="width-content"
                                 appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
-                  <textarea matInput formControlName="mensaje" placeholder="Escribe aquí"></textarea>
+                  <textarea matInput [formControlName]="field.name" placeholder="Escribe aquí"></textarea>
                   <mat-error
                     *ngIf="forms[key].get(field.name)?.invalid && (forms[key].get(field.name)?.dirty || forms[key].get(field.name)?.touched)">
                     <app-form-errors [control]="forms[key].get(field.name)"></app-form-errors>

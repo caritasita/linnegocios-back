@@ -564,7 +564,7 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
               label: 'Mensaje',
               value: 'mensaje',
               type: 'textarea',
-              validation: [Validators.required],
+              validation: [Validators.required]
             }
           ],
           [

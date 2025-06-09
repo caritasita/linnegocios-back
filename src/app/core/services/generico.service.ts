@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../../shared/confirm-dialog/confirm-dialog.component';
 import {BehaviorSubject, firstValueFrom} from 'rxjs';
@@ -19,11 +19,12 @@ export class GenericoService {
     private snackBar: MatSnackBar,
     private datePipe: DatePipe,
     private breakpointObserver: BreakpointObserver
-  ) {}
+  ) {
+  }
 
   confirmDialog(message: string): Promise<boolean> {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: { message }
+      data: {message}
     });
 
     return firstValueFrom(dialogRef.afterClosed());
@@ -31,7 +32,7 @@ export class GenericoService {
 
   errorDialog(message: string): Promise<boolean> {
     const dialogRef = this.dialog.open(ErrorDialogComponent, {
-      data: { message }
+      data: {message}
     });
 
     return firstValueFrom(dialogRef.afterClosed());
@@ -39,7 +40,7 @@ export class GenericoService {
 
   openSnackBar(message: string, action: string, classTypeAlert: string, actionCallback: () => void) {
     this.snackBar.openFromComponent(SnackbarGenericoComponent, {
-      data: { message, action, actionCallback},
+      data: {message, action, actionCallback},
       duration: 3000,
       horizontalPosition: 'right',
       verticalPosition: 'bottom',
@@ -69,6 +70,7 @@ export class GenericoService {
 
   private fieldVisibility = new BehaviorSubject<any>({});
   fieldVisibility$ = this.fieldVisibility.asObservable();
+
   updateFieldVisibility(fieldName: string, value: boolean) {
     const currentState = this.fieldVisibility.getValue();
     currentState[fieldName] = value;
@@ -88,8 +90,21 @@ export class GenericoService {
       dialogWidth = '50vw'; // Pantallas LG
     }
 
-    return { width: dialogWidth, height: dialogHeight };
+    return {width: dialogWidth, height: dialogHeight};
   }
 
+
+  getFormatFecha(fecha: Date): string {
+    // console.log(`fecha ${fecha}`);
+    // Obtener los componentes de la fecha
+    const dia = String(fecha.getDate()).padStart(2, '0'); // Día (1-31)
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Mes (1-12)
+    const anio = fecha.getFullYear(); // Año (4 dígitos)
+
+    // Formato DDMMYYYY
+    const formatoFinal = `${dia}/${mes}/${anio}`;
+    console.log(`formatoFinal ${formatoFinal}`);
+    return formatoFinal;
+  }
 
 }
