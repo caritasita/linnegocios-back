@@ -1,4 +1,5 @@
 import {User} from './User';
+import {Archivo} from './Archivo';
 
 
 export class Marketing {
@@ -8,6 +9,6 @@ export class Marketing {
   imagen?: Archivo;
   imagenPreview?: Archivo;
   activo?: boolean;
-  fechaRegistro: Date;
-  usuarioRegistro: User;
+  fechaRegistro!: Date;
+  usuarioRegistro!: User;
 }

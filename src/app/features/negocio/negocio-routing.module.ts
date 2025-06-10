@@ -6,7 +6,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./comunicado/comunicado.component').then(m => m.ComunicadoComponent)
+    loadComponent: () => import('./publicidad/publicidad.component').then(m => m.PublicidadComponent)
   }, // Ruta por defecto
   {
     path: 'negocio',

@@ -138,7 +138,6 @@ export class ComunicadoComponent implements OnInit {
     }));
   }
 
-
   formFiltros(): void {
     this.fieldsFilters = [
       {

@@ -9,7 +9,13 @@
           <span [innerHTML]="sanitizeHtml(element[column.clave])"></span>
         </ng-container>
         <ng-template #textTemplate>
-          @if (column.tipo === 'fecha') {
+          @if(column.tipo === 'imagen'){
+            <div
+              class="image-preview-table"
+            >
+              <img [src]="element[column.clave].url" alt="Vista previa de la imagen"/>
+            </div>
+          }@else if (column.tipo === 'fecha') {
             {{ element[column.clave] | date:'dd-MM-yyyy HH:mm a' }}
           } @else if (column.tipo == 'boleano') {
             {{ element[column.clave] ? 'Activo' : 'Inactivo' }}

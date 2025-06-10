@@ -92,8 +92,6 @@ export class TablaGenericaComponent implements OnInit, AfterViewInit, OnChanges 
     const columnsAux = this.columns.map(c => c.clave);
     this.displayedColumns = [...columnsAux, 'actions'];
     this.dataSource = new MatTableDataSource(this.data);
-    console.log('DATA EN TABLA');
-    console.table(this.dataSource);
   }
 
   ngAfterViewInit() {

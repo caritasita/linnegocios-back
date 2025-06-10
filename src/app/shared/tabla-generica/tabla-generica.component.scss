@@ -32,3 +32,23 @@ table {
   scrollbar-color: $color-primario #f1f1f1; /* Color del thumb y del track */
   scrollbar-width: thin; /* Grosor del scrollbar */
 }
+
+.image-preview-table{
+  width: 50px;
+  height: 50px;
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+  background-color: $color-blanco;
+  overflow: hidden;
+  margin: 0.5rem 0;
+  box-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.1),  /* Sombra más clara */
+    0 4px 5px rgba(0, 0, 0, 0.1), /* Sombra intermedia */
+    0 4px 10px rgba(0, 0, 0, 0.1);   /* Sombra más oscura */
+  transition: box-shadow 0.3s ease;
+  img{
+    width: inherit;
+    height: inherit;
+    border-radius: 0.25rem;
+  }
+}
