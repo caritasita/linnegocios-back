@@ -28,6 +28,8 @@ import {DateAdapter, MAT_DATE_FORMATS, MatNativeDateModule, NativeDateAdapter} f
 import {CUSTOM_DATE_FORMATS} from '../../core/config/custom-date-formats';
 import {CustomDateAdapter} from '../../core/config/CustomDateAdapter';
 import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
+import {NgxImageCompressService} from 'ngx-image-compress';
+import {Archivo} from '../models/Archivo';
 
 @Component({
   selector: 'app-form-dialog-generico',
@@ -91,7 +93,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
     private fb: FormBuilder,
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any,
     @Optional() public dialogRef: MatDialogRef<FormDialogGenericoComponent>,
-    private genericoService: GenericoService
+    private genericoService: GenericoService,
+    private ngxImageCompressService: NgxImageCompressService
   ) {
   }
 
@@ -208,10 +211,11 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
           contentType: [this.data.imagen?.contentType || null],
           nombre: [this.data.imagen?.nombre || null],
           size: [this.data.imagen?.size || null],
-          encodeImage: [this.data.imagen?.encodeImage || null]
+          encodeImage: [this.data.imagen?.encodeImage || null],
+          resultCompresed: [this.data.imagen?.resultCompresed || null]
         });
 
-        this.imagePreview= this.data.imagen?.url
+        this.imagePreview= this.data.imagenPreview?.url || this.data.imagen?.url
       } else if (field.type === 'toggle') {
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || false,
@@ -304,13 +308,35 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
       const reader = new FileReader();
 
       reader.onload = () => {
+        this.ngxImageCompressService.compressFile(reader.result + '', 1, 100, 100).then(
+          result => {
+            this.ngxImageCompressService.compressFile(reader.result + '', -1, 75, 50).then(
+              resultCompresed => {
+                try {
+                  const image: Archivo = {
+                    encodeImage: result,
+                    resultCompresed,
+                    nombre: file.name,
+                    size: file.size,
+                    contentType: file.type,
+                  };
+
+                  nameForm.get(nameInput)?.setValue(image);
+                } catch (e) {
+                  console.warn('warning-img->', e);
+                }
+              },
+              error => {
+                console.error('error->', error);
+              }
+            );
+          },
+          error => {
+            console.error('error->', error);
+          }
+        );
+
         this.imagePreview = reader.result as string; // Esto mostrará la vista previa de la imagen
-        nameForm.get(nameInput)?.setValue({
-          contentType: file.type,
-          nombre: file.name,
-          size: file.size,
-          encodeImage: reader.result // O puedes usar otra forma de codificación si es necesario
-        });
       };
       reader.readAsDataURL(file); // Cambia esto si necesitas otro formato
     }
