@@ -42,15 +42,15 @@
     </mat-toolbar>
 
     <div class="container p-3" *ngIf="fieldsFilters && fieldsFilters.length>0">
-      <app-form-generico
-        [fields]="fieldsFilters"
-        [sinEstilosCard]='true'
+      <app-form-dialog-generico
+        [fieldForms]="fieldsFilters"
         [showHeader]="false"
         [nombreBotonCancelar]="'Limpiar'"
         [nombreButtonGuardar]="'Buscar'"
+        [esFiltro]="true"
         (submitForm)="procesarfiltros($event)"
         (resetFormFiltros)="resetFormFiltros()"
-      ></app-form-generico>
+      ></app-form-dialog-generico>
     </div>
   </mat-drawer>
 </mat-drawer-container>

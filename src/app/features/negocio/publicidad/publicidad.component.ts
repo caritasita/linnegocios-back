@@ -38,7 +38,8 @@ import {Marketing} from '../../../shared/models/Marketing';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './publicidad.component.html',
   styleUrl: './publicidad.component.css'
@@ -46,7 +47,7 @@ import {Marketing} from '../../../shared/models/Marketing';
 export class PublicidadComponent implements OnInit {
   dataList: Partial<Marketing>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
   queryParams = {
     max: 10,
@@ -145,26 +146,24 @@ export class PublicidadComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'pais',
-        label: 'País',
-        type: 'select',
-        options: this.transformedPaisList,
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: "publicidad",
+        fields: [
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+
+        ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.publicidad});
     this.lista();
   }
 
