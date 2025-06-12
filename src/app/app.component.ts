@@ -32,7 +32,7 @@ import {LoadingComponent} from './features/loading/loading.component';
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  providers:[{provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},]
+  // providers:[{provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},]
 })
 export class AppComponent implements OnInit {
   title = 'linnegocios-back';

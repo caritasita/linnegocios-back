@@ -17,6 +17,9 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {BuzonService} from '../../../core/services/buzon.service';
+import {Buzon} from '../../../shared/models/Buzon';
+import {first, Subject, Subscription} from 'rxjs';
+import {FirestoreModule} from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-buzon',
@@ -33,13 +36,15 @@ import {BuzonService} from '../../../core/services/buzon.service';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FirestoreModule,
   ],
   templateUrl: './buzon.component.html',
-  styleUrl: './buzon.component.css'
+  styleUrl: './buzon.component.css',
+  providers: [BuzonService]
 })
 export class BuzonComponent implements OnInit {
-  dataList: Partial<Marketing>[] = [];
+  dataList: Partial<Buzon>[] = [];
   totalRecords = 0;
   fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
@@ -50,38 +55,35 @@ export class BuzonComponent implements OnInit {
     registrosEliminados: false,
   };
   columns: ColumnasTabla[] = [
-    {clave: 'id', valor: 'ID', tipo: "text"},
-    {clave: 'fecha', valor: 'fecha', tipo: "fecha"},
-    {clave: 'usuarioPDV', valor: 'Usuario/Correo', tipo: "fecha"},
-    {clave: 'telefono', valor: 'Teléfono', tipo: "texto"},
-    {clave: 'estatus', valor: 'Estatus', tipo: "boleano"},
-    {clave: 'mensaje', valor: 'Mensaje', tipo: "texto"},
+    // {clave: 'id', valor: 'ID', tipo: "text"},
+    {clave: 'datosContacto', valor: 'Datos de contacto', tipo: "text"},
+    {clave: 'datosBuzon', valor: 'Datos buzón', tipo: "texto"},
     {clave: 'ultimoSeguimiento', valor: 'Último seguimiento', tipo: "texto"},
   ];
   actions: ActionsTabla[] = [
     {
       name: 'Cerrar buzón',
-      icon: "edit",
+      icon: "close",
       tooltipText: 'Cerrar buzón',
       callback: (item: any) => this.cerrarBuzon(item),
-      hideAction: (item: any) => {
-        if(item.activo) {
-          return !item.activo
-        }
-        return true
-      }
+      // hideAction: (item: any) => {
+      //   if(item.activo) {
+      //     return !item.activo
+      //   }
+      //   return true
+      // }
     },
     {
       name: 'Abrir seguimiento',
       icon: "edit",
       tooltipText: 'Abrir seguimiento',
       callback: (item: any) => this.abrirSeguimiento(item),
-      hideAction: (item: any) => {
-        if(item.activo) {
-          return !item.activo
-        }
-        return true
-      }
+      // hideAction: (item: any) => {
+      //   if(item.activo) {
+      //     return !item.activo
+      //   }
+      //   return true
+      // }
     },
     // {
     //   name: 'Recuperar eliminado',
@@ -96,6 +98,9 @@ export class BuzonComponent implements OnInit {
     //   }
     // }
   ];
+
+  public buzonSub$!: Subscription;
+  public buzon$ = new Subject<any>();
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
 
@@ -114,7 +119,10 @@ export class BuzonComponent implements OnInit {
     if (resetOffset) {
       this.queryParams.offset = 0;
     }
-    this.buzonService
+
+    this.buzon$.asObservable().subscribe(() => {
+
+      this.buzonSub$ = this.buzonService
       .list({
         ...this.queryParams,
         registrosActivos: !this.queryParams.registrosEliminados,
@@ -125,16 +133,28 @@ export class BuzonComponent implements OnInit {
         console.table(this.dataList)
 
       });
+    });
+    this.buzon$.next(null);
   }
 
   generarTablaPersonalizada(data: any): any {
     return data.map((item: any, index: number) => ({
-      id: item?.id,
-      descripcion: item?.descripcion,
-      fechaRegistro: item.fechaRegistro,
-      usuario: item?.usuarioRegistro?.nombre ? `${item?.usuarioRegistro.nombre} ${item?.usuarioRegistro.apeidoPaterno}` : '---',
-      activo: item.activo,
       ...data[index],
+      id: item?.id,
+      datosContacto: `
+      <br>
+      <b class="fz-title-fila-tabla">Negocio:</b> ${item.negocio.id} - ${item.negocio.nombre} <br>
+      <b class="fz-title-fila-tabla">Cajero:</b> ${item?.usuarioPDV.nombre} ${item?.usuarioPDV.apeidoPaterno} <br>
+      <b class="fz-title-fila-tabla">Teléfono:</b> ${item.telefono} <br>
+      <b class="fz-title-fila-tabla">Correo:</b> ${item.correo} <br>
+      <br>
+      `,
+      datosBuzon: `
+      <b class="fz-title-fila-tabla">Fecha:</b> ${item?.fecha} <br>
+      <b class="fz-title-fila-tabla">Mensaje:</b> ${item?.mensaje} <br>
+      <b class="fz-title-fila-tabla">Estatus:</b> ${item.estatus} <br>
+      `,
+      ultimoSeguimiento: item?.ultimoSeguimiento,
     }));
   }
 
@@ -179,11 +199,27 @@ export class BuzonComponent implements OnInit {
     this.lista();
   }
 
-  cerrarBuzon(data: any){
+  async cerrarBuzon(data: any) {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Seguro que desea cerrar el buzón?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
+    const payload = {
+      id: data.id,
+      status: 'cerrado',
+    };
+
+    this.buzonService
+      .update(payload)
+      .pipe(first())
+      .subscribe(() => this.buzon$.next(null));
 
   }
 
-  abrirSeguimiento(data: any){
+  abrirSeguimiento(data: any) {
 
   }
 

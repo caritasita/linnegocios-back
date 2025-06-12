@@ -13,7 +13,7 @@ export class BuzonService {
 
   constructor(
     private http: HttpClient,
-    // private firestore: AngularFirestore,
+    private firestore: AngularFirestore,
     private crudService: CrudService
   ) {
   }
@@ -39,9 +39,9 @@ export class BuzonService {
     return this.http.get<any>(UrlServer.horarioSoporte + '/show', {params: {dia: '' + (horario.dia === 7 ? 0 : horario.dia)}});
   }
 
-  // public refreshHorario(): Observable<any> {
-  //   return this.firestore.collection('horarioSoporte').valueChanges();
-  // }
+  public refreshHorario(): Observable<any> {
+    return this.firestore.collection('horarioSoporte').valueChanges();
+  }
 
   public setHorarioStatus(payload: any = {}): Observable<any> {
     return this.http.put(UrlServer.setHorarioSoporte, payload);
