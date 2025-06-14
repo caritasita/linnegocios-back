@@ -37,6 +37,7 @@ import {SeguimientoProgramadoNegocioService} from '../../../core/services/seguim
 import {SeguimientoNegocio} from '../../../shared/models/seguimientoNegocio';
 import {SeguimientoProgramadoNegocio} from '../../../shared/models/seguimientoProgramadoNegocio';
 import {LogSeguimientoNegocioComponent} from './log-seguimiento-negocio/log-seguimiento-negocio.component';
+import {SeguimientoNegocioComponent} from '../seguimiento-negocio/seguimiento-negocio.component';
 
 @Component({
   selector: 'app-negocio',
@@ -55,20 +56,19 @@ import {LogSeguimientoNegocioComponent} from './log-seguimiento-negocio/log-segu
     NgIf,
     TablaGenericaComponent,
     FormDialogGenericoComponent,
+    SeguimientoNegocioComponent,
   ],
   templateUrl: './negocio.component.html',
   styleUrl: './negocio.component.scss',
 })
 export class NegocioComponent implements OnInit, OnDestroy {
-  LogSeguimientoNegocioComponent = LogSeguimientoNegocioComponent;
 
   dataList: Partial<Negocio>[] = [];
   estadosList: Partial<Estado>[] = [];
   giroComercialList: GiroComercial[] = [];
   logsList: LogMovimientosLicencia[] = [];
-
-  tipoSeguimientoList: TipoSeguimientoNegocio[] = [];
-  estatusSeguimientoList: EstatusSeguimientoNegocio[] = [];
+  @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
+  @ViewChild('seguimientoDrawer') drawerSeguimientoNegocio!: MatDrawer;
 
   totalRecords = 0;
   fieldsFilters!: Field[];
@@ -115,7 +115,7 @@ export class NegocioComponent implements OnInit, OnDestroy {
     },
     {
       name: 'Registrar seguimiento',
-      icon: "edit_calendar",
+      icon: "directions_walk",
       tooltipText: 'Registrar seguimiento',
       hideAction: (item: any) => {
         return false;
@@ -186,19 +186,7 @@ export class NegocioComponent implements OnInit, OnDestroy {
       callback: (item: any) => this.delete(item)
     },
   ];
-
-  fieldFormSeguimiento!: FieldForm[];
-
-  @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
-  @ViewChild('drawerSeguimientoNegocio') drawerSeguimientoNegocio!: MatDrawer;
-
-  private listSeguimientosRequest: Subscription | null = null;
-  private listSeguimientosProgramadosRequest: Subscription | null = null;
   private saveRequest: Subscription | null = null;
-
-  datosComponenteExtra!: any;
-
-
   negocio!: number;
 
   constructor(
@@ -207,9 +195,6 @@ export class NegocioComponent implements OnInit, OnDestroy {
     private crudService: CrudService,
     private dialog: MatDialog,
     private validationMessagesService: ValidationMessagesService,
-    private tipoSeguimientoService: TipoSeguimientoService,
-    private estatusSeguimientoNegocioService: EstatusSeguimientoNegocioService,
-    private seguimientoNegocioService: SeguimientoNegocioService,
   ) {
   }
 
@@ -271,7 +256,7 @@ export class NegocioComponent implements OnInit, OnDestroy {
 <b class="fz-title-fila-tabla">Último seguimiento:</b><br>
 ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '---'}<br>
 <b class="fz-title-fila-tabla">Último comentario:</b><br>
-<div class="size-comentario-tabla">${item.ultimoSeguimiento ? item.ultimoSeguimiento.mensaje : '---'}</div><br>
+<div class="acortar-comentario-en-tabla">${item.ultimoSeguimiento ? item.ultimoSeguimiento.mensaje : '---'}</div><br>
         `,
       ...data[index],
     }));
@@ -518,142 +503,8 @@ ${item.ultimoSeguimiento ? item.ultimoSeguimiento.estatusSeguimiento.nombre : '-
     });
   }
 
-  async openSeguimientoNegocio(negocio: Negocio) {
-
-    this.negocio= 0
-    this.negocio = negocio.id
-
-    await this.getTipoSeguimiento();
-    await this.getEstatusSeguimiento();
-
-    const listaTipoSeguimiento: any = this.tipoSeguimientoList?.map(ts => ({
-      label: ts?.nombre,
-      value: ts?.id
-    }));
-
-    const listaEstatusSeguimiento: any = this.estatusSeguimientoList?.map(ts => ({
-      label: ts?.nombre,
-      value: ts?.id
-    }));
-
-    this.fieldFormSeguimiento = [
-      {
-        form: 'seguimientoNegocio',
-        fields: [
-          [
-            {
-              name: 'tipoSeguimiento',
-              label: 'Tipo de seguimiento',
-              type: 'select',
-              options: listaTipoSeguimiento,
-              validation: Validators.required
-            }
-          ],
-          [
-            {
-              name: 'estatusSeguimiento',
-              label: 'Estatus de seguimiento',
-              type: 'select',
-              options: listaEstatusSeguimiento,
-              validation: Validators.required
-            }
-          ],
-          [
-            {
-              name: 'mensaje',
-              label: 'Mensaje',
-              value: 'mensaje',
-              type: 'textarea',
-              validation: [Validators.required]
-            }
-          ],
-          [
-            {
-              name: 'programado',
-              label: '¿Programar seguimiento?',
-              value: 'programado',
-              type: 'toggle',
-            }
-          ],
-          [
-            {
-              name: 'tipoSeguimientoProgramado',
-              label: 'Tipo de comunicación',
-              options: listaTipoSeguimiento,
-              type: 'select',
-              dependsOn: 'seguimientoNegocio.programado',
-            }
-          ],
-          [
-            {
-              name: 'fechaProgramada',
-              label: 'Fecha programada',
-              value: 'fechaProgramada',
-              type: 'datepicker',
-              dependsOn: 'seguimientoNegocio.programado',
-            }
-          ],
-          [
-            {
-              name: 'hora',
-              label: 'Hora de la cita',
-              value: 'hora',
-              type: 'timepicker',
-              dependsOn: 'seguimientoNegocio.programado',
-            }
-          ],
-          [
-            {
-              name: 'enlace',
-              label: 'Link de capacitación',
-              value: 'enlace',
-              type: 'text',
-              dependsOn: 'seguimientoNegocio.programado',
-            }
-          ],
-        ]
-      },
-    ]
-
-    this.datosComponenteExtra = {
-      negocioId: this.negocio
-    }
-
-    this.drawerSeguimientoNegocio.open()
-  }
-
-  async getTipoSeguimiento(): Promise<void> {
-    const response: any = await lastValueFrom(this.tipoSeguimientoService.list({all: true}));
-    this.tipoSeguimientoList = response.data;
-  }
-
-  async getEstatusSeguimiento(): Promise<void> {
-    const response: any = await lastValueFrom(this.estatusSeguimientoNegocioService.list({all: true}));
-    this.estatusSeguimientoList = response.data;
-  }
-
-  registrarSeguimiento(seguimiento: any) {
-
-    if(seguimiento.seguimientoNegocio.programado){
-      const hour: string = seguimiento.seguimientoNegocio.hora; // Ejemplo: "12:24"
-      const [hours, minutes] = hour.split(':'); // hours = "12", minutes = "24"
-      const numericHours = Number(hours);
-      const numericMinutes = Number(minutes.split(' ')[0]);
-      if (!(seguimiento.seguimientoNegocio.fechaProgramada instanceof Date)) {
-        seguimiento.fechaProgramada = new Date(seguimiento.seguimientoNegocio.fechaProgramada); // Convertir si es necesario
-      }
-
-      seguimiento.seguimientoNegocio.fechaProgramada.setHours(numericHours, numericMinutes);
-      seguimiento.seguimientoNegocio.fechaProgramada = seguimiento.seguimientoNegocio.fechaProgramada.toGMTString();
-      seguimiento.hora = hours;
-    }
-
-    const data = {...seguimiento.seguimientoNegocio, negocio: this.negocio}
-    this.saveRequest = this.seguimientoNegocioService.create(data).subscribe(() => {
-      if (seguimiento) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
-      });
-      this.seguimientoNegocioService.updateListSeguimiento();
-    });
+  openSeguimientoNegocio(negocio: any){
+    this.drawerSeguimientoNegocio.open(negocio?.id);
   }
 
   private async delete(objeto: any) {

@@ -80,9 +80,10 @@ tr:hover {
   }
 }
 
-.bg-danger{
+.bg-danger {
   color: $color-danger-dark !important;
-  &:hover{
+
+  &:hover {
     background-color: $color-danger-light;
   }
 }
@@ -245,7 +246,7 @@ tr:hover {
 
 /*Estilos para el la ventana que se muestra de lado derecho para los filtros*/
 .content-mat-drawer {
-  width: 100%;
+  //width: 100%;
 
   .content-login {
     background-color: $color-primario !important;
@@ -254,13 +255,17 @@ tr:hover {
 
   .content-sidenav {
     position: fixed;
-    min-width: 70vw;
-    max-width: 800px !important;
+    min-width: 25vw;
+    //max-width: 800px !important;
     border-radius: 0.75rem !important;
     @media (max-width: 768px) {
       width: 100vw;
     }
     margin-top: 65px;
+
+    &[drawerWidth] {
+      min-width: attr(drawerWidth vw) !important;
+    }
   }
 }
 
@@ -356,10 +361,12 @@ tr:hover {
 
 .mdc-data-table__header-cell {
   letter-spacing: 0.2px !important;
+
   &:first-child, &:last-child {
     padding: 0 16px !important;
   }
-  &:last-child{
+
+  &:last-child {
     width: 220px !important;
     max-width: 340px !important;
 
@@ -368,6 +375,7 @@ tr:hover {
       max-width: 180px !important;
     }
   }
+
   padding: 0 8px !important;
 
 }
@@ -377,6 +385,7 @@ tr:hover {
     padding: 0 16px !important;
 
   }
+
   font-weight: 400 !important;
   padding: 6px 8px !important;
   font-family: 'Roboto', serif;
@@ -388,14 +397,23 @@ tr:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-.fz-title-fila-tabla{
+.fz-title-fila-tabla {
   font-weight: 700 !important;
 }
 
-.size-comentario-tabla{
-  width: 300px !important;
+.acortar-comentario-en-tabla {
+  width: 300px !important; //tamaño default
+
+  &[data-ancho-texto-static] {
+    width: attr(data-ancho-texto-static px) !important;
+  }
+
   @media (max-width: 1366px) {
-    width: 200px !important;
+    width: 200px !important; //tamaño default
+
+    &[data-ancho-texto-static] {
+      width: 500px !important;
+    }
   }
   font-size: 0.75rem;
 }
@@ -412,23 +430,24 @@ mat-form-field input[readonly] {
   cursor: not-allowed;
 }
 
-mat-list{
+mat-list {
   .mdc-list-item__primary-text {
     font-size: 14px !important;
   }
 }
+
 .mat-mdc-tab-body {
   padding: 0.25rem 0 !important;
 }
 
-.acortar-texto-max-300px{
+.acortar-texto-max-300px {
   width: 300px !important;
   white-space: break-spaces;
   overflow: hidden;
 }
 
 .mdc-list-item.mdc-list-item--with-one-line {
-   height: max-content !important;
+  height: max-content !important;
 }
 
 .ngx-material-timepicker-container {

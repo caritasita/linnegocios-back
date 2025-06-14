@@ -1,0 +1,23 @@
+<mat-drawer #drawerSeguimientoNegocio class="content-sidenav p-0 mat-elevation-z8" mode="over" drawerWidth="60" position="end">
+  <mat-toolbar class="border-bottom">
+    <mat-icon class="mr-1">directions_walk</mat-icon>
+    <span>Seguimiento negocio</span>
+    <div class="spacer"></div>
+    <button mat-icon-button class="bordered-icon-button" (click)="drawerSeguimientoNegocio.toggle()">
+      <mat-icon>close_round</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <div class="container pr-3 pl-3" *ngIf="fieldFormSeguimiento">
+    <app-form-dialog-generico
+      [showHeader]="false"
+      [fieldForms]="fieldFormSeguimiento"
+      [componente]="LogSeguimientoNegocioComponent"
+      [datos]="datosComponenteExtra"
+      [twoColumn]="true"
+      nombreButtonGuardar="Registrar seguimiento"
+      [mostrarBotonCancelar]="false"
+      (submitForm)="registrarSeguimiento($event)"
+    ></app-form-dialog-generico>
+  </div>
+</mat-drawer>

@@ -1,15 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Marketing} from '../../../shared/models/Marketing';
 import {
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {PublicidadService} from '../../../core/services/publicidad.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
-import {Validators} from '@angular/forms';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -20,13 +17,15 @@ import {BuzonService} from '../../../core/services/buzon.service';
 import {Buzon} from '../../../shared/models/Buzon';
 import {first, Subject, Subscription} from 'rxjs';
 import {FirestoreModule} from '@angular/fire/firestore';
+import {EstatusSeguimientoNegocioService} from '../../../core/services/estatus-seguimiento-negocio.service';
+import {EstatusSeguimientoNegocio} from '../../../shared/models/estatusSeguimientoNegocio';
+import {SeguimientoNegocioComponent} from '../seguimiento-negocio/seguimiento-negocio.component';
 
 @Component({
   selector: 'app-buzon',
   standalone: true,
   imports: [
     FormDialogGenericoComponent,
-    MatButton,
     MatCard,
     MatCardContent,
     MatCardHeader,
@@ -37,7 +36,8 @@ import {FirestoreModule} from '@angular/fire/firestore';
     MatToolbar,
     NgIf,
     TablaGenericaComponent,
-    FirestoreModule,
+    MatButton,
+    SeguimientoNegocioComponent,
   ],
   templateUrl: './buzon.component.html',
   styleUrl: './buzon.component.css',
@@ -47,7 +47,6 @@ export class BuzonComponent implements OnInit {
   dataList: Partial<Buzon>[] = [];
   totalRecords = 0;
   fieldsFilters!: FieldForm[];
-  transformedPaisList!: any;
   queryParams = {
     max: 10,
     offset: 0,
@@ -58,61 +57,44 @@ export class BuzonComponent implements OnInit {
     // {clave: 'id', valor: 'ID', tipo: "text"},
     {clave: 'datosContacto', valor: 'Datos de contacto', tipo: "text"},
     {clave: 'datosBuzon', valor: 'Datos buzón', tipo: "texto"},
-    {clave: 'ultimoSeguimiento', valor: 'Último seguimiento', tipo: "texto"},
   ];
   actions: ActionsTabla[] = [
     {
       name: 'Cerrar buzón',
-      icon: "close",
+      icon: "delete_forever",
       tooltipText: 'Cerrar buzón',
       callback: (item: any) => this.cerrarBuzon(item),
-      // hideAction: (item: any) => {
-      //   if(item.activo) {
-      //     return !item.activo
-      //   }
-      //   return true
-      // }
     },
     {
       name: 'Abrir seguimiento',
-      icon: "edit",
+      icon: "directions_walk",
       tooltipText: 'Abrir seguimiento',
-      callback: (item: any) => this.abrirSeguimiento(item),
-      // hideAction: (item: any) => {
-      //   if(item.activo) {
-      //     return !item.activo
-      //   }
-      //   return true
-      // }
+      callback: (item: any) => this.openSeguimientoNegocio(item.negocio),
     },
-    // {
-    //   name: 'Recuperar eliminado',
-    //   icon: "restore_from_trash",
-    //   tooltipText: 'Recuperar registro eliminado',
-    //   callback: (item: any) => this.recoverRegister(item.id),
-    //   hideAction: (item: any) => {
-    //     if(!item.activo) {
-    //       return item.activo
-    //     }
-    //     return true
-    //   }
-    // }
   ];
+
+  estatusSeguimientoList: EstatusSeguimientoNegocio[] = [];
+  transformedEstatusSeguimientoList!: any;
+
+  listEstatusBuzon = LIST_ESTATUS_BUZON;
 
   public buzonSub$!: Subscription;
   public buzon$ = new Subject<any>();
 
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
+  @ViewChild('seguimientoDrawer') drawerSeguimientoNegocio!: MatDrawer;
 
   constructor(
     private buzonService: BuzonService,
     private genericoService: GenericoService,
+    private estatusSeguimientoNegocioService: EstatusSeguimientoNegocioService,
     private dialog: MatDialog
   ) {
   }
 
   ngOnInit() {
     this.lista();
+    this.getEstatusSeguimiento();
   }
 
   lista(resetOffset = false) {
@@ -123,16 +105,16 @@ export class BuzonComponent implements OnInit {
     this.buzon$.asObservable().subscribe(() => {
 
       this.buzonSub$ = this.buzonService
-      .list({
-        ...this.queryParams,
-        registrosActivos: !this.queryParams.registrosEliminados,
-      })
-      .subscribe((response: any) => {
-        this.dataList = this.generarTablaPersonalizada(response.data);
-        this.totalRecords = response.count;
-        console.table(this.dataList)
+        .list({
+          ...this.queryParams,
+          registrosActivos: !this.queryParams.registrosEliminados,
+        })
+        .subscribe((response: any) => {
+          this.dataList = this.generarTablaPersonalizada(response.data);
+          this.totalRecords = response.count;
+          console.table(this.dataList)
 
-      });
+        });
     });
     this.buzon$.next(null);
   }
@@ -150,14 +132,25 @@ export class BuzonComponent implements OnInit {
       <br>
       `,
       datosBuzon: `
-      <b class="fz-title-fila-tabla">Fecha:</b> ${item?.fecha} <br>
-      <b class="fz-title-fila-tabla">Mensaje:</b> ${item?.mensaje} <br>
+      <b class="fz-title-fila-tabla">Fecha:</b> ${this.genericoService.getFormatedDateTime(item.fecha)} <br>
       <b class="fz-title-fila-tabla">Estatus:</b> ${item.estatus} <br>
+      <b class="fz-title-fila-tabla">Último seguimiento:</b> ${item?.ultimoSeguimiento || '---'} <br>
+      <b class="fz-title-fila-tabla">Mensaje:</b> <div class="acortar-comentario-en-tabla" data-ancho-texto-static="600">${item?.mensaje}</div> <br>
       `,
-      ultimoSeguimiento: item?.ultimoSeguimiento,
     }));
   }
 
+  private getEstatusSeguimiento() {
+    this.estatusSeguimientoNegocioService.list({all: true}).subscribe((response: any) => {
+      this.estatusSeguimientoList= response.data;
+      this.transformedEstatusSeguimientoList = this.estatusSeguimientoList.map((es: any) => {
+        return {
+          label: es.nombre,
+          value: `${es.id}(${es.isLeadBasura})`
+        }
+      } );
+    });
+  }
 
   formFiltros(): void {
     this.fieldsFilters = [
@@ -166,9 +159,34 @@ export class BuzonComponent implements OnInit {
         fields: [
           [
             {
-              name: 'registrosEliminados',
-              label: 'Ver eliminados',
-              type: 'toggle',
+              name: 'fechaRegistroInicio',
+              label: 'Fecha inicio',
+              type: 'datepicker',
+            },
+          ],
+          [
+            {
+              name: 'fechaRegistroFin',
+              label: 'Fecha fin',
+              type: 'datepicker',
+            },
+          ],
+          [
+            {
+              name: 'estatus',
+              label: 'Estatus',
+              value: 'estatus',
+              options: this.listEstatusBuzon,
+              type: 'select',
+            },
+          ],
+          [
+            {
+              name: 'estatusSeguimiento',
+              label: 'Estatus de seguimiento',
+              value: 'estatusSeguimiento',
+              options: this.transformedEstatusSeguimientoList,
+              type: 'select',
             },
           ]
 
@@ -219,10 +237,9 @@ export class BuzonComponent implements OnInit {
 
   }
 
-  abrirSeguimiento(data: any) {
-
+  openSeguimientoNegocio(negocio: any){
+    this.drawerSeguimientoNegocio.open(negocio?.id);
   }
-
   // openFormDialog(data: any = {}) {
   //
   //   const fieldForms: FieldForm[] = [
@@ -315,3 +332,9 @@ export class BuzonComponent implements OnInit {
   // }
 
 }
+
+const LIST_ESTATUS_BUZON = [
+  { label: 'NUEVO', value: 'Buzón nuevo' },
+  { label: 'EN_SEGUIMIENTO', value: 'Buzón en seguimiento' },
+  { label: 'CERRADO', value: 'Buzón cerrado' },
+];
