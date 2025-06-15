@@ -26,7 +26,9 @@ export interface ColumnasTabla {
 export interface ActionsTabla {
   name: string,
   icon: string,
-  tooltipText: string
+  tooltipText: string,
+  changeColorDefault?: boolean,
+  changeIconBy?: string,
   hideAction?: (b: any) => boolean,
   callback: (item: any) => void,
 }

@@ -172,7 +172,7 @@
                     placeholder="Selecciona una hora"
                     [formControlName]="field.name"
                   />
-                  <ngx-material-timepicker #picker [format]="24"></ngx-material-timepicker>
+                  <ngx-material-timepicker #picker [format]="24" (timeChanged)="onTimeChange($event, forms[key], field.name)"></ngx-material-timepicker>
                 </mat-form-field>
 
                 <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.visibility"

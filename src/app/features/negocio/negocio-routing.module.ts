@@ -6,7 +6,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./buzon/buzon.component').then(m => m.BuzonComponent)
+    loadComponent: () => import('./horario-soporte/horario-soporte.component').then(m => m.HorarioSoporteComponent)
   }, // Ruta por defecto
   {
     path: 'negocio',

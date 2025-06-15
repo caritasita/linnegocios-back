@@ -89,6 +89,8 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
 
   @ViewChild('contenedorDinamico', {read: ViewContainerRef, static: true}) contenedorDinamico!: ViewContainerRef;
 
+  clockFace: '12hr' | '24hr' = '24hr';
+
   constructor(
     private fb: FormBuilder,
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -364,6 +366,13 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
       this.forms[formsKey].reset();
 
     }
+  }
+
+  // Puedes agregar un método para manejar el cambio de hora si es necesario
+  onTimeChange(event: any, nameForm: FormGroup, nameInput: string) {
+    const selectedTime = nameForm.get(nameInput);
+    console.log('Hora seleccionada:', event);
+    // Aquí puedes manejar la hora seleccionada como necesites
   }
 }
 

@@ -88,6 +88,20 @@ tr:hover {
   }
 }
 
+.tc-primario{
+  color: $color-primario;
+}
+.tc-red{
+  color: $color-danger-dark;
+}
+
+.tc-green{
+  color: $color-green-dark;
+}
+.tc-gray{
+  color: $gray-linnegicios;
+}
+
 .ml-1 {
   margin-left: $margin-1;
 }
@@ -256,7 +270,6 @@ tr:hover {
   .content-sidenav {
     position: fixed;
     min-width: 25vw;
-    //max-width: 800px !important;
     border-radius: 0.75rem !important;
     @media (max-width: 768px) {
       width: 100vw;

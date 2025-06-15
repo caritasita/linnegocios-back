@@ -9,13 +9,13 @@
           <span [innerHTML]="sanitizeHtml(element[column.clave])"></span>
         </ng-container>
         <ng-template #textTemplate>
-          @if(column.tipo === 'imagen'){
+          @if (column.tipo === 'imagen') {
             <div
               class="image-preview-table"
             >
               <img [src]="element[column.clave].url" alt="Vista previa de la imagen"/>
             </div>
-          }@else if (column.tipo === 'fecha') {
+          } @else if (column.tipo === 'fecha') {
             {{ element[column.clave] | date:'dd-MM-yyyy HH:mm a' }}
           } @else if (column.tipo == 'boleano') {
             {{ element[column.clave] ? 'Activo' : 'Inactivo' }}
@@ -41,7 +41,22 @@
         <ng-container *ngFor="let action of actions">
           @if (!action?.hideAction?.(row)) {
             <button mat-icon-button (click)="action.callback(row)">
-              <mat-icon class="mat-icon-round" [matTooltip]="action.tooltipText">{{ action.icon }}</mat-icon>
+              @if (action.changeColorDefault) {
+                <mat-icon
+                  class="mat-icon-round"
+                  [ngClass]="{'tc-red': !row.activo, 'tc-gray': row.activo}"
+                  [matTooltip]="action.tooltipText"
+                >
+                  {{ row.activo ? action.icon : action.changeIconBy }}
+                </mat-icon>
+              } @else {
+                <mat-icon
+                  class="mat-icon-round"
+                  [matTooltip]="action.tooltipText"
+                >
+                  {{ action.icon }}
+                </mat-icon>
+              }
             </button>
           }
         </ng-container>

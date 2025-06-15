@@ -42,7 +42,7 @@ import {GenericoService} from '../../../core/services/generico.service';
     FormsModule,
     MatButtonModule,
     ReactiveFormsModule,
-    FormGenericoComponent,
+    FormDialogGenericoComponent,
   ],
   templateUrl: './estado.component.html',
   styleUrl: './estado.component.scss'
@@ -51,7 +51,7 @@ export class EstadoComponent implements OnInit {
   paisList: Pais[] = [];
   dataList: Partial<Estado>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
   queryParams = {
     max: 10,
@@ -150,25 +150,38 @@ export class EstadoComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'pais',
-        label: 'País',
-        type: 'select',
-        options: this.transformedPaisList,
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+       form: 'estado',
+       fields: [
+         [
+           {
+             name: 'filtroGeneral',
+             label: 'Clave / Nombre',
+             type: 'text',
+           },
+         ],
+         [
+           {
+             name: 'pais',
+             label: 'País',
+             type: 'select',
+             options: this.transformedPaisList,
+           },
+         ],
+         [
+           {
+             name: 'registrosEliminados',
+             label: 'Ver eliminados',
+             type: 'toggle',
+           },
+         ]
+       ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
+    form= form.estado
     this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
