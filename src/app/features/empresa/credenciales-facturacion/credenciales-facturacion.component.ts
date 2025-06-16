@@ -2,27 +2,25 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {
   FieldForm,
   FormDialogGenericoComponent
-} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
-import {MatButton, MatIconButton} from '@angular/material/button';
-import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
-import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
-import {MatIcon} from '@angular/material/icon';
-import {MatToolbar} from '@angular/material/toolbar';
-import {NgIf} from '@angular/common';
-import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {Pais} from '../../../shared/models/Pais';
+} from "../../../shared/form-dialog-generico/form-dialog-generico.component";
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatCard, MatCardContent, MatCardHeader} from "@angular/material/card";
+import {MatDrawer, MatDrawerContainer} from "@angular/material/sidenav";
+import {MatIcon} from "@angular/material/icon";
+import {MatToolbar} from "@angular/material/toolbar";
+import {NgIf} from "@angular/common";
+import {TablaGenericaComponent} from "../../../shared/tabla-generica/tabla-generica.component";
 import {Estado} from '../../../shared/models/Estado';
 import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {EstadoService} from '../../../core/services/estado.service';
-import {PaisService} from '../../../core/services/pais.service';
+import {CrudService} from '../../../core/services/crud.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
-import {Validators} from '@angular/forms';
-import {CrudService} from '../../../core/services/crud.service';
 import {UrlServer} from '../../../core/helpers/UrlServer';
+import {Validators} from '@angular/forms';
 
 @Component({
-  selector: 'app-credencial-electronico',
+  selector: 'app-credenciales-facturacion',
   standalone: true,
   imports: [
     FormDialogGenericoComponent,
@@ -38,10 +36,10 @@ import {UrlServer} from '../../../core/helpers/UrlServer';
     NgIf,
     TablaGenericaComponent
   ],
-  templateUrl: './credencial-electronico.component.html',
-  styleUrl: './credencial-electronico.component.css'
+  templateUrl: './credenciales-facturacion.component.html',
+  styleUrl: './credenciales-facturacion.component.css'
 })
-export class CredencialElectronicoComponent implements OnInit {
+export class CredencialesFacturacionComponent implements OnInit {
   dataList: Partial<Estado>[] = [];
   totalRecords = 0;
   fieldsFilters!: FieldForm[];
@@ -55,17 +53,11 @@ export class CredencialElectronicoComponent implements OnInit {
   columns: ColumnasTabla[] = [
     // {clave: 'negocio', valor: 'ID negocio', tipo: "texto"},
     {clave: 'negocio', valor: 'Negocio', tipo: "texto"},
-    {clave: 'idEquivalencia', valor: 'ID Tae', tipo: "texto"},
     {clave: 'usuario', valor: 'usuario', tipo: "texto"},
-    {clave: 'password', valor: 'Contraseña', tipo: "password"}
+    {clave: 'password', valor: 'Contraseña', tipo: "password"},
+    {clave: 'url', valor: 'url', tipo: "texto"}
   ];
   actions: ActionsTabla[] = [
-    {
-      name: 'Editar',
-      icon: "edit",
-      tooltipText: 'Editar',
-      callback: (item: any) => this.openFormDialog(item),
-    },
     {
       name: 'Eliminar',
       icon: "delete",
@@ -95,7 +87,7 @@ export class CredencialElectronicoComponent implements OnInit {
 
     this.crudService.list({
       ...this.queryParams,
-      tipoCredencial: 'TAE',
+      tipoCredencial: 'FACTURA',
       registrosActivos: !this.queryParams.registrosEliminados,
     }, UrlServer.credencialElectronico)
       .subscribe((credenciales: any) => {
@@ -108,9 +100,9 @@ export class CredencialElectronicoComponent implements OnInit {
     return data.map((item: any, index: number) => ({
       ...data[index],
       negocio: `<b class="fz-title-fila-tabla">( ID: ${item?.negocio.id} )</b> ${item?.negocio.nombre}`,
-      idEquivalencia: item.idEquivalencia,
       usuario: item.usuario,
       password: item.password,
+      url: item.url,
     }));
   }
 
@@ -133,7 +125,7 @@ export class CredencialElectronicoComponent implements OnInit {
   }
 
   procesarfiltros(form: any) {
-    form= form.estado
+    form = form.estado
     this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
@@ -182,10 +174,6 @@ export class CredencialElectronicoComponent implements OnInit {
     ]
 
     let titleDialog = 'Registrar credenciales'
-    if (data.id) {
-      titleDialog = 'Editar credenciales'
-      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
-    }
 
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
@@ -199,20 +187,11 @@ export class CredencialElectronicoComponent implements OnInit {
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
       result = result.credenciales
-      if (data.id) {
-        result = ({...result, id: data.id})
-        this.crudService.update(result, UrlServer.credencialElectronico).subscribe((respueta) => {
-          if (respueta) this.genericoService.openSnackBar('Registro actualizado exitosamente', 'Aceptar', 'snack-bar-success', () => {
-          });
-          this.lista();
+      this.crudService.create(result, UrlServer.credencialElectronico).subscribe((respueta) => {
+        if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
         });
-      } else {
-        this.crudService.create(result, UrlServer.credencialElectronico).subscribe((respueta) => {
-          if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
-          });
-          this.lista();
-        });
-      }
+        this.lista();
+      });
       dialogRef.close();
     });
   }

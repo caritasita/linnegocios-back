@@ -16,6 +16,10 @@ const routes: Routes = [
     path: 'user',
     loadComponent: () => import('./user/user.component').then(m => m.UserComponent)
   },
+  {
+    path: 'credencialesFacturacion',
+    loadComponent: () => import('./credenciales-facturacion/credenciales-facturacion.component').then(m => m.CredencialesFacturacionComponent)
+  },
 
   { path: '**', loadComponent: () => import('./user/user.component').then(m => m.UserComponent) },
 

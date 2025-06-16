@@ -6,7 +6,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./horario-soporte/horario-soporte.component').then(m => m.HorarioSoporteComponent)
+    loadComponent: () => import('./credencial-electronico/credencial-electronico.component').then(m => m.CredencialElectronicoComponent)
   }, // Ruta por defecto
   {
     path: 'negocio',

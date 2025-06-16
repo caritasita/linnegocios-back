@@ -23,6 +23,8 @@
             {{ element[column.clave] | currency }}
           } @else if (column.tipo == 'porcentaje') {
             {{ (element[column.clave] / 100) | percent }}
+          } @else if (column.tipo == 'password') {
+            ******
           } @else {
             @if (isObject(element[column.clave])) {
               {{ element[column.clave].nombre || '---' }}
