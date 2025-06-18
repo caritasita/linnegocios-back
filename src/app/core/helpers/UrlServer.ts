@@ -104,7 +104,7 @@ export const UrlServer = {
   role: 'role',
   actualizarPermiso: 'actualizarPermiso',
   pagoDetalle: 'pagoDetalle',
-  reportePagoLicencias: 'reportePagoLicencias',
+  reportePagoLicencias: 'reportes/reportePagoLicencias',
   obtenerPermisos: 'obtenerPermisos',
   actualizarVistaBloqueada: 'actualizarVistaBloqueada',
   creditoEstatus: 'creditoEstatus',

@@ -14,7 +14,7 @@ export class CrudService {
     return this.http.get<any[]>(url, {params: p});
   }
 
-  get<T>(id: number, url: string, parametros?: {}): Observable<T> {
+  get<T>(id: any, url: string, parametros?: {}): Observable<T> {
     url = url + (id != null ? '/' + id : '');
     return this.http.get<T>(url, { params: parametros || {} }).pipe(
       map(this.extractData)

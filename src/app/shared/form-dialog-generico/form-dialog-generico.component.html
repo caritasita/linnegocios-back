@@ -25,7 +25,7 @@
                     <!-- Botón para limpiar el campo -->
                     <button *ngIf="(forms[key].get(field.name)?.value && !field?.disabled)"
                             matSuffix mat-icon-button aria-label="Clear"
-                            (click)="forms[key].get(field.name)?.setValue(''); clearField(field.name)">
+                            (click)="forms[key].get(field.name)?.setValue('')">
                       <mat-icon>close</mat-icon>
                     </button>
                     <!-- Componente para mostrar mensajes de validación -->
@@ -148,6 +148,32 @@
                   </mat-error>
                 </mat-form-field>
 
+                <mat-form-field *ngIf="field.type === 'autocomplete' && !field.visibility" class="width-content"
+                                appearance="outline">
+                  <mat-label>{{ field.label | uppercase }}</mat-label>
+                  <input
+                    type="text"
+                    matInput [formControlName]="field.name"
+                    [matAutocomplete]="auto"
+                    placeholder="Escribe aquí el valor a buscar."
+                  >
+                  <button
+                    *ngIf="(forms[key]?.get(field.name)?.value && !field?.disabled)"
+                    matSuffix mat-icon-button aria-label="Clear"
+                    (click)="forms[key]?.get(field.name)?.setValue('')"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <mat-autocomplete
+                    #auto="matAutocomplete"
+                    (optionSelected)="onOptionSelected($event.option.value, forms[key], field.name, field?.relatedField)"
+                  >
+                    <mat-option *ngFor="let option of options" [value]="option">
+                      {{ option.id }} - {{ option.nombre }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+
                 <mat-form-field *ngIf="field.type === 'datepicker' && !field.visibility" class="width-content"
                                 appearance="outline">
                   <mat-label>{{ field.label | uppercase }}</mat-label>
@@ -172,7 +198,7 @@
                     placeholder="Selecciona una hora"
                     [formControlName]="field.name"
                   />
-                  <ngx-material-timepicker #picker [format]="24" (timeChanged)="onTimeChange($event, forms[key], field.name)"></ngx-material-timepicker>
+                  <ngx-material-timepicker #picker [format]="24"></ngx-material-timepicker>
                 </mat-form-field>
 
                 <mat-slide-toggle *ngIf="field.type === 'toggle' && !field.visibility"

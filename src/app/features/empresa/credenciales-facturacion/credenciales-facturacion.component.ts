@@ -12,12 +12,10 @@ import {NgIf} from "@angular/common";
 import {TablaGenericaComponent} from "../../../shared/tabla-generica/tabla-generica.component";
 import {Estado} from '../../../shared/models/Estado';
 import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
-import {EstadoService} from '../../../core/services/estado.service';
 import {CrudService} from '../../../core/services/crud.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {UrlServer} from '../../../core/helpers/UrlServer';
-import {Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-credenciales-facturacion',
@@ -69,7 +67,6 @@ export class CredencialesFacturacionComponent implements OnInit {
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
 
   constructor(
-    private estadoService: EstadoService,
     private crudService: CrudService,
     private genericoService: GenericoService,
     private dialog: MatDialog
@@ -144,56 +141,6 @@ export class CredencialesFacturacionComponent implements OnInit {
     this.queryParams.max = event.max;
     this.queryParams.offset = event.offset;
     this.lista();
-  }
-
-  openFormDialog(data: any = {}) {
-
-    const fieldForms: FieldForm[] = [
-      {
-        form: 'credenciales',
-        fields: [
-          [
-            {
-              name: 'usuario',
-              label: 'Usuario',
-              value: 'usuario',
-              type: 'text',
-              validation: Validators.required
-            }
-          ],
-          [
-            {
-              name: 'password',
-              label: 'Contraseña',
-              value: 'password',
-              type: 'text',
-            }
-          ],
-        ]
-      }
-    ]
-
-    let titleDialog = 'Registrar credenciales'
-
-    const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
-      data: {
-        titleDialog: titleDialog,
-        fieldForms,
-        data
-      },
-      disableClose: true,
-      width: '50vw',
-    });
-
-    dialogRef.componentInstance.submitForm.subscribe(result => {
-      result = result.credenciales
-      this.crudService.create(result, UrlServer.credencialElectronico).subscribe((respueta) => {
-        if (respueta) this.genericoService.openSnackBar('Registro creado exitosamente', 'Aceptar', 'snack-bar-success', () => {
-        });
-        this.lista();
-      });
-      dialogRef.close();
-    });
   }
 
   private async delete(objeto: any) {

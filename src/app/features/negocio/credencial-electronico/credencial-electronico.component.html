@@ -4,14 +4,27 @@
       <mat-toolbar>
         <span>Credenciales TAE</span>
         <div class="spacer"></div>
+
+        <button mat-button mat-stroked-button (click)="syncProductosElectronicos()" class="mr-3">
+          <mat-icon>password_2</mat-icon>
+          Restablecer credenciales
+        </button>
+        <button mat-button mat-stroked-button (click)="syncCredenciales()" class="mr-3">
+          <mat-icon>cloud_sync</mat-icon>
+          Sincronizar productos
+        </button>
+
+        <div class="divisor-vertical"></div>
+
         <button mat-button mat-stroked-button (click)="openFormDialog()" class="mr-3">
           <mat-icon>add</mat-icon>
           Agregar
         </button>
-        <button mat-stroked-button mat-button (click)="drawer.toggle(); formFiltros()">
-          <mat-icon>filter_alt</mat-icon>
-          Filtros
-        </button>
+        <!--TODO: Se deja por si en algún momento se requiere agregar filtros.-->
+        <!--        <button mat-stroked-button mat-button (click)="drawer.toggle(); formFiltros()">-->
+        <!--          <mat-icon>filter_alt</mat-icon>-->
+        <!--          Filtros-->
+        <!--        </button>-->
       </mat-toolbar>
     </mat-card-header>
 
@@ -28,32 +41,33 @@
   </mat-card>
 
 
+  <!--TODO: Se deja por si en algún momento se requiere agregar filtros.-->
   <!--FILTROS-->
-  <mat-drawer #drawer class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end" >
-    <mat-toolbar  class="border-bottom">
-      <mat-icon class="mr-1">filter_alt</mat-icon>
-      <span>
-        Filtros
-      </span>
-      <div class="spacer"></div>
-      <button mat-icon-button class="bordered-icon-button" (click)="drawer.toggle()">
-        <mat-icon>close_round</mat-icon>
-      </button>
-    </mat-toolbar>
+  <!--  <mat-drawer #drawer class="content-sidenav p-0 mat-elevation-z8" mode="over" position="end" >-->
+  <!--    <mat-toolbar  class="border-bottom">-->
+  <!--      <mat-icon class="mr-1">filter_alt</mat-icon>-->
+  <!--      <span>-->
+  <!--        Filtros-->
+  <!--      </span>-->
+  <!--      <div class="spacer"></div>-->
+  <!--      <button mat-icon-button class="bordered-icon-button" (click)="drawer.toggle()">-->
+  <!--        <mat-icon>close_round</mat-icon>-->
+  <!--      </button>-->
+  <!--    </mat-toolbar>-->
 
-    <div class="container p-3" *ngIf="fieldsFilters && fieldsFilters.length>0">
-      <div>agregar filtros aquí</div>
-      <app-form-dialog-generico
-        [fieldForms]="fieldsFilters"
-        [showHeader]="false"
-        [esFiltro]="true"
-        [nombreBotonCancelar]="'Limpiar'"
-        [nombreButtonGuardar]="'Buscar'"
-        (submitForm)="procesarfiltros($event)"
-        (resetFormFiltros)="resetFormFiltros()"
-      ></app-form-dialog-generico>
-    </div>
-  </mat-drawer>
+  <!--    <div class="container p-3" *ngIf="fieldsFilters && fieldsFilters.length>0">-->
+  <!--      <div>agregar filtros aquí</div>-->
+  <!--      <app-form-dialog-generico-->
+  <!--        [fieldForms]="fieldsFilters"-->
+  <!--        [showHeader]="false"-->
+  <!--        [esFiltro]="true"-->
+  <!--        [nombreBotonCancelar]="'Limpiar'"-->
+  <!--        [nombreButtonGuardar]="'Buscar'"-->
+  <!--        (submitForm)="procesarfiltros($event)"-->
+  <!--        (resetFormFiltros)="resetFormFiltros()"-->
+  <!--      ></app-form-dialog-generico>-->
+  <!--    </div>-->
+  <!--  </mat-drawer>-->
 </mat-drawer-container>
 
 

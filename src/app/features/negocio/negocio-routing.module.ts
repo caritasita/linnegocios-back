@@ -6,7 +6,7 @@ const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./credencial-electronico/credencial-electronico.component').then(m => m.CredencialElectronicoComponent)
+    loadComponent: () => import('./licencia/licencia.component').then(m => m.LicenciaComponent)
   }, // Ruta por defecto
   {
     path: 'negocio',

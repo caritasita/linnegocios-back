@@ -22,7 +22,7 @@ import {MatCardModule} from '@angular/material/card';
 import {FormErrorsComponent} from '../form-errors/form-errors.component';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {GenericoService} from '../../core/services/generico.service';
-import {Subscription} from 'rxjs';
+import {debounceTime, distinctUntilChanged, Subscription, switchMap} from 'rxjs';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {DateAdapter, MAT_DATE_FORMATS, MatNativeDateModule, NativeDateAdapter} from '@angular/material/core';
 import {CUSTOM_DATE_FORMATS} from '../../core/config/custom-date-formats';
@@ -30,6 +30,8 @@ import {CustomDateAdapter} from '../../core/config/CustomDateAdapter';
 import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import {NgxImageCompressService} from 'ngx-image-compress';
 import {Archivo} from '../models/Archivo';
+import {MatAutocompleteModule, MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {CrudService} from '../../core/services/crud.service';
 
 @Component({
   selector: 'app-form-dialog-generico',
@@ -51,6 +53,8 @@ import {Archivo} from '../models/Archivo';
     MatDatepickerModule,
     MatNativeDateModule,
     NgxMaterialTimepickerModule,
+    MatAutocompleteModule,
+    MatAutocompleteTrigger,
   ],
   providers: [
     {provide: DateAdapter, useClass: CustomDateAdapter},
@@ -66,9 +70,12 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   @Input() titleDialog: string = "Registrar";
   @Input() twoColumn = false;
   @Input() nombreButtonGuardar: string = 'Guardar';
-  @Input() nombreBotonCancelar: string = 'Cancelar'
+  @Input() nombreBotonCancelar: string = 'Cancelar';
   @Input() mostrarBotonCancelar: Boolean = true;
   @Input() esFiltro: Boolean = false;
+  @Input() criteriaSearch = 'filtroGeneral';
+  @Input() max: number = 15
+  // @Input() urlServer: string = '';
   @Output() submitForm = new EventEmitter<any>();
   @Output() resetFormFiltros = new EventEmitter<any>();
 
@@ -87,6 +94,9 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   componentRef!: any;
   imagePreview: string | null = null;
 
+  observableFiltro: Subscription | null = null;
+  options: any[] = [];
+
   @ViewChild('contenedorDinamico', {read: ViewContainerRef, static: true}) contenedorDinamico!: ViewContainerRef;
 
   clockFace: '12hr' | '24hr' = '24hr';
@@ -96,6 +106,7 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any,
     @Optional() public dialogRef: MatDialogRef<FormDialogGenericoComponent>,
     private genericoService: GenericoService,
+    private crudService: CrudService,
     private ngxImageCompressService: NgxImageCompressService
   ) {
   }
@@ -105,18 +116,13 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   }
 
   ngOnInit() {
-    console.log(`this.dialogData?.titleDialog ${this.dialogData?.titleDialog}`);
     this.fieldForms = this.fieldForms.length > 0 ? this.fieldForms : this.dialogData?.fieldForms;
-    this.titleDialog = this.dialogData?.titleDialog ? this.dialogData?.titleDialog : this.titleDialog ;
+    this.titleDialog = this.dialogData?.titleDialog ? this.dialogData?.titleDialog : this.titleDialog;
     this.twoColumn = (this.twoColumn ? this.twoColumn : this.dialogData?.twoColumn) || false;
     this.data = this.dialogData?.data || {};
-    console.log(`this.titleDialog ${this.titleDialog}`);
-
 
     for (const key of this.fieldForms) {
-      // if(this.fieldForms.hasOwnProperty(key.form)){
       this.forms[key.form] = this.createForm(key.fields)
-      // }
     }
 
     this.componente = this.componente || this?.dialogData?.componente;
@@ -156,7 +162,6 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
       this.obtenerEstatusActualCheckbox();
     }
   }
-
 
   listenCheckbox() {
     this.subscription = this.genericoService.fieldVisibility$.subscribe((visibility) => {
@@ -198,15 +203,16 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   }
 
   onCheckboxChange(fieldName: string, event: any) {
-    console.log(`fieldName ${fieldName}`);
-    console.log(`checkd ${event.checked}`)
     this.genericoService.updateFieldVisibility(fieldName, event?.checked);
   }
 
   createForm(formulario: any): FormGroup {
+
     const formGroup: { [key: string]: FormControl | FormGroup } = {}; // Permite FormGroup anidado
     this.fieldsFlat = formulario.flat()
+
     this.fieldsFlat.forEach((field: any) => {
+
       if (field.type === 'file') {
         // Crear un FormGroup anidado para el campo "imagen"
         formGroup[field.name] = this.fb.group({
@@ -216,20 +222,23 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
           encodeImage: [this.data.imagen?.encodeImage || null],
           resultCompresed: [this.data.imagen?.resultCompresed || null]
         });
+        this.imagePreview = this.data.imagenPreview?.url || this.data.imagen?.url
 
-        this.imagePreview= this.data.imagenPreview?.url || this.data.imagen?.url
       } else if (field.type === 'toggle') {
         formGroup[field.name] = new FormControl(
           this.getValueByPath(this.data, field.value || '') || false,
           field.validation
         );
+
       } else {
+
         formGroup[field.name] = new FormControl(
           this.data[field.name] || '',
           field.validation
         );
 
         if (field.type === 'select' || field.type === 'multiselect') {
+
           this.searchControls[field.name] = new FormControl();
           this.filteredOptions[field.name] = field.options; // Inicializa las opciones filtradas
 
@@ -252,7 +261,30 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
                 : [selectedOption?.id || selectedOption?.clave || selectedOption]
             ); // Selecciona el ID a editar
           }
+
         }
+
+        if (field.type === 'autocomplete')
+          this.observableFiltro = formGroup[field.name].valueChanges.pipe(
+            debounceTime(300), // Espera 300 ms después de que el usuario deja de escribir
+            distinctUntilChanged(), // Solo emite si el valor ha cambiado
+            switchMap((value: any) => {
+              if(value){
+                return this.crudService.list({
+                  [this.criteriaSearch]: value,
+                  max: this.max,
+                  order: 'asc'
+                }, field.urlServer);
+              }
+              return [];
+
+            }) // Cambia esto por la URL de tu servidor
+          ).subscribe(({data}: any) => {
+            this.options = data;
+            // if (this.options.length === 1 && this.autoSetUniqueValue) {
+            //   this.setUniqueValue();
+            // }
+          });
       }
     });
 
@@ -298,9 +330,11 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
     }
   }
 
-  clearField(fieldName: string): void {
-    this.form.get(fieldName)?.setValue('');
-  }
+  // clearField(fieldName: string): void {
+  //   if(fieldName !== '' && fieldName !== undefined && fieldName !== null){
+  //     this.form.get(fieldName)?.setValue('');
+  //   }
+  // }
 
   onImagePicked(event: Event, nameForm: FormGroup, nameInput: string) {
     console.log(`nameInput ${nameInput}`);
@@ -368,11 +402,10 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
     }
   }
 
-  // Puedes agregar un método para manejar el cambio de hora si es necesario
-  onTimeChange(event: any, nameForm: FormGroup, nameInput: string) {
-    const selectedTime = nameForm.get(nameInput);
-    console.log('Hora seleccionada:', event);
-    // Aquí puedes manejar la hora seleccionada como necesites
+  onOptionSelected(option: any, nameForm: FormGroup, nameInput: string, relatedField: any) {
+    const selectedId = option.id;
+    nameForm.get(relatedField)?.setValue(selectedId)
+    nameForm.get(nameInput)?.setValue(`${option.id} ${option.nombre}`)
   }
 }
 
@@ -394,6 +427,8 @@ export interface Field {
   dependsOn?: string;
   fillColumn?: string;
   disabled?: boolean;
+  relatedField?: string;
+  urlServer?: string;
 }
 
 export interface OptionField {

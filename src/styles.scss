@@ -222,6 +222,14 @@ tr:hover {
   background-color: $color-blanco !important;
 }
 
+.divisor-vertical{
+  height: 30px;
+  background-color: $gray-linnegicios-light;
+  width: 2px;
+  margin-right: 1rem;
+  //border: 1px solid $color-primario-50;
+}
+
 .width-content {
   width: 100% !important;
 }

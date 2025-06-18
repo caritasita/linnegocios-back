@@ -10,11 +10,8 @@ import {MatIcon} from '@angular/material/icon';
 import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {Pais} from '../../../shared/models/Pais';
 import {Estado} from '../../../shared/models/Estado';
 import {ActionsTabla, ColumnasTabla} from '../../catalogos/pais/pais.component';
-import {EstadoService} from '../../../core/services/estado.service';
-import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
@@ -54,7 +51,7 @@ export class CredencialElectronicoComponent implements OnInit {
   };
   columns: ColumnasTabla[] = [
     // {clave: 'negocio', valor: 'ID negocio', tipo: "texto"},
-    {clave: 'negocio', valor: 'Negocio', tipo: "texto"},
+    {clave: 'negocio', valor: 'Tendero', tipo: "texto"},
     {clave: 'idEquivalencia', valor: 'ID Tae', tipo: "texto"},
     {clave: 'usuario', valor: 'usuario', tipo: "texto"},
     {clave: 'password', valor: 'Contraseña', tipo: "password"}
@@ -77,7 +74,6 @@ export class CredencialElectronicoComponent implements OnInit {
   @ViewChild('tablaGenerica') tablaGenerica!: TablaGenericaComponent;
 
   constructor(
-    private estadoService: EstadoService,
     private crudService: CrudService,
     private genericoService: GenericoService,
     private dialog: MatDialog
@@ -133,7 +129,7 @@ export class CredencialElectronicoComponent implements OnInit {
   }
 
   procesarfiltros(form: any) {
-    form= form.estado
+    form = form.estado
     this.queryParams = ({...this.queryParams, ...form});
     this.lista();
   }
@@ -155,11 +151,42 @@ export class CredencialElectronicoComponent implements OnInit {
   }
 
   openFormDialog(data: any = {}) {
+    let isEditing = false
+    let titleDialog = 'Registrar credenciales'
+    if (data.id) {
+      titleDialog = 'Editar credenciales'
+      isEditing = true
+    }
 
     const fieldForms: FieldForm[] = [
       {
         form: 'credenciales',
         fields: [
+          ...(!isEditing ? [
+            [
+              {
+                name: 'negocioAutocomplate',
+                label: 'Negocio',
+                value: 'negocioAutocomplate',
+                type: 'autocomplete',
+                urlServer: 'negocio',
+                relatedField: 'negocio',
+                validation: Validators.required
+              }
+            ]
+          ] : []),
+          // Solo incluye el campo "negocio" si no estás editando
+          ...(!isEditing ? [
+            [
+              {
+                name: 'negocio',
+                label: 'Negocio',
+                value: 'negocio',
+                type: 'number',
+                visibility: true,
+              }
+            ]
+          ] : []),
           [
             {
               name: 'usuario',
@@ -181,12 +208,6 @@ export class CredencialElectronicoComponent implements OnInit {
       }
     ]
 
-    let titleDialog = 'Registrar credenciales'
-    if (data.id) {
-      titleDialog = 'Editar credenciales'
-      this.genericoService.setFieldDisabled(fieldForms, 'clave', true)
-    }
-
     const dialogRef = this.dialog.open(FormDialogGenericoComponent, {
       data: {
         titleDialog: titleDialog,
@@ -199,6 +220,9 @@ export class CredencialElectronicoComponent implements OnInit {
 
     dialogRef.componentInstance.submitForm.subscribe(result => {
       result = result.credenciales
+      result.tipoCredencial = 'TAE';
+      result.empresa = 1;
+
       if (data.id) {
         result = ({...result, id: data.id})
         this.crudService.update(result, UrlServer.credencialElectronico).subscribe((respueta) => {
@@ -228,6 +252,34 @@ export class CredencialElectronicoComponent implements OnInit {
     this.crudService.delete(UrlServer.credencialElectronico, objeto.id).subscribe(() => {
       this.lista();
     });
+  }
+
+  async syncProductosElectronicos() {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Sincronizar productos electrónicos?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
+    this.crudService
+      .get(0, UrlServer.syncProductosElectronicos)
+      .subscribe(() => {
+      });
+  }
+
+  async syncCredenciales() {
+    const isConfirmed = await this.genericoService.confirmDialog(
+      '¿Actualizar todas las credenciales?'
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
+    this.crudService
+      .get(null, UrlServer.resetearCredencialesTae)
+      .subscribe(() => {
+      });
   }
 
 }

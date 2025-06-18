@@ -16,7 +16,7 @@
               <img [src]="element[column.clave].url" alt="Vista previa de la imagen"/>
             </div>
           } @else if (column.tipo === 'fecha') {
-            {{ element[column.clave] | date:'dd-MM-yyyy HH:mm a' }}
+            {{ element[column.clave] ? (element[column.clave] | date:'dd-MM-yyyy HH:mm a') : '---' }}
           } @else if (column.tipo == 'boleano') {
             {{ element[column.clave] ? 'Activo' : 'Inactivo' }}
           } @else if (column.tipo == 'moneda') {
