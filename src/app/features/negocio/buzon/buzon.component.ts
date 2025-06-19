@@ -16,7 +16,6 @@ import {NgIf} from '@angular/common';
 import {BuzonService} from '../../../core/services/buzon.service';
 import {Buzon} from '../../../shared/models/Buzon';
 import {first, Subject, Subscription} from 'rxjs';
-import {FirestoreModule} from '@angular/fire/firestore';
 import {EstatusSeguimientoNegocioService} from '../../../core/services/estatus-seguimiento-negocio.service';
 import {EstatusSeguimientoNegocio} from '../../../shared/models/estatusSeguimientoNegocio';
 import {SeguimientoNegocioComponent} from '../seguimiento-negocio/seguimiento-negocio.component';
@@ -155,7 +154,7 @@ export class BuzonComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        form: "publicidad",
+        form: "buzon",
         fields: [
           [
             {
@@ -197,7 +196,7 @@ export class BuzonComponent implements OnInit {
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form.publicidad});
+    this.queryParams = ({...this.queryParams, ...form.buzon});
     this.lista();
   }
 
