@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -9,7 +8,6 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -29,7 +27,6 @@ import {permisosEmpresaCredencial} from '../../../core/helpers/permissions.data'
   selector: 'app-credenciales-facturacion-empresa',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -40,7 +37,8 @@ import {permisosEmpresaCredencial} from '../../../core/helpers/permissions.data'
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './credenciales-facturacion-empresa.component.html',
   styleUrl: './credenciales-facturacion-empresa.component.css'
@@ -50,7 +48,7 @@ export class CredencialesFacturacionEmpresaComponent implements OnInit {
   totalRecords = 0;
   empresaList: Empresa[] = [];
   proveedorList: ProveedorFacturacion[] = [];
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedEmpresaList!: any;
   transformedProveedorList!: any;
   queryParams = {
@@ -167,15 +165,22 @@ export class CredencialesFacturacionEmpresaComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'credencialesFacturacionEmpresa',
+        fields: [
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.credencialesFacturacionEmpresa});
     this.lista();
   }
 

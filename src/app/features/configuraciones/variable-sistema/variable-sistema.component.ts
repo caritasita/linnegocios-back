@@ -1,5 +1,4 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -8,7 +7,6 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -19,13 +17,12 @@ import {Validators} from '@angular/forms';
 import {VariableSistema} from '../../../shared/models/VariableSistema';
 import {VariableSistemaService} from '../../../core/services/variable-sistema.service';
 import {hasPermission} from '../../../core/helpers/utilities';
-import {permisosEmpresaCredencial, permisosVariableSistema} from '../../../core/helpers/permissions.data';
+import {permisosVariableSistema} from '../../../core/helpers/permissions.data';
 
 @Component({
   selector: 'app-variable-sistema',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -36,7 +33,8 @@ import {permisosEmpresaCredencial, permisosVariableSistema} from '../../../core/
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './variable-sistema.component.html',
   styleUrl: './variable-sistema.component.css'
@@ -44,7 +42,7 @@ import {permisosEmpresaCredencial, permisosVariableSistema} from '../../../core/
 export class VariableSistemaComponent implements OnInit {
   dataList: Partial<VariableSistema>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
   queryParams = {
     max: 10,
@@ -121,20 +119,29 @@ export class VariableSistemaComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Nombre / Valor',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'variableSistema',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Nombre / Valor',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.variableSistema});
     this.lista();
   }
 

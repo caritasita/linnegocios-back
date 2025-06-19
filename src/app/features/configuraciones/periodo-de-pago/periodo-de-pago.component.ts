@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -9,7 +8,6 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -23,7 +21,6 @@ import {PeriodoDePagoService} from '../../../core/services/periodo-de-pago.servi
   selector: 'app-periodo-de-pago',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -34,7 +31,8 @@ import {PeriodoDePagoService} from '../../../core/services/periodo-de-pago.servi
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './periodo-de-pago.component.html',
   styleUrl: './periodo-de-pago.component.css'
@@ -42,7 +40,7 @@ import {PeriodoDePagoService} from '../../../core/services/periodo-de-pago.servi
 export class PeriodoDePagoComponent implements OnInit {
   dataList: Partial<ConfiguracionCobroMes>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -117,20 +115,30 @@ export class PeriodoDePagoComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Nombre / Mes / Descuento',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'periodoDePago',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Nombre / Mes / Descuento',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.periodoDePago});
     this.lista();
   }
 
