@@ -34,7 +34,8 @@ import {FormGenericoComponent} from '../../../shared/form-generico/form-generico
     MatDrawerContainer,
     FormGenericoComponent,
     MatDrawer,
-    MatIconButton
+    MatIconButton,
+    FormDialogGenericoComponent
   ],
   templateUrl: './regimen-fiscal.component.html',
   styleUrl: './regimen-fiscal.component.css'
@@ -42,7 +43,7 @@ import {FormGenericoComponent} from '../../../shared/form-generico/form-generico
 export class RegimenFiscalComponent implements OnInit {
   totalRecords: number = 0;
   regimenFiscalList: any[] = [];
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -63,7 +64,7 @@ export class RegimenFiscalComponent implements OnInit {
       tooltipText: 'Editar',
       callback: (item: any) => this.openFormDialog(item),
       hideAction: (item: any) => {
-        if(item.activo) {
+        if (item.activo) {
           return !item.activo
         }
         return true
@@ -75,7 +76,7 @@ export class RegimenFiscalComponent implements OnInit {
       tooltipText: 'Eliminar',
       callback: (item: any) => this.delete(item),
       hideAction: (item: any) => {
-        if(item.activo) {
+        if (item.activo) {
           return !item.activo
         }
         return true
@@ -87,7 +88,7 @@ export class RegimenFiscalComponent implements OnInit {
       tooltipText: 'Recuperar registro eliminado',
       callback: (item: any) => this.recoverRegister(item.id),
       hideAction: (item: any) => {
-        if(!item.activo) {
+        if (!item.activo) {
           return item.activo
         }
         return true
@@ -126,20 +127,29 @@ export class RegimenFiscalComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'regimenFiscal',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.regimenFiscal});
     this.lista();
   }
 

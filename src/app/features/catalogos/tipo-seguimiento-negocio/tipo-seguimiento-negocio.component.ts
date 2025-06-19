@@ -5,12 +5,10 @@ import {
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -23,7 +21,6 @@ import {TipoSeguimientoService} from '../../../core/services/tipo-seguimiento.se
   selector: 'app-tipo-seguimiento-negocio',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -34,7 +31,8 @@ import {TipoSeguimientoService} from '../../../core/services/tipo-seguimiento.se
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './tipo-seguimiento-negocio.component.html',
   styleUrl: './tipo-seguimiento-negocio.component.css'
@@ -42,7 +40,7 @@ import {TipoSeguimientoService} from '../../../core/services/tipo-seguimiento.se
 export class TipoSeguimientoNegocioComponent implements OnInit {
   dataList: any[] = [];
   totalRecords: number = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -142,20 +140,30 @@ export class TipoSeguimientoNegocioComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'tipoSeguimientoNegocio',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.tipoSeguimientoNegocio});
     this.lista();
   }
 

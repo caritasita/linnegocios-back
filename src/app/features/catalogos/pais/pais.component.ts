@@ -49,6 +49,7 @@ export interface ActionsTabla {
     FormGenericoComponent,
     MatDrawer,
     MatIconButton,
+    FormDialogGenericoComponent,
   ],
   templateUrl: './pais.component.html',
   styleUrl: './pais.component.css',
@@ -56,7 +57,7 @@ export interface ActionsTabla {
 export class PaisComponent implements OnInit {
   paisList: any[] = [];
   totalRecords: number = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -140,20 +141,29 @@ export class PaisComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'pais',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.pais});
     this.lista();
   }
 

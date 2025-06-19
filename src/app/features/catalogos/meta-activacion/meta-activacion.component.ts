@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -10,7 +9,6 @@ import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
 import {MetaActivacionService} from '../../../core/services/meta-activacion.service';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -25,7 +23,6 @@ import {permisosMetaActivacion} from '../../../core/helpers/permissions.data';
   selector: 'app-meta-activacion',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -36,7 +33,8 @@ import {permisosMetaActivacion} from '../../../core/helpers/permissions.data';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './meta-activacion.component.html',
   styleUrl: './meta-activacion.component.css'
@@ -44,7 +42,7 @@ import {permisosMetaActivacion} from '../../../core/helpers/permissions.data';
 export class MetaActivacionComponent implements OnInit {
   dataList: any[] = [];
   totalRecords: number = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -128,15 +126,24 @@ export class MetaActivacionComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave',
-        type: 'text',
-      },
+        form: 'metaActivacion',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave',
+              type: 'text',
+            },
+          ]
+        ]
+      }
+
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.metaActivacion});
     this.lista();
   }
 

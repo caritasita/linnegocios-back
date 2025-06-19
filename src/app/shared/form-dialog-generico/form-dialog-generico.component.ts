@@ -72,10 +72,9 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   @Input() nombreButtonGuardar: string = 'Guardar';
   @Input() nombreBotonCancelar: string = 'Cancelar';
   @Input() mostrarBotonCancelar: Boolean = true;
-  @Input() esFiltro: Boolean = false;
+  @Input() esFiltro: Boolean = false; //CUANDO ES PARA LOS FILTROS, SE REQUIERE PASAR ESTE PARÁMETRO
   @Input() criteriaSearch = 'filtroGeneral';
   @Input() max: number = 15
-  // @Input() urlServer: string = '';
   @Output() submitForm = new EventEmitter<any>();
   @Output() resetFormFiltros = new EventEmitter<any>();
 
@@ -98,8 +97,6 @@ export class FormDialogGenericoComponent implements OnInit, OnDestroy, OnChanges
   options: any[] = [];
 
   @ViewChild('contenedorDinamico', {read: ViewContainerRef, static: true}) contenedorDinamico!: ViewContainerRef;
-
-  clockFace: '12hr' | '24hr' = '24hr';
 
   constructor(
     private fb: FormBuilder,

@@ -1,16 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
 import {ActionsTabla, ColumnasTabla} from '../pais/pais.component';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -23,7 +20,6 @@ import {TipoCreditoService} from '../../../core/services/tipo-credito.service';
   selector: 'app-tipo-credito',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -34,7 +30,8 @@ import {TipoCreditoService} from '../../../core/services/tipo-credito.service';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './tipo-credito.component.html',
   styleUrl: './tipo-credito.component.css'
@@ -42,7 +39,7 @@ import {TipoCreditoService} from '../../../core/services/tipo-credito.service';
 export class TipoCreditoComponent implements OnInit {
   dataList: any[] = [];
   totalRecords: number = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -126,20 +123,29 @@ export class TipoCreditoComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'tipoCredito',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.tipoCredito});
     this.lista();
   }
 

@@ -3,7 +3,6 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {MatDialog} from '@angular/material/dialog';
 import {FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -21,7 +20,6 @@ import {MatDrawer, MatSidenavModule} from '@angular/material/sidenav';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {GenericoService} from '../../../core/services/generico.service';
 
 @Component({

@@ -1,5 +1,4 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -10,12 +9,10 @@ import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-gener
 import {Pais} from '../../../shared/models/Pais';
 import {Estado} from '../../../shared/models/Estado';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../pais/pais.component';
-import {EstadoService} from '../../../core/services/estado.service';
 import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -30,7 +27,6 @@ import {MetodoDePago} from '../../../shared/models/MetodoDePago';
   selector: 'app-comprobante-metodo-pago',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -41,7 +37,8 @@ import {MetodoDePago} from '../../../shared/models/MetodoDePago';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './comprobante-metodo-pago.component.html',
   styleUrl: './comprobante-metodo-pago.component.scss'
@@ -56,7 +53,7 @@ export class ComprobanteMetodoPagoComponent implements OnInit {
   transformedTipoComprobanteList!: any;
   transformedMetodoPagoList!: any;
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -184,27 +181,38 @@ export class ComprobanteMetodoPagoComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'tipoComprobante',
-        label: 'Tipo de comprobante',
-        type: 'select',
-        options: this.transformedTipoComprobanteList,
-      },
-      {
-        name: 'metodoDePago',
-        label: 'Metodo de pago',
-        type: 'select',
-        options: this.transformedMetodoPagoList,
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'comprobanteMetodoPago',
+        fields: [
+          [
+            {
+              name: 'tipoComprobante',
+              label: 'Tipo de comprobante',
+              type: 'select',
+              options: this.transformedTipoComprobanteList,
+            },
+          ],
+          [
+            {
+              name: 'metodoDePago',
+              label: 'Metodo de pago',
+              type: 'select',
+              options: this.transformedMetodoPagoList,
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.comprobanteMetodoPago});
     this.lista();
   }
 

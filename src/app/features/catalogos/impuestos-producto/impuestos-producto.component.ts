@@ -36,7 +36,8 @@ import {permisosImpuestoProducto} from '../../../core/helpers/permissions.data';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './impuestos-producto.component.html',
   styleUrl: './impuestos-producto.component.css'
@@ -46,7 +47,7 @@ export class ImpuestosProductoComponent implements OnInit {
   tiposImpuestoList: OptionField[] = [];
 
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedTipoImpuestoList!: any;
   queryParams = {
     max: 10,
@@ -132,15 +133,22 @@ export class ImpuestosProductoComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
+        form: 'impuestosProducto',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            }
+          ]
+        ]
       }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.impuestosProducto});
     this.lista();
   }
 

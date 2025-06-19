@@ -1,11 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
-import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
-import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
-import {MatIcon} from '@angular/material/icon';
+import {MatDrawerContainer} from '@angular/material/sidenav';
 import {MatToolbar} from '@angular/material/toolbar';
-import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {Field} from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../pais/pais.component';

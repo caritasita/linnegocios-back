@@ -158,9 +158,9 @@
                     placeholder="Escribe aquí el valor a buscar."
                   >
                   <button
-                    *ngIf="(forms[key]?.get(field.name)?.value && !field?.disabled)"
+                    *ngIf="(forms[key].get(field.name)?.value && !field?.disabled)"
                     matSuffix mat-icon-button aria-label="Clear"
-                    (click)="forms[key]?.get(field.name)?.setValue('')"
+                    (click)="forms[key].get(field.name)?.setValue('')"
                   >
                     <mat-icon>close</mat-icon>
                   </button>

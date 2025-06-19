@@ -35,7 +35,8 @@ import {TipoComprobanteService} from '../../../core/services/tipo-comprobante.se
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './tipo-comprobante.component.html',
   styleUrl: './tipo-comprobante.component.css'
@@ -45,7 +46,7 @@ export class TipoComprobanteComponent implements OnInit {
   dataList: TipoComprobante[] = [];
   estadoList: Partial<Estado>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
   queryParams = {
     max: 10,
@@ -131,20 +132,30 @@ export class TipoComprobanteComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'tipoComprobante',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.tipoComprobante});
     this.lista();
   }
 

@@ -1,5 +1,4 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -8,7 +7,6 @@ import {MatToolbar} from '@angular/material/toolbar';
 import {NgIf} from '@angular/common';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
@@ -25,7 +23,6 @@ import {hasPermission} from '../../../core/helpers/utilities';
   selector: 'app-experiencia-agente',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -36,7 +33,8 @@ import {hasPermission} from '../../../core/helpers/utilities';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './experiencia-agente.component.html',
   styleUrl: './experiencia-agente.component.css'
@@ -44,7 +42,7 @@ import {hasPermission} from '../../../core/helpers/utilities';
 export class ExperienciaAgenteComponent implements OnInit {
   dataList: Partial<ExperienciaAgente>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   queryParams = {
     max: 10,
     offset: 0,
@@ -128,15 +126,23 @@ export class ExperienciaAgenteComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave',
-        type: 'text',
-      },
+        form: 'experienciaAgente',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave',
+              type: 'text',
+            },
+          ]
+        ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.experienciaAgente});
     this.lista();
   }
 

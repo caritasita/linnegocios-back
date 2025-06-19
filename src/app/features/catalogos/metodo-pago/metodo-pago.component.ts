@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {TipoComprobante} from '../../../shared/models/tipo-comprobante';
-import {Estado} from '../../../shared/models/Estado';
 import {
   Field,
   FieldForm,
@@ -8,11 +7,9 @@ import {
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {TipoComprobanteService} from '../../../core/services/tipo-comprobante.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -25,7 +22,6 @@ import {MetodoPagoService} from '../../../core/services/metodo-pago.service';
   selector: 'app-metodo-pago',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -36,16 +32,16 @@ import {MetodoPagoService} from '../../../core/services/metodo-pago.service';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './metodo-pago.component.html',
   styleUrl: './metodo-pago.component.css'
 })
 export class MetodoPagoComponent implements OnInit {
   dataList: TipoComprobante[] = [];
-  estadoList: Partial<Estado>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
   queryParams = {
     max: 10,
@@ -131,20 +127,30 @@ export class MetodoPagoComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Clave / Nombre',
-        type: 'text',
-      },
-      {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'metodoPago',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Clave / Nombre',
+              type: 'text',
+            },
+          ],
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
+
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.metodoPago});
     this.lista();
   }
 
