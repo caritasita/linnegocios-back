@@ -1,19 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {Pais} from '../../../shared/models/Pais';
-import {Estado} from '../../../shared/models/Estado';
 import {
-  Field,
   FieldForm,
   FormDialogGenericoComponent
 } from '../../../shared/form-dialog-generico/form-dialog-generico.component';
 import {ColumnasTabla} from '../../catalogos/pais/pais.component';
 import {TablaGenericaComponent} from '../../../shared/tabla-generica/tabla-generica.component';
-import {EstadoService} from '../../../core/services/estado.service';
-import {PaisService} from '../../../core/services/pais.service';
 import {GenericoService} from '../../../core/services/generico.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Validators} from '@angular/forms';
-import {FormGenericoComponent} from '../../../shared/form-generico/form-generico.component';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCard, MatCardContent, MatCardHeader} from '@angular/material/card';
 import {MatDrawer, MatDrawerContainer} from '@angular/material/sidenav';
@@ -29,7 +23,6 @@ import {permisosRol} from '../../../core/helpers/permissions.data';
   selector: 'app-role',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -40,7 +33,8 @@ import {permisosRol} from '../../../core/helpers/permissions.data';
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './role.component.html',
   styleUrl: './role.component.css'
@@ -48,7 +42,7 @@ import {permisosRol} from '../../../core/helpers/permissions.data';
 export class RoleComponent implements OnInit {
   dataList: Partial<Rol>[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedPaisList!: any;
   queryParams = {
     max: 10,
@@ -131,15 +125,22 @@ export class RoleComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'filtroGeneral',
-        label: 'Nombre',
-        type: 'text',
-      },
+        form: 'role',
+        fields: [
+          [
+            {
+              name: 'filtroGeneral',
+              label: 'Nombre',
+              type: 'text',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.role});
     this.lista();
   }
 

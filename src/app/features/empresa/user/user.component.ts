@@ -26,7 +26,6 @@ import {ValidationMessagesService} from '../../../core/services/validation-messa
   selector: 'app-user',
   standalone: true,
   imports: [
-    FormGenericoComponent,
     MatButton,
     MatCard,
     MatCardContent,
@@ -37,7 +36,8 @@ import {ValidationMessagesService} from '../../../core/services/validation-messa
     MatIconButton,
     MatToolbar,
     NgIf,
-    TablaGenericaComponent
+    TablaGenericaComponent,
+    FormDialogGenericoComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
@@ -46,7 +46,7 @@ export class UserComponent implements OnInit {
   dataList: Partial<User>[] = [];
   roleList: Rol[] = [];
   totalRecords = 0;
-  fieldsFilters!: Field[];
+  fieldsFilters!: FieldForm[];
   transformedRoleList!: any;
   queryParams = {
     max: 10,
@@ -172,15 +172,22 @@ export class UserComponent implements OnInit {
   formFiltros(): void {
     this.fieldsFilters = [
       {
-        name: 'registrosEliminados',
-        label: 'Ver eliminados',
-        type: 'toggle',
-      },
+        form: 'user',
+        fields: [
+          [
+            {
+              name: 'registrosEliminados',
+              label: 'Ver eliminados',
+              type: 'toggle',
+            },
+          ]
+        ]
+      }
     ]
   }
 
   procesarfiltros(form: any) {
-    this.queryParams = ({...this.queryParams, ...form});
+    this.queryParams = ({...this.queryParams, ...form.user});
     this.lista();
   }
 
